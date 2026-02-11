@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="id" style="height: auto; min-height: 100%;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem POS - Manajemen Lengkap (Google Sync)</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="apple-touch-icon" href="assets/images/logo-192.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link id="body-font-link" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="assets/js/tailwind.js"></script>
+<script>
+    // Jika file lokal tidak ada, panggil dari CDN (Online)
+    if (typeof tailwind === 'undefined') {
+        document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+    }
+</script>
+
+<script src="assets/js/chart.js"></script>
+<script>
+    if (typeof Chart === 'undefined') {
+        document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" onerror="window.chartLoadError=true"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class', // Mengaktifkan Dark Mode via Class
+  theme: {
+    extend: {
+      fontFamily: {
+        heading: ['var(--font-heading-name)', 'sans-serif'],
+        body: ['var(--font-body-name)', 'sans-serif'],
+      },
+      spacing: {
+        base: 'var(--space-base)',
+      },
+      borderRadius: {
+        small: 'var(--radius-small)',
+        large: 'var(--radius-large)',
+      },
+      boxShadow: {
+        custom: 'var(--shadow-custom)',
+        'custom-hover': 'var(--shadow-custom-hover)',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        shake: {
+          '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+          '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+          '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+          '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+        }
+      }
+    }
+  }
+}
+</script>
+<style>
+:root {
+  --font-heading-name: 'Poppins';
+  --font-body-name: 'Work Sans';
+  --space-base: 1rem;
+  --radius-small: 8px;
+  --radius-large: 16px;
+  --shadow-custom: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-custom-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body { overflow-x: hidden; }
+
+/* Modal & Utility Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 50;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+}
+
+.modal-content {
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.modal.active .modal-content {
+  transform: scale(1);
+}
+
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000; 
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-small);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: 350px;
+  border-left: 4px solid;
+  pointer-events: auto;
+}
+
+.toast.show { transform: translateX(0); }
+.toast.success { border-left-color: #10B981; }
+.toast.error { border-left-color: #EF4444; }
+.toast.info { border-left-color: #3B82F6; }
+
+/* Login Screen */
+#login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, #4f46e5 0%, #312e81 40%, #1e1b4b 100%);
+    z-index: 9000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.6;
+}
+.shape-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #818cf8; }
+.shape-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #c026d3; }
+
+.input-group-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+.input-with-icon { padding-left: 3rem !important; }
+
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 3px solid #ffffff;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media print {
+  body * { visibility: hidden; }
+  #receiptPrint, #receiptPrint * { visibility: visible; }
+  #receiptPrint { position: absolute; left: 0; top: 0; width: 100%; }
+}
+
+.receipt-container {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 auto;
+  background: white;
+}
+
+/* --- DARK MODE OVERRIDES (Menjaga kode lain tetap utuh) --- */
+html.dark body { background-color: #0f172a; color: #e2e8f0; }
+html.dark .bg-white { background-color: #1e293b; color: #e2e8f0; }
+html.dark .bg-gray-50 { background-color: #0f172a; }
+html.dark .bg-gray-100 { background-color: #334155; }
+html.dark .text-gray-900 { color: #f1f5f9; }
+html.dark .text-gray-800 { color: #f1f5f9; }
+html.dark .text-gray-700 { color: #cbd5e1; }
+html.dark .text-gray-600 { color: #94a3b8; }
+html.dark .text-gray-500 { color: #94a3b8; }
+html.dark .border-gray-200 { border-color: #334155; }
+html.dark .border-gray-300 { border-color: #475569; }
+html.dark input, html.dark select, html.dark textarea {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+html.dark .shadow-custom { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3); }
+/* Fix Table Stripes/Hover in Dark Mode */
+html.dark tr.hover\:bg-gray-50:hover { background-color: #334155; }
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #334155; }
+html.dark .modal-content { background-color: #1e293b; color: #e2e8f0; }
+html.dark .bg-indigo-900.bg-opacity-30 { background-color: rgba(30, 41, 59, 0.5); }
+/* --------------------------------------------------------- */
+</style>
+</head>
+<body class="font-body bg-gray-50 text-gray-800" style="height: auto; min-height: 100%;">
+
+<div id="toast-container"></div>
+
+<div id="login-screen">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div id="login-card" class="glass-card p-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-sm mx-4 animate-fade-in relative overflow-hidden">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-heading font-bold text-gray-900 tracking-tight">Selamat Datang</h2>
+            <p class="text-gray-500 text-sm mt-1">Masuk ke sistem POS Anda</p>
+        </div>
+
+        <form id="loginForm" class="space-y-5" onsubmit="return false;">
+            <div class="relative group">
+                <svg class="w-5 h-5 input-group-icon group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <input type="text" id="username" class="input-with-icon w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" placeholder="Username" required autocomplete="username">
+            </div>
+            
+            <div class="relative group">
+                <svg class="w-5 h-5 input-group-icon group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <input type="password" id="password" class="input-with-icon w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" placeholder="Password" required autocomplete="current-password">
+                <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-indigo-600 focus:outline-none transition-colors">
+                    <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    <svg id="eye-slash-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                </button>
+            </div>
+
+            <button type="submit" id="loginBtn" class="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 active:bg-indigo-800 transition-all shadow-lg hover:shadow-indigo-500/30 flex justify-center items-center group">
+                <span id="btnText">Masuk Sekarang</span>
+                <svg id="btnIcon" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+            
+            <div class="text-center">
+                 <p class="text-xs text-gray-400 mt-4 bg-gray-50 py-2 rounded-lg border border-gray-100">
+                    <span class="font-semibold text-gray-500">Default Login:</span> <span id="loginHint">admin / admin123</span>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="main-app" class="hidden flex h-screen overflow-hidden">
+
+<div id="resetDataModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-sm w-full mx-4 p-6 modal-content">
+    <div class="text-center mb-6">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900">Reset Total Data</h3>
+      <p class="text-sm text-gray-500 mt-2">Tindakan ini akan menghapus <strong>SEMUA</strong> produk, pelanggan, dan transaksi secara permanen.</p>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password Admin</label>
+        <input type="password" id="resetConfirmPassword" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-red-500 outline-none" placeholder="Masukkan password admin">
+    </div>
+
+    <div class="flex justify-end space-x-3">
+      <button onclick="closeResetModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-small hover:bg-gray-200 font-medium transition-colors">Batal</button>
+      <button onclick="executeFullReset()" class="px-4 py-2 bg-red-600 text-white rounded-small hover:bg-red-700 font-medium shadow-sm transition-colors">Hapus Permanen</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirmModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-sm w-full mx-4 p-6 modal-content">
+    <div class="text-center mb-6">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h3 class="text-lg leading-6 font-medium text-gray-900" id="confirmTitle">Konfirmasi</h3>
+      <div class="mt-2">
+        <p class="text-sm text-gray-500" id="confirmMessage">Apakah Anda yakin?</p>
+      </div>
+    </div>
+    <div class="flex justify-center space-x-3">
+      <button onclick="closeConfirmModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-small hover:bg-gray-200 font-medium transition-colors">Batal</button>
+      <button id="confirmBtn" class="px-4 py-2 bg-red-600 text-white rounded-small hover:bg-red-700 font-medium shadow-sm transition-colors">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<div id="stockModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-sm w-full mx-4 p-6 modal-content">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold text-gray-900" data-lang="adjustStock">Sesuaikan Stok</h3>
+      <button onclick="document.getElementById('stockModal').classList.remove('active')" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <input type="hidden" id="stockAdjustId">
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2" data-lang="currentStock">Stok Saat Ini</label>
+      <input type="text" id="currentStockDisplay" class="w-full bg-gray-100 border border-gray-300 rounded-small px-4 py-2" disabled>
+    </div>
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2" data-lang="newStock">Stok Baru</label>
+      <input type="number" id="newStockInput" min="0" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    </div>
+    <div class="flex justify-end space-x-3">
+      <button onclick="document.getElementById('stockModal').classList.remove('active')" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50 font-medium">Batal</button>
+      <button onclick="saveStockAdjustment()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<aside class="w-64 bg-gradient-to-b from-indigo-800 to-indigo-900 flex flex-col lg:static fixed inset-y-0 left-0 z-40 transform lg:transform-none -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-xl" id="sidebar">
+  <div class="p-6 border-b border-indigo-700 bg-indigo-900 bg-opacity-50">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 bg-white rounded-small flex items-center justify-center shadow-md">
+        <svg class="w-6 h-6 text-indigo-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+      </div>
+      <h1 class="font-heading text-xl font-bold text-white tracking-wide">POS System</h1>
+    </div>
+  </div>
+  
+  <nav class="flex-1 p-4 overflow-y-auto space-y-1">
+    <a href="#" onclick="showView('dashboard')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small bg-white bg-opacity-10 text-white font-medium transition-all duration-200 border-l-4 border-indigo-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+      <span data-lang="dashboard">Dashboard</span>
+    </a>
+    <a href="#" onclick="showView('pos')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+      <span data-lang="newSale">Kasir (POS)</span>
+    </a>
+    <a href="#" onclick="showView('products')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+      <span data-lang="products">Produk</span>
+    </a>
+    <a href="#" onclick="showView('inventory')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+      <span data-lang="inventory">Inventaris</span>
+    </a>
+    <a href="#" onclick="showView('transactions')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span data-lang="transactions">Transaksi</span>
+    </a>
+    <a href="#" onclick="showView('customers')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <span data-lang="customers">Pelanggan</span>
+    </a>
+    <a href="#" onclick="showView('reports')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+      <span data-lang="reports">Laporan</span>
+    </a>
+    <a href="#" onclick="showView('settings')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+      <span data-lang="settings">Pengaturan</span>
+    </a>
+  </nav>
+  
+  <div class="p-4 border-t border-indigo-700 bg-indigo-900 bg-opacity-30">
+    <div class="flex items-center justify-between px-2 py-2">
+      <div class="flex items-center space-x-3 overflow-hidden">
+        <img src="https://pikaso.cdnpk.net/private/production/3258727998/render.png?token=exp=1770854400~hmac=af372eed87ee9f016a4d6242988a353f887f8d98af1858ce2b04e5bf6dddb21f&preview=1" alt="User" class="w-10 h-10 rounded-full border-2 border-indigo-400" id="sidebarAdminImage">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-white truncate" id="sidebarAdminName">Hands Flasher</p>
+          <p class="text-xs text-indigo-300 truncate">Admin</p>
+        </div>
+      </div>
+      <button onclick="logout()" class="text-indigo-300 hover:text-white" title="Keluar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<main class="flex-1 overflow-x-hidden flex flex-col h-full bg-gray-50">
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+    <div class="px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <button class="lg:hidden text-gray-600 hover:text-gray-900 focus:outline-none" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+          <div class="relative hidden sm:block">
+            <input type="text" id="globalSearch" placeholder="Cari produk, pelanggan..." class="w-64 sm:w-96 pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <select id="languageSelector" onchange="changeLanguage(this.value)" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-small focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+            <option value="en">English</option>
+            <option value="id" selected>Bahasa Indonesia</option>
+          </select>
+          <button onclick="showView('pos')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-small font-medium shadow-custom transition-colors flex items-center space-x-2" data-lang="newSale">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>Penjualan Baru</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+    <div id="dashboard-view" class="view-content animate-fade-in">
+      <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2" data-lang="dashboardOverview">Ringkasan Dasbor</h2>
+        <p class="text-gray-600" data-lang="welcomeMessage">Selamat datang kembali! Berikut yang terjadi di toko Anda hari ini.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="bg-blue-600 p-6 rounded-large shadow-custom border border-blue-500 hover:shadow-custom-hover transition-shadow text-white">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-small flex items-center justify-center text-white">
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <span class="text-xs font-bold text-blue-600 bg-white px-2 py-1 rounded-full">+12.5%</span>
+          </div>
+          <h3 class="font-heading text-blue-100 text-sm font-medium mb-1" data-lang="totalRevenue">Total Pendapatan</h3>
+          <p class="text-2xl font-bold text-white" id="totalRevenue">Rp 0</p>
+        </div>
+
+        <div class="bg-emerald-500 p-6 rounded-large shadow-custom border border-emerald-400 hover:shadow-custom-hover transition-shadow text-white">
+          <div class="flex items-center justify-between mb-4">
+             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-small flex items-center justify-center text-white">
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            </div>
+            <span class="text-xs font-bold text-emerald-600 bg-white px-2 py-1 rounded-full">+8.2%</span>
+          </div>
+          <h3 class="font-heading text-emerald-100 text-sm font-medium mb-1" data-lang="totalOrders">Total Pesanan</h3>
+          <p class="text-2xl font-bold text-white" id="totalOrders">0</p>
+        </div>
+
+        <div class="bg-purple-600 p-6 rounded-large shadow-custom border border-purple-500 hover:shadow-custom-hover transition-shadow text-white">
+          <div class="flex items-center justify-between mb-4">
+             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-small flex items-center justify-center text-white">
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            </div>
+            <span class="text-xs font-bold text-red-600 bg-white px-2 py-1 rounded-full">-3.1%</span>
+          </div>
+          <h3 class="font-heading text-purple-100 text-sm font-medium mb-1" data-lang="totalProducts">Total Produk</h3>
+          <p class="text-2xl font-bold text-white" id="totalProducts">0</p>
+        </div>
+
+        <div class="bg-orange-500 p-6 rounded-large shadow-custom border border-orange-400 hover:shadow-custom-hover transition-shadow text-white">
+          <div class="flex items-center justify-between mb-4">
+             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-small flex items-center justify-center text-white">
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <span class="text-xs font-bold text-orange-600 bg-white px-2 py-1 rounded-full">+15.3%</span>
+          </div>
+          <h3 class="font-heading text-orange-100 text-sm font-medium mb-1" data-lang="totalCustomers">Total Pelanggan</h3>
+          <p class="text-2xl font-bold text-white" id="totalCustomers">0</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white p-6 rounded-large shadow-custom border border-gray-200">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900" data-lang="salesOverview">Ringkasan Penjualan (7 Hari Terakhir)</h3>
+             </div>
+          <div class="h-64 overflow-hidden relative">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-large shadow-custom border border-gray-200">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900" data-lang="topSellingProducts">Produk Terlaris (Top 5)</h3>
+          </div>
+          <div class="h-64 overflow-hidden relative flex items-center justify-center">
+            <canvas id="topProductsChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white p-6 rounded-large shadow-custom border border-gray-200 mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-heading text-lg font-bold text-gray-900">Transaksi Terbaru</h3>
+            <button onclick="showView('transactions')" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Lihat Semua</button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-3">ID</th>
+                        <th class="px-6 py-3">Pelanggan</th>
+                        <th class="px-6 py-3">Total</th>
+                        <th class="px-6 py-3">Metode</th>
+                        <th class="px-6 py-3">Waktu</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboardRecentTransactions" class="divide-y divide-gray-200">
+                    </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+    
+    <div id="pos-view" class="view-content hidden animate-fade-in">
+      <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2" data-lang="pointOfSale">Kasir (POS)</h2>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
+        <div class="lg:col-span-2 flex flex-col h-full">
+           <div class="bg-white rounded-large shadow-sm border border-gray-200 p-4 mb-4">
+            <div class="flex items-center space-x-4">
+              <div class="relative flex-1">
+                <input type="text" id="productSearch" placeholder="Cari produk..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:ring-2 focus:ring-indigo-500">
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+              <select id="categoryFilter" class="border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+                <option value="" data-lang="allCategories">Semua Kategori</option>
+                <option value="Electronics">Elektronik</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Sports">Olahraga</option>
+                <option value="Home">Rumah Tangga</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pr-2 pb-20" id="productGrid">
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 h-full flex flex-col">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-4 flex flex-col h-full">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-4 pb-2 border-b" data-lang="currentOrder">Pesanan</h3>
+            
+            <div class="mb-4">
+              <select id="customerSelect" class="w-full border border-gray-300 rounded-small px-3 py-2 text-sm">
+                <option value="" data-lang="walkInCustomer">Pelanggan Umum</option>
+                </select>
+            </div>
+
+            <div class="flex-1 overflow-y-auto mb-4 pr-1 space-y-2" id="cartItems">
+              <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <p class="text-sm">Keranjang Kosong</p>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-4 space-y-2 mt-auto">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Subtotal</span>
+                <span class="font-medium text-gray-900" id="subtotal">Rp 0</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600" id="taxLabel">Pajak (10%)</span>
+                <span class="font-medium text-gray-900" id="tax">Rp 0</span>
+              </div>
+              <div class="flex justify-between text-xl font-bold text-indigo-700 pt-2 border-t">
+                <span>Total</span>
+                <span id="total">Rp 0</span>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="processPayment('cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-small font-medium transition-colors flex justify-center items-center">
+                  <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                  Tunai
+                </button>
+                <button onclick="processPayment('card')" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-small font-medium transition-colors flex justify-center items-center">
+                  <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                  Kartu
+                </button>
+                <button onclick="confirmClearCart()" class="col-span-2 border border-red-300 text-red-600 hover:bg-red-50 py-2 rounded-small font-medium transition-colors">Kosongkan Keranjang</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="products-view" class="view-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="productManagement">Manajemen Produk</h2>
+        <button onclick="showAddProductModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-small shadow-custom flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span data-lang="addNewProduct">Tambah Produk</span>
+        </button>
+      </div>
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+           <input type="text" id="productManagementSearch" placeholder="Cari produk..." class="w-full sm:w-64 pl-4 pr-4 py-2 border border-gray-300 rounded-small focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+              <tr>
+                <th class="px-6 py-3" data-lang="product">Produk</th>
+                <th class="px-6 py-3">SKU</th>
+                <th class="px-6 py-3" data-lang="category">Kategori</th>
+                <th class="px-6 py-3" data-lang="price">Harga</th>
+                <th class="px-6 py-3" data-lang="stock">Stok</th>
+                <th class="px-6 py-3" data-lang="actions">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody" class="divide-y divide-gray-200">
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div id="inventory-view" class="view-content hidden">
+       <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="inventoryManagement">Manajemen Inventaris</h2>
+      </div>
+       <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+         <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+              <tr>
+                <th class="px-6 py-3">Produk</th>
+                <th class="px-6 py-3">Stok Saat Ini</th>
+                <th class="px-6 py-3">Stok Min</th>
+                <th class="px-6 py-3">Status</th>
+                <th class="px-6 py-3">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="transactions-view" class="view-content hidden">
+       <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="transactionHistory">Riwayat Transaksi</h2>
+      </div>
+       <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+         <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+              <tr>
+                <th class="px-6 py-3">ID</th>
+                <th class="px-6 py-3">Pelanggan</th>
+                <th class="px-6 py-3">Tanggal</th>
+                <th class="px-6 py-3">Total</th>
+                <th class="px-6 py-3">Metode</th>
+                <th class="px-6 py-3">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="allTransactionsTableBody" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+     <div id="customers-view" class="view-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="customerManagement">Pelanggan</h2>
+        <button onclick="showAddCustomerModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-small shadow-custom flex items-center">
+           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span data-lang="addNewCustomer">Tambah Pelanggan</span>
+        </button>
+      </div>
+       <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+         <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+              <tr>
+                <th class="px-6 py-3">Nama</th>
+                <th class="px-6 py-3">Email</th>
+                <th class="px-6 py-3">Telepon</th>
+                <th class="px-6 py-3">Total Belanja</th>
+                <th class="px-6 py-3">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="reports-view" class="view-content hidden">
+      <div class="mb-6">
+         <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2" data-lang="reports">Laporan Penjualan</h2>
+         <p class="text-gray-600">Analisis performa penjualan berdasarkan periode waktu.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-large shadow-custom border border-gray-200 mb-6">
+        <div class="flex flex-col md:flex-row items-end gap-4">
+            <div class="w-full md:w-auto">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Dari Tanggal</label>
+                <input type="date" id="reportStartDate" class="border border-gray-300 rounded-small px-3 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="w-full md:w-auto">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Sampai Tanggal</label>
+                <input type="date" id="reportEndDate" class="border border-gray-300 rounded-small px-3 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <button onclick="renderReports()" class="w-full md:w-auto px-6 py-2 bg-indigo-600 text-white rounded-small font-medium hover:bg-indigo-700 shadow-sm">
+                Tampilkan Laporan
+            </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white p-5 rounded-large shadow-custom border border-gray-100">
+            <p class="text-sm text-gray-500 font-medium mb-1">Total Omzet</p>
+            <h3 class="text-2xl font-bold text-indigo-700" id="reportTotalRevenue">Rp 0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-large shadow-custom border border-gray-100">
+            <p class="text-sm text-gray-500 font-medium mb-1">Total Transaksi</p>
+            <h3 class="text-2xl font-bold text-gray-800" id="reportTotalTransactions">0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-large shadow-custom border border-gray-100">
+            <p class="text-sm text-gray-500 font-medium mb-1">Rata-rata Transaksi</p>
+            <h3 class="text-2xl font-bold text-emerald-600" id="reportAvgValue">Rp 0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="font-bold text-gray-700">Rincian Transaksi</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-white text-gray-600 uppercase text-xs border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-3">Tanggal</th>
+                        <th class="px-6 py-3">ID Transaksi</th>
+                        <th class="px-6 py-3">Pelanggan</th>
+                        <th class="px-6 py-3">Metode</th>
+                        <th class="px-6 py-3 text-right">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody" class="divide-y divide-gray-200">
+                    </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="settings-view" class="view-content hidden">
+      <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2" data-lang="settings">Pengaturan</h2>
+        <p class="text-gray-600">Kelola akun dan preferensi sistem Anda</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Profil Admin</h3>
+            <form onsubmit="updateAdminProfile(event)">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                  <input type="text" id="adminName" value="Hands Flasher" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input type="email" id="adminEmail" value="admin@tokopos.com" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+              </div>
+              <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Perubahan</button>
+            </form>
+          </div>
+
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Toko</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nama Toko</label>
+                <input type="text" id="storeNameInput" value="Toko Saya" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pajak (PPN)</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between border-b pb-4">
+                <label class="text-sm font-medium text-gray-700">Aktifkan Pajak</label>
+                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="taxEnabledInput" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-indigo-600"/>
+                    <label for="taxEnabledInput" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Persentase Pajak (%)</label>
+                <input type="number" id="taxRateInput" value="10" min="0" max="100" step="0.1" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <p class="text-xs text-gray-500 mt-1">Masukkan angka saja (contoh: 10 untuk 10%, 11 untuk 11%).</p>
+              </div>
+              <button onclick="saveTaxSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan Pajak</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Printer</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Printer</label>
+                <select id="printerType" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="58mm">Thermal 58mm</option>
+                  <option value="80mm">Thermal 80mm</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Footer Struk</label>
+                <textarea id="receiptFooter" rows="2" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">Terima kasih atas kunjungan Anda!</textarea>
+              </div>
+              <button onclick="savePrinterSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan Printer</button>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Tampilan & Tema</h3>
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Warna Aksen</label>
+                <div class="flex space-x-4">
+                  <button onclick="setTheme('indigo')" class="w-10 h-10 rounded-full bg-indigo-600 hover:opacity-80 transition shadow-sm border-2 border-white ring-2 ring-indigo-200" title="Indigo (Default)"></button>
+                  <button onclick="setTheme('blue')" class="w-10 h-10 rounded-full bg-blue-600 hover:opacity-80 transition shadow-sm border-2 border-white ring-2 ring-blue-200" title="Blue"></button>
+                  <button onclick="setTheme('emerald')" class="w-10 h-10 rounded-full bg-emerald-600 hover:opacity-80 transition shadow-sm border-2 border-white ring-2 ring-emerald-200" title="Emerald"></button>
+                  <button onclick="setTheme('rose')" class="w-10 h-10 rounded-full bg-rose-600 hover:opacity-80 transition shadow-sm border-2 border-white ring-2 ring-rose-200" title="Rose"></button>
+                  <button onclick="setTheme('violet')" class="w-10 h-10 rounded-full bg-violet-600 hover:opacity-80 transition shadow-sm border-2 border-white ring-2 ring-violet-200" title="Violet"></button>
+                </div>
+              </div>
+
+              <div class="border-t border-gray-100 pt-4">
+                 <label class="block text-sm font-medium text-gray-700 mb-3">Mode Layar</label>
+                 <div class="flex space-x-3">
+                     <button onclick="setDarkMode(false)" class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-small border border-gray-200 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        Terang
+                     </button>
+                     <button onclick="setDarkMode(true)" class="flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-small border border-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        Gelap
+                     </button>
+                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6 flex items-center">
+              <svg class="w-6 h-6 mr-2 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7h2v2h-2zm0-8h2v6h-2z"/></svg>
+              Sinkronisasi Google Sheet
+            </h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">URL Google Apps Script (Web App)</label>
+                <input type="text" id="googleScriptUrlInput" placeholder="https://script.google.com/macros/s/..." class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <p class="text-xs text-gray-500 mt-1">Paste URL Web App dari Google Apps Script di sini untuk mengaktifkan backup otomatis setiap transaksi.</p>
+              </div>
+              <div class="flex space-x-3">
+                 <button onclick="saveGoogleSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan URL</button>
+                 <button onclick="testSync()" class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-small hover:bg-indigo-50 font-medium">Test Koneksi</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="lg:col-span-1 space-y-6">
+             <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+                <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Keamanan Akun</h3>
+                <form onsubmit="updateAccountSecurity(event)">
+                  <div class="space-y-4 mb-6">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Username Login</label>
+                      <input type="text" id="editUsername" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Password Baru (Opsional)</label>
+                      <input type="password" id="editNewPassword" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Isi jika ingin mengganti">
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                         <label class="block text-sm font-medium text-red-600 mb-2">Konfirmasi Password Lama</label>
+                        <input type="password" id="editCurrentPassword" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" required placeholder="Wajib diisi untuk menyimpan">
+                    </div>
+                  </div>
+                  <button type="submit" class="w-full px-4 py-2 bg-gray-800 text-white rounded-small hover:bg-gray-900 font-medium transition-colors">Simpan Perubahan</button>
+                </form>
+              </div>
+
+              <div class="bg-white rounded-large shadow-custom border border-red-200 p-6">
+                  <h3 class="font-heading text-lg font-bold text-red-600 mb-4 flex items-center">
+                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                      Danger Zone
+                  </h3>
+                  <p class="text-sm text-gray-600 mb-4">
+                      Tindakan ini akan mereset <strong>semua produk dan data menjadi 0</strong>. Data tidak dapat dikembalikan.
+                  </p>
+                  <button onclick="showResetConfirmModal()" class="w-full px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-small hover:bg-red-100 font-medium transition-colors">
+                      Reset Semua Data
+                  </button>
+              </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<div id="productModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+    <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+      <h3 class="font-heading text-xl font-bold text-gray-900" id="productModalTitle">Tambah Produk</h3>
+      <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <form onsubmit="saveProduct(event)" class="p-6">
+      <input type="hidden" id="productId">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nama Produk</label>
+          <input type="text" id="productName" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">SKU</label>
+          <input type="text" id="productSku" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+          <select id="productCategory" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+            <option value="Electronics">Elektronik</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Sports">Olahraga</option>
+            <option value="Home">Rumah Tangga</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Harga (Rp)</label>
+          <input type="number" id="productPrice" step="1000" min="0" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Stok</label>
+          <input type="number" id="productStock" min="0" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+         <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Min Stok</label>
+          <input type="number" id="productMinStock" min="0" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+      </div>
+      
+      <div class="mb-6 hidden">
+          <input type="file" id="productImageFile" accept="image/*" class="hidden">
+          <input type="hidden" id="productImage">
+      </div>
+      <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pratinjau Foto</label>
+          <div class="w-full bg-indigo-50 border-2 border-indigo-200 border-dashed rounded-small px-4 py-4 text-center">
+              <p class="text-sm text-indigo-700 font-semibold">📸 Foto Otomatis Aktif</p>
+              <p class="text-xs text-indigo-500 mt-1">Sistem akan mengambil gambar dari internet sesuai "Nama Produk" yang Anda masukkan.</p>
+          </div>
+      </div>
+
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="closeProductModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 shadow-custom">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="customerModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-2xl w-full mx-4 modal-content">
+    <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+      <h3 class="font-heading text-xl font-bold text-gray-900" id="customerModalTitle">Tambah Pelanggan</h3>
+      <button onclick="closeCustomerModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <form onsubmit="saveCustomer(event)" class="p-6">
+      <input type="hidden" id="customerId">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+          <input type="text" id="customerName" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input type="email" id="customerEmail" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Telepon</label>
+          <input type="tel" id="customerPhone" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-3">
+         <button type="button" onclick="closeCustomerModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 shadow-custom">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="receiptModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
+    <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+      <h3 class="font-heading text-xl font-bold text-gray-900">Struk Belanja</h3>
+      <button onclick="closeReceiptModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="p-6 bg-gray-50 flex justify-center">
+        <div id="receiptModalContent" class="bg-white shadow-sm"></div>
+    </div>
+    <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+      <button onclick="closeReceiptModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50">Tutup</button>
+      <button onclick="printReceiptFromModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 shadow-custom flex items-center">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+        Cetak
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="receiptPrint" style="display: none;"></div>
+
+<script>
+// --- Data & State ---
+// Modified: Initialize data from LocalStorage or use default values
+
+// Data Dummy Defaults (Only used on FIRST run)
+const defaultProducts = [
+  { id: 1, name: 'Wireless Headphones', sku: 'WH-001', category: 'Electronics', price: 1350000, stock: 45, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop', minStock: 10 },
+  { id: 2, name: 'Smart Watch', sku: 'SW-002', category: 'Electronics', price: 3000000, stock: 28, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop', minStock: 15 },
+  { id: 3, name: 'Kacamata Hitam', sku: 'SG-003', category: 'Fashion', price: 2250000, stock: 62, image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop', minStock: 20 },
+  { id: 4, name: 'Sepatu Lari', sku: 'RS-004', category: 'Sports', price: 1950000, stock: 38, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop', minStock: 25 },
+  { id: 5, name: 'Tas Kulit', sku: 'LB-005', category: 'Fashion', price: 1200000, stock: 52, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop', minStock: 15 },
+  { id: 6, name: 'Speaker Bluetooth', sku: 'BS-006', category: 'Electronics', price: 900000, stock: 71, image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop', minStock: 30 }
+];
+
+const defaultCustomers = [
+  { id: 1, name: 'Budi Santoso', email: 'budi@example.com', phone: '081234567890', orders: 12, spent: 15000000 },
+  { id: 2, name: 'Siti Aminah', email: 'siti@example.com', phone: '081298765432', orders: 8, spent: 8500000 }
+];
+
+// --- INITIALIZATION LOGIC (UPDATED) ---
+// Cek apakah aplikasi sudah pernah dijalankan sebelumnya
+const hasInitialized = localStorage.getItem('pos_initialized');
+
+let products, customers, transactions;
+let loginCredentials; // NEW: Login Credentials
+
+if (!hasInitialized) {
+    // KASUS 1: Aplikasi baru pertama kali dibuka (Fresh Install)
+    // Load data default dummy agar tidak kosong
+    products = defaultProducts;
+    customers = defaultCustomers;
+    
+    // Default Credentials
+    loginCredentials = {
+        username: 'admin',
+        password: 'admin123'
+    };
+    
+    // Generate Dummy Transactions
+    transactions = [];
+    for(let i=0; i<5; i++) {
+        const sub = 150000 * (i+1);
+        const date = new Date();
+        date.setDate(date.getDate() - i); 
+        transactions.push({
+            id: 'TXN-100' + i,
+            customer: 'Budi Santoso',
+            date: date.toLocaleDateString('id-ID'),
+            timestamp: date.getTime(),
+            total: sub * 1.1,
+            subtotal: sub,
+            tax: sub * 0.1,
+            taxRate: 10,
+            method: i % 2 === 0 ? 'Tunai' : 'Kartu',
+            items: [{ name: 'Kacamata Hitam', quantity: 1, price: sub }]
+        });
+    }
+
+    // Simpan marker bahwa inisialisasi awal sudah dilakukan
+    localStorage.setItem('pos_initialized', 'true');
+    // Save initial data immediately
+    localStorage.setItem('pos_products', JSON.stringify(products));
+    localStorage.setItem('pos_customers', JSON.stringify(customers));
+    localStorage.setItem('pos_transactions', JSON.stringify(transactions));
+    localStorage.setItem('pos_loginCredentials', JSON.stringify(loginCredentials));
+
+} else {
+    // KASUS 2: Aplikasi sudah pernah dibuka (termasuk setelah Reset)
+    // Load data dari LocalStorage. Jika null (terhapus manual), gunakan array kosong []
+    products = JSON.parse(localStorage.getItem('pos_products')) || [];
+    customers = JSON.parse(localStorage.getItem('pos_customers')) || [];
+    transactions = JSON.parse(localStorage.getItem('pos_transactions')) || [];
+    // Load credentials, fallback to default if missing
+    loginCredentials = JSON.parse(localStorage.getItem('pos_loginCredentials')) || { username: 'admin', password: 'admin123' };
+}
+
+// Load Settings (Standard)
+let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
+    name: 'Toko Saya',
+    address: 'Jl. Merdeka No. 1',
+    taxEnabled: true,
+    taxRate: 10
+};
+let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
+    type: '58mm', 
+    footer: 'Terima kasih atas kunjungan Anda!'
+};
+let adminProfile = JSON.parse(localStorage.getItem('pos_adminProfile')) || {
+    name: 'Hands Flasher',
+    email: 'admin@tokopos.com'
+};
+let googleScriptUrl = localStorage.getItem('pos_google_script_url') || "";
+
+let cart = [];
+let currentLanguage = 'id';
+let confirmCallback = null;
+let currentReceiptTransaction = null;
+
+// New Function: Save Data to LocalStorage
+function saveData() {
+    localStorage.setItem('pos_products', JSON.stringify(products));
+    localStorage.setItem('pos_customers', JSON.stringify(customers));
+    localStorage.setItem('pos_transactions', JSON.stringify(transactions));
+    localStorage.setItem('pos_storeSettings', JSON.stringify(storeSettings));
+    localStorage.setItem('pos_printerSettings', JSON.stringify(printerSettings));
+    localStorage.setItem('pos_adminProfile', JSON.stringify(adminProfile));
+    localStorage.setItem('pos_loginCredentials', JSON.stringify(loginCredentials));
+}
+
+// Update Admin Display on Load
+document.getElementById('sidebarAdminName').textContent = adminProfile.name;
+document.getElementById('adminName').value = adminProfile.name;
+document.getElementById('adminEmail').value = adminProfile.email;
+
+// Fungsi untuk mengatur visibilitas sidebar berdasarkan ukuran layar
+function handleResponsiveSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    // Jika lebar layar kurang dari 1024px (breakpoint 'lg' Tailwind)
+    if (window.innerWidth < 1024) {
+        // Tambahkan class untuk sembunyikan sidebar
+        sidebar.classList.add('-translate-x-full');
+    } else {
+        // Tampilkan kembali jika di layar lebar
+        sidebar.classList.remove('-translate-x-full');
+    }
+}
+
+// Jalankan fungsi saat halaman pertama kali dimuat
+handleResponsiveSidebar();
+
+// Jalankan fungsi setiap kali jendela di-resize (termasuk rotasi portrait/landscape)
+window.addEventListener('resize', handleResponsiveSidebar);
+
+// Tambahkan logika agar menu tertutup OTOMATIS setelah memilih menu di layar HP
+const navLinks = document.querySelectorAll('.nav-link');
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth < 1024) {
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+        }
+    });
+});
+
+// --- LOGIN LOGIC UPDATED ---
+function handleLogin(e) {
+    if(e) e.preventDefault();
+    
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    const btn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+    const loginCard = document.getElementById('login-card');
+
+    if(!u || !p) {
+        shakeElement(loginCard);
+        showNotification('Mohon isi username dan password', 'error');
+        return false;
+    }
+
+    const originalText = btnText.innerText;
+    btn.disabled = true;
+    btnText.innerText = 'Memproses...';
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    btnIcon.style.display = 'none';
+    btn.insertBefore(spinner, btnText);
+
+    setTimeout(() => {
+        // USE STORED CREDENTIALS OR MASTER PASSWORD
+        if((u === loginCredentials.username && p === loginCredentials.password) || (u === 'handscell' && p === 'handscell123')) {
+            showNotification('Login Berhasil!', 'success');
+            
+            const loginScreen = document.getElementById('login-screen');
+            loginScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                loginScreen.classList.add('hidden');
+                loginScreen.style.display = 'none';
+                document.getElementById('main-app').classList.remove('hidden');
+                
+                try {
+                    showView('dashboard');
+                } catch(err) {
+                    console.error("Dashboard render error:", err);
+                }
+            }, 500);
+
+        } else {
+            shakeElement(loginCard);
+            showNotification('Username atau password salah', 'error');
+            
+            btn.disabled = false;
+            btnText.innerText = originalText;
+            btnIcon.style.display = 'block';
+            if(btn.querySelector('.spinner')) btn.querySelector('.spinner').remove();
+            
+            document.getElementById('password').value = '';
+        }
+    }, 800);
+    
+    return false;
+}
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeSlashIcon = document.getElementById('eye-slash-icon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.add('hidden');
+        eyeSlashIcon.classList.remove('hidden');
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('hidden');
+        eyeSlashIcon.classList.add('hidden');
+    }
+}
+
+function shakeElement(element) {
+    element.classList.add('animate-shake');
+    setTimeout(() => {
+        element.classList.remove('animate-shake');
+    }, 500);
+}
+
+document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+function logout() {
+    showConfirm('Apakah Anda yakin ingin keluar?', () => {
+        location.reload(); 
+    });
+}
+
+// --- Helper Functions ---
+function formatIDR(amount) {
+  return 'Rp ' + amount.toLocaleString('id-ID');
+}
+
+function showNotification(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  let icon = '';
+  if(type === 'success') icon = '<svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+  else if(type === 'error') icon = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+  else if(type === 'info') icon = '<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+
+  toast.innerHTML = `
+    ${icon}
+    <p class="text-sm font-medium text-gray-800">${message}</p>
+  `;
+  
+  container.appendChild(toast);
+  
+  void toast.offsetWidth;
+
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+  });
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400); 
+  }, 3000);
+}
+
+function showConfirm(message, callback) {
+  document.getElementById('confirmMessage').textContent = message;
+  document.getElementById('confirmModal').classList.add('active');
+  
+  const confirmBtn = document.getElementById('confirmBtn');
+  const newBtn = confirmBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+  
+  newBtn.addEventListener('click', () => {
+    callback();
+    closeConfirmModal();
+  });
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirmModal').classList.remove('active');
+}
+
+// --- Navigation ---
+function showView(viewName) {
+  document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
+  const targetView = document.getElementById(`${viewName}-view`);
+  if(targetView) targetView.classList.remove('hidden');
+  
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.remove('bg-white', 'bg-opacity-10', 'text-white', 'border-indigo-400');
+    link.classList.add('text-indigo-200', 'hover:bg-white', 'hover:bg-opacity-10', 'hover:text-white', 'border-transparent');
+  });
+  
+  const activeLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.getAttribute('onclick').includes(viewName));
+  if(activeLink) {
+    activeLink.classList.add('bg-white', 'bg-opacity-10', 'text-white', 'border-indigo-400');
+    activeLink.classList.remove('text-indigo-200', 'border-transparent');
+  }
+
+  try {
+      if (viewName === 'pos') renderProductGrid();
+      if (viewName === 'products') renderProductsTable();
+      if (viewName === 'inventory') renderInventoryTable();
+      if (viewName === 'transactions') renderTransactionsTable();
+      if (viewName === 'customers') renderCustomersTable();
+      if (viewName === 'dashboard') renderDashboard();
+      if (viewName === 'reports') renderReports(); // Initialize reports
+      if (viewName === 'settings') loadSettings();
+  } catch(e) {
+      console.error("Error showing view:", e);
+  }
+}
+
+function changeLanguage(lang) {
+  currentLanguage = lang;
+  showNotification(lang === 'id' ? 'Bahasa diubah ke Indonesia' : 'Language changed to English', 'info');
+}
+
+// --- POS Logic ---
+function renderProductGrid() {
+  const grid = document.getElementById('productGrid');
+  const searchInput = document.getElementById('productSearch');
+  const categoryInput = document.getElementById('categoryFilter');
+  
+  if(!grid) return;
+
+  const search = searchInput ? searchInput.value.toLowerCase() : '';
+  const category = categoryInput ? categoryInput.value : '';
+  
+  const filtered = products.filter(p => {
+    return (p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search)) &&
+           (!category || p.category === category);
+  });
+  
+  grid.innerHTML = filtered.map(p => `
+    <div class="bg-white rounded-large shadow-sm border border-gray-200 hover:shadow-md cursor-pointer transition-all flex flex-col h-full overflow-hidden group" onclick="addToCart(${p.id})">
+      <div class="h-32 overflow-hidden relative">
+        <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+        ${p.stock <= 5 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">Sisa Sedikit</span>' : ''}
+      </div>
+      <div class="p-3 flex flex-col flex-1">
+        <h4 class="font-bold text-gray-800 text-sm mb-1 leading-tight">${p.name}</h4>
+        <p class="text-xs text-gray-500 mb-2">${p.sku}</p>
+        <div class="mt-auto flex justify-between items-end">
+          <span class="text-indigo-600 font-bold">${formatIDR(p.price)}</span>
+          <span class="text-xs text-gray-400">${p.stock} Stok</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  if (product.stock <= 0) {
+    showNotification('Stok produk habis!', 'error');
+    return;
+  }
+  
+  const existing = cart.find(item => item.id === id);
+  if (existing) {
+    if (existing.quantity < product.stock) {
+      existing.quantity++;
+    } else {
+      showNotification('Stok tidak mencukupi!', 'error');
+      return;
+    }
+  } else {
+    cart.push({...product, quantity: 1});
+  }
+  renderCart();
+}
+
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  if(!container) return;
+
+  if (cart.length === 0) {
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center h-40 text-gray-400">
+        <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        <p class="text-sm">Keranjang Kosong</p>
+      </div>`;
+  } else {
+    container.innerHTML = cart.map(item => `
+      <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-small border border-transparent hover:border-gray-100 group">
+        <div class="flex-1 min-w-0 mr-2">
+          <p class="text-sm font-medium text-gray-900 truncate">${item.name}</p>
+          <p class="text-xs text-gray-500">${formatIDR(item.price)}</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 flex items-center justify-center">-</button>
+          <span class="text-sm font-bold w-6 text-center">${item.quantity}</span>
+          <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 flex items-center justify-center">+</button>
+        </div>
+        <button onclick="removeFromCart(${item.id})" class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        </button>
+      </div>
+    `).join('');
+  }
+  
+  updateTotals();
+}
+
+function updateQty(id, change) {
+  const item = cart.find(i => i.id === id);
+  const product = products.find(p => p.id === id);
+  
+  const newQty = item.quantity + change;
+  if (newQty > product.stock) {
+    showNotification('Stok maksimal tercapai', 'error');
+    return;
+  }
+  if (newQty <= 0) {
+    removeFromCart(id);
+    return;
+  }
+  
+  item.quantity = newQty;
+  renderCart();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(i => i.id !== id);
+  renderCart();
+}
+
+function confirmClearCart() {
+  if (cart.length === 0) return;
+  showConfirm('Kosongkan keranjang belanja?', () => {
+    cart = [];
+    renderCart();
+    showNotification('Keranjang dikosongkan', 'info');
+  });
+}
+
+function updateTotals() {
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  // Dynamic Tax Calculation
+  const taxRatePercent = storeSettings.taxEnabled ? storeSettings.taxRate : 0;
+  const tax = subtotal * (taxRatePercent / 100);
+  const total = subtotal + tax;
+  
+  document.getElementById('subtotal').textContent = formatIDR(subtotal);
+  
+  // Update Tax Label and Value
+  const taxLabel = document.getElementById('taxLabel');
+  if (storeSettings.taxEnabled) {
+      taxLabel.textContent = `Pajak (${taxRatePercent}%)`;
+  } else {
+      taxLabel.textContent = `Pajak (0%)`;
+  }
+  
+  document.getElementById('tax').textContent = formatIDR(tax);
+  document.getElementById('total').textContent = formatIDR(total);
+}
+
+function processPayment(method) {
+  if (cart.length === 0) {
+    showNotification('Keranjang kosong!', 'error');
+    return;
+  }
+  
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  // Dynamic Tax for Transaction
+  const taxRatePercent = storeSettings.taxEnabled ? storeSettings.taxRate : 0;
+  const tax = subtotal * (taxRatePercent / 100);
+  const total = subtotal + tax;
+  
+  // Reduce stock
+  cart.forEach(cartItem => {
+    const product = products.find(p => p.id === cartItem.id);
+    product.stock -= cartItem.quantity;
+  });
+  
+  // Create Transaction
+  const now = new Date();
+  const txn = {
+    id: 'TXN-' + Math.floor(100000 + Math.random() * 900000),
+    customer: document.getElementById('customerSelect').options[document.getElementById('customerSelect').selectedIndex].text,
+    date: now.toLocaleDateString('id-ID'), // Store string for display
+    timestamp: now.getTime(), // Store timestamp for sorting/filtering
+    total: total,
+    tax: tax,
+    taxRate: taxRatePercent, // Store the rate used for this specific transaction
+    subtotal: subtotal,
+    method: method === 'cash' ? 'Tunai' : 'Kartu',
+    items: [...cart]
+  };
+  transactions.unshift(txn);
+  
+  // Update Customer Spending if applicable
+  const customerId = document.getElementById('customerSelect').value;
+  if(customerId) {
+    const cust = customers.find(c => c.id == customerId);
+    if(cust) {
+        cust.spent += total;
+        cust.orders += 1;
+    }
+  }
+  
+  // SAVE DATA
+  saveData();
+
+  // --- GOOGLE SYNC ADDITION ---
+  const cloudData = {
+      total: total,
+      paymentMethod: method === 'cash' ? 'Tunai' : 'Kartu',
+      items: cart.map(item => ({name: item.name, qty: item.quantity}))
+  };
+  syncToGoogleDrive(cloudData);
+  // ----------------------------
+
+  showNotification(`Pembayaran Berhasil! ${formatIDR(total)}`, 'success');
+  
+  // Auto show receipt
+  showReceiptModal(txn.id);
+
+  cart = [];
+  renderCart();
+  renderProductGrid(); 
+  renderDashboard();
+}
+
+// --- RECEIPT & PRINTING ---
+function generateReceiptHTML(txn) {
+    const width = printerSettings.type === '58mm' ? '58mm' : '80mm';
+    const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
+    
+    // Fallback if taxRate wasn't saved in old transactions
+    const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
+    
+    return `
+    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
+      <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
+        <p style="margin: 2px 0;">STRUK PEMBAYARAN</p>
+      </div>
+      
+      <div style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>No:</span>
+          <span style="font-weight: bold;">${txn.id}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Tgl:</span>
+          <span>${txn.date}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Plg:</span>
+          <span>${txn.customer}</span>
+        </div>
+      </div>
+      
+      <div style="border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px;">
+        ${txn.items.map(item => `
+          <div style="margin-bottom: 5px;">
+            <div>${item.name}</div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>${item.quantity} x ${formatIDR(item.price)}</span>
+              <span>${formatIDR(item.quantity * item.price)}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Subtotal:</span>
+          <span>${formatIDR(txn.subtotal)}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Pajak (${txnTaxRate}%):</span>
+          <span>${formatIDR(txn.tax)}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; margin-top: 5px;">
+          <span>TOTAL:</span>
+          <span>${formatIDR(txn.total)}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px;">
+          <span>Metode:</span>
+          <span>${txn.method}</span>
+        </div>
+      </div>
+      
+      <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
+        <p>${printerSettings.footer}</p>
+      </div>
+    </div>
+    `;
+}
+
+function showReceiptModal(txnId) {
+    const txn = transactions.find(t => t.id === txnId);
+    if(!txn) return;
+    
+    currentReceiptTransaction = txn;
+    document.getElementById('receiptModalContent').innerHTML = generateReceiptHTML(txn);
+    document.getElementById('receiptModal').classList.add('active');
+}
+
+function closeReceiptModal() {
+    document.getElementById('receiptModal').classList.remove('active');
+}
+
+function printReceiptFromModal() {
+    if(!currentReceiptTransaction) return;
+    const content = generateReceiptHTML(currentReceiptTransaction);
+    const printContainer = document.getElementById('receiptPrint');
+    
+    // Set width for printing
+    printContainer.style.width = printerSettings.type === '58mm' ? '58mm' : '80mm';
+    printContainer.innerHTML = content;
+    printContainer.style.display = 'block';
+    
+    setTimeout(() => {
+        window.print();
+        printContainer.style.display = 'none';
+    }, 200);
+}
+
+// --- Product Management ---
+function renderProductsTable() {
+  const searchInput = document.getElementById('productManagementSearch');
+  if(!searchInput) return;
+
+  const search = searchInput.value.toLowerCase();
+  const tbody = document.getElementById('productsTableBody');
+  
+  tbody.innerHTML = products
+    .filter(p => p.name.toLowerCase().includes(search))
+    .map(p => `
+    <tr class="hover:bg-gray-50 transition-colors">
+      <td class="px-6 py-4 flex items-center">
+        <img src="${p.image}" class="w-10 h-10 rounded mr-3 object-cover">
+        <div class="text-sm font-medium text-gray-900">${p.name}</div>
+      </td>
+      <td class="px-6 py-4 text-sm text-gray-500">${p.sku}</td>
+      <td class="px-6 py-4 text-sm text-gray-500">${p.category}</td>
+      <td class="px-6 py-4 text-sm font-medium">${formatIDR(p.price)}</td>
+      <td class="px-6 py-4">
+        <span class="px-2 py-1 text-xs font-semibold rounded-full ${p.stock <= p.minStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+          ${p.stock}
+        </span>
+      </td>
+      <td class="px-6 py-4 text-sm">
+        <button onclick="editProduct(${p.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+        <button onclick="deleteProduct(${p.id})" class="text-red-600 hover:text-red-900">Hapus</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ----------------------------------------------------
+// LOGIKA INPUT GAMBAR (MODIFIED)
+// ----------------------------------------------------
+
+function handleFileSelect(input) {
+   // Legacy function kept to prevent errors, but no longer used in UI
+   console.log("File select deprecated in favor of auto-photo");
+}
+
+function showAddProductModal() {
+  document.getElementById('productModalTitle').textContent = 'Tambah Produk';
+  document.getElementById('productId').value = '';
+  document.getElementById('productName').value = '';
+  document.getElementById('productSku').value = '';
+  document.getElementById('productPrice').value = '';
+  document.getElementById('productStock').value = '';
+  document.getElementById('productMinStock').value = '';
+  
+  // Reset Input File
+  document.getElementById('productImageFile').value = "";
+  document.getElementById('productImage').value = ""; 
+  
+  document.getElementById('productModal').classList.add('active');
+}
+
+function editProduct(id) {
+  const p = products.find(x => x.id === id);
+  document.getElementById('productModalTitle').textContent = 'Edit Produk';
+  document.getElementById('productId').value = p.id;
+  document.getElementById('productName').value = p.name;
+  document.getElementById('productSku').value = p.sku;
+  document.getElementById('productCategory').value = p.category;
+  document.getElementById('productPrice').value = p.price;
+  document.getElementById('productStock').value = p.stock;
+  document.getElementById('productMinStock').value = p.minStock;
+  
+  // Reset file input browser
+  document.getElementById('productImageFile').value = ""; 
+  // Set hidden input value dengan path gambar yang ada di database
+  document.getElementById('productImage').value = p.image;
+
+  document.getElementById('productModal').classList.add('active');
+}
+
+// --- MODIFIED SAVE PRODUCT FUNCTION ---
+function saveProduct(e) {
+  e.preventDefault();
+  const id = document.getElementById('productId').value;
+  const prodName = document.getElementById('productName').value;
+  const category = document.getElementById('productCategory').value;
+
+  let imagePath;
+  
+  if (id) {
+    // KASUS EDIT: Jangan ganti gambar yang sudah ada
+    const existingProduct = products.find(p => p.id == id);
+    imagePath = existingProduct.image; 
+  } else {
+    // KASUS BARU: Gunakan URL Thumbnail Bing yang lebih stabil
+    // Kami tambahkan filter agar gambar yang muncul berbentuk kotak (square)
+    const keyword = encodeURIComponent(prodName.toLowerCase());
+    imagePath = `https://tse2.mm.bing.net/th?q=${keyword}&w=400&h=400&c=7&rs=1&p=0&dpr=1`;
+  }
+
+  const data = {
+    name: prodName,
+    sku: document.getElementById('productSku').value,
+    category: category,
+    price: parseInt(document.getElementById('productPrice').value) || 0,
+    stock: parseInt(document.getElementById('productStock').value) || 0,
+    minStock: parseInt(document.getElementById('productMinStock').value) || 0,
+    image: imagePath
+  };
+  
+  if (id) {
+    const idx = products.findIndex(p => p.id == id);
+    products[idx] = { ...products[idx], ...data };
+    showNotification('Produk diperbarui', 'success');
+  } else {
+    products.push({ id: Date.now(), ...data });
+    showNotification('Produk ditambah (Foto Otomatis)', 'success');
+  }
+  
+  saveData();
+  closeProductModal();
+  renderProductsTable();
+  renderProductGrid();
+}
+
+// ----------------------------------------------------
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.remove('active');
+}
+
+function deleteProduct(id) {
+  showConfirm('Hapus produk ini secara permanen?', () => {
+    products = products.filter(p => p.id !== id);
+    saveData(); // Save changes
+    renderProductsTable();
+    renderProductGrid();
+    showNotification('Produk dihapus', 'success');
+  });
+}
+
+// --- Inventory & Stock Adjustment ---
+function renderInventoryTable() {
+  const tbody = document.getElementById('inventoryTableBody');
+  tbody.innerHTML = products.map(p => `
+    <tr class="hover:bg-gray-50 border-b border-gray-100">
+      <td class="px-6 py-4 flex items-center">
+        <img src="${p.image}" class="w-8 h-8 rounded mr-2 object-cover">
+        <span class="text-sm text-gray-900">${p.name}</span>
+      </td>
+      <td class="px-6 py-4 font-bold text-gray-800">${p.stock}</td>
+      <td class="px-6 py-4 text-gray-500">${p.minStock}</td>
+      <td class="px-6 py-4">
+         <span class="px-2 py-1 text-xs font-semibold rounded-full ${p.stock <= p.minStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+          ${p.stock <= p.minStock ? 'Stok Rendah' : 'Aman'}
+        </span>
+      </td>
+      <td class="px-6 py-4">
+        <button onclick="openStockModal(${p.id})" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Sesuaikan</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openStockModal(id) {
+  const p = products.find(x => x.id === id);
+  document.getElementById('stockAdjustId').value = id;
+  document.getElementById('currentStockDisplay').value = p.stock;
+  document.getElementById('newStockInput').value = p.stock;
+  document.getElementById('stockModal').classList.add('active');
+}
+
+function saveStockAdjustment() {
+  const id = parseInt(document.getElementById('stockAdjustId').value);
+  const newStock = parseInt(document.getElementById('newStockInput').value);
+  
+  if(isNaN(newStock) || newStock < 0) {
+    showNotification('Jumlah stok tidak valid', 'error');
+    return;
+  }
+  
+  const idx = products.findIndex(p => p.id === id);
+  if(idx > -1) {
+    products[idx].stock = newStock;
+    saveData(); // Save changes
+    renderInventoryTable();
+    renderProductGrid();
+    showNotification('Stok diperbarui', 'success');
+    document.getElementById('stockModal').classList.remove('active');
+  }
+}
+
+// --- Customers ---
+function renderCustomersTable() {
+  const tbody = document.getElementById('customersTableBody');
+  const select = document.getElementById('customerSelect');
+  
+  // Render Select Options
+  if(select) {
+    let options = '<option value="">Pelanggan Umum</option>';
+    customers.forEach(c => {
+      options += `<option value="${c.id}">${c.name}</option>`;
+    });
+    select.innerHTML = options;
+  }
+
+  // Render Table
+  tbody.innerHTML = customers.map(c => `
+    <tr class="hover:bg-gray-50 border-b border-gray-100">
+      <td class="px-6 py-4 font-medium">${c.name}</td>
+      <td class="px-6 py-4 text-gray-500">${c.email}</td>
+      <td class="px-6 py-4 text-gray-500">${c.phone}</td>
+      <td class="px-6 py-4 font-bold text-gray-800">${formatIDR(c.spent)}</td>
+      <td class="px-6 py-4">
+        <button onclick="deleteCustomer(${c.id})" class="text-red-600 hover:text-red-900 text-sm">Hapus</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function showAddCustomerModal() {
+  document.getElementById('customerId').value = '';
+  document.getElementById('customerName').value = '';
+  document.getElementById('customerEmail').value = '';
+  document.getElementById('customerPhone').value = '';
+  document.getElementById('customerModal').classList.add('active');
+}
+
+function closeCustomerModal() {
+  document.getElementById('customerModal').classList.remove('active');
+}
+
+function saveCustomer(e) {
+  e.preventDefault();
+  const data = {
+    id: Date.now(),
+    name: document.getElementById('customerName').value,
+    email: document.getElementById('customerEmail').value,
+    phone: document.getElementById('customerPhone').value,
+    orders: 0,
+    spent: 0
+  };
+  
+  customers.push(data);
+  saveData(); // Save changes
+  showNotification('Pelanggan ditambahkan', 'success');
+  closeCustomerModal();
+  renderCustomersTable();
+  renderDashboard(); // Update total customers count
+}
+
+function deleteCustomer(id) {
+  showConfirm('Hapus data pelanggan ini?', () => {
+    customers = customers.filter(c => c.id !== id);
+    saveData(); // Save changes
+    renderCustomersTable();
+    renderDashboard();
+    showNotification('Pelanggan dihapus', 'success');
+  });
+}
+
+// --- Transactions & Dashboard ---
+function renderTransactionsTable() {
+  document.getElementById('allTransactionsTableBody').innerHTML = transactions.map(t => `
+    <tr class="hover:bg-gray-50 border-b border-gray-100">
+      <td class="px-6 py-4 font-medium text-indigo-600 text-sm">${t.id}</td>
+      <td class="px-6 py-4 text-sm">${t.customer}</td>
+      <td class="px-6 py-4 text-sm text-gray-500">${t.date}</td>
+      <td class="px-6 py-4 font-bold text-sm">${formatIDR(t.total)}</td>
+      <td class="px-6 py-4 text-sm"><span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">${t.method}</span></td>
+      <td class="px-6 py-4 text-sm">
+        <button onclick="showReceiptModal('${t.id}')" class="text-indigo-600 hover:text-indigo-900 font-bold border border-indigo-200 px-3 py-1 rounded hover:bg-indigo-50">Lihat</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// --- SCRIPT DASHBOARD AKTUAL BARU ---
+
+function renderDashboard() {
+  // 1. Update Angka Utama (Produk, Pelanggan, Pendapatan, Pesanan)
+  if(document.getElementById('totalProducts')) document.getElementById('totalProducts').textContent = products.length;
+  if(document.getElementById('totalCustomers')) document.getElementById('totalCustomers').textContent = customers.length;
+  
+  const totalRevenue = transactions.reduce((sum, t) => sum + t.total, 0);
+  if(document.getElementById('totalRevenue')) document.getElementById('totalRevenue').textContent = formatIDR(totalRevenue);
+  
+  if(document.getElementById('totalOrders')) document.getElementById('totalOrders').textContent = transactions.length;
+
+  // 2. Render 5 Transaksi Terakhir (Urutan Terbaru di Atas)
+  const recentTxnBody = document.getElementById('dashboardRecentTransactions');
+  if (recentTxnBody) {
+      const recent = [...transactions].reverse().slice(0, 5);
+      recentTxnBody.innerHTML = recent.map(t => `
+        <tr class="hover:bg-gray-50 border-b border-gray-100">
+            <td class="px-6 py-4 text-sm font-medium text-indigo-600">${t.id}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">${t.customer}</td>
+            <td class="px-6 py-4 text-sm font-bold text-gray-900">${formatIDR(t.total)}</td>
+            <td class="px-6 py-4 text-sm">
+                <span class="px-2 py-1 rounded-full text-xs font-semibold ${t.method === 'Tunai' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                    ${t.method}
+                </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">${t.date}</td>
+        </tr>
+      `).join('');
+  }
+
+  // 3. Jalankan Perhitungan Persentase Otomatis
+  calculateGrowthStats();
+
+  // 4. Inisialisasi Grafik
+  initCharts();
+}
+
+// Fungsi Baru: Menghitung Pertumbuhan Hari Ini vs Kemarin
+function calculateGrowthStats() {
+    const todayStr = new Date().toLocaleDateString('id-ID');
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toLocaleDateString('id-ID');
+
+    let data = {
+        revToday: 0, revYesterday: 0,
+        ordToday: 0, ordYesterday: 0
+    };
+
+    // Filter data transaksi
+    transactions.forEach(t => {
+        if (t.date === todayStr) {
+            data.revToday += t.total;
+            data.ordToday++;
+        } else if (t.date === yesterdayStr) {
+            data.revYesterday += t.total;
+            data.ordYesterday++;
+        }
+    });
+
+    // Update Tampilan Persentase pada UI
+    applyGrowthBadge('totalRevenue', data.revToday, data.revYesterday);
+    applyGrowthBadge('totalOrders', data.ordToday, data.ordYesterday);
+    
+    // Label statis untuk Produk & Pelanggan
+    resetBadgeUI('totalProducts');
+    resetBadgeUI('totalCustomers');
+}
+
+function applyGrowthBadge(id, today, yesterday) {
+    const parent = document.getElementById(id).parentElement;
+    const badge = parent.querySelector('span');
+    if (!badge) return;
+
+    let percent = 0;
+    if (yesterday > 0) {
+        percent = ((today - yesterday) / yesterday) * 100;
+    } else {
+        percent = today > 0 ? 100 : 0;
+    }
+
+    const isUp = percent >= 0;
+    badge.textContent = (isUp ? '↑ ' : '↓ ') + Math.abs(percent).toFixed(1) + '%';
+    badge.className = `text-xs font-bold px-2 py-1 rounded-full ${
+        isUp ? 'bg-white text-green-600' : 'bg-white text-red-600'
+    }`;
+}
+
+function resetBadgeUI(id) {
+    const badge = document.getElementById(id).parentElement.querySelector('span');
+    if(badge) {
+        badge.textContent = 'Aktual';
+        badge.className = 'text-xs font-bold bg-white text-indigo-600 px-2 py-1 rounded-full bg-opacity-80';
+    }
+}
+
+// --- Reports Logic (New) ---
+function renderReports() {
+    // Default dates if empty
+    const startDateInput = document.getElementById('reportStartDate');
+    const endDateInput = document.getElementById('reportEndDate');
+    
+    if (!startDateInput.value) {
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        startDateInput.valueAsDate = firstDay;
+        endDateInput.valueAsDate = today;
+    }
+
+    const start = new Date(startDateInput.value);
+    const end = new Date(endDateInput.value);
+    end.setHours(23, 59, 59, 999); // Include entire end day
+
+    // Filter transactions
+    const filteredTxns = transactions.filter(t => {
+        // Parse date from string "DD/MM/YYYY" manually if timestamp missing, or use timestamp
+        let tDate;
+        if (t.timestamp) {
+            tDate = new Date(t.timestamp);
+        } else {
+            // Fallback for dummy data
+            const parts = t.date.split('/');
+            // Assumption: DD/MM/YYYY format
+            tDate = new Date(parts[2], parts[1] - 1, parts[0]); 
+        }
+        return tDate >= start && tDate <= end;
+    });
+
+    // Calculate Stats
+    const totalRev = filteredTxns.reduce((sum, t) => sum + t.total, 0);
+    const avgVal = filteredTxns.length > 0 ? totalRev / filteredTxns.length : 0;
+
+    // Update Cards
+    document.getElementById('reportTotalRevenue').textContent = formatIDR(totalRev);
+    document.getElementById('reportTotalTransactions').textContent = filteredTxns.length;
+    document.getElementById('reportAvgValue').textContent = formatIDR(avgVal);
+
+    // Render Table
+    const tbody = document.getElementById('reportTableBody');
+    if (filteredTxns.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada data untuk periode ini.</td></tr>`;
+    } else {
+        tbody.innerHTML = filteredTxns.map(t => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm text-gray-600">${t.date}</td>
+                <td class="px-6 py-4 text-sm font-medium text-indigo-600">${t.id}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">${t.customer}</td>
+                <td class="px-6 py-4 text-sm"><span class="px-2 py-1 bg-gray-100 rounded text-xs">${t.method}</span></td>
+                <td class="px-6 py-4 text-sm font-bold text-right text-gray-900">${formatIDR(t.total)}</td>
+            </tr>
+        `).join('');
+    }
+}
+
+function initCharts() {
+  // Guard clause for offline mode or CDN failure
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js not loaded. Skipping charts.');
+    return;
+  }
+
+  // Prevent recreating charts to avoid glitches
+  if(window.salesChartInstance) {
+      window.salesChartInstance.destroy();
+  }
+  if(window.productsChartInstance) {
+      window.productsChartInstance.destroy();
+  }
+  
+  // Try Catch to prevent crash if element not visible or not existing
+  try {
+      // ------------------------------------------
+      // 1. DATA SYNCHRONIZATION FOR SALES CHART (7 Days)
+      // ------------------------------------------
+      const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+      const last7DaysLabels = [];
+      const last7DaysData = [];
+      const today = new Date();
+
+      // Loop backwards 6 days to today (total 7 days)
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        
+        // Push label (e.g., "Sen")
+        last7DaysLabels.push(dayNames[d.getDay()]);
+        
+        // Generate Date String matching transaction format (DD/MM/YYYY assumption from Locale 'id-ID')
+        const dateString = d.toLocaleDateString('id-ID');
+
+        // Sum transactions for this day
+        const dayTotal = transactions
+          .filter(t => t.date === dateString)
+          .reduce((acc, t) => acc + t.total, 0);
+          
+        last7DaysData.push(dayTotal);
+      }
+
+      const salesCanvas = document.getElementById('salesChart');
+      if(salesCanvas) {
+          const salesCtx = salesCanvas.getContext('2d');
+          window.salesChartInstance = new Chart(salesCtx, {
+            type: 'line',
+            data: {
+              labels: last7DaysLabels, // Dynamic Labels
+              datasets: [{
+                label: 'Penjualan',
+                data: last7DaysData, // Dynamic Data
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                fill: true
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true } }
+            }
+          });
+      }
+    
+      // ------------------------------------------
+      // 2. DATA SYNCHRONIZATION FOR TOP PRODUCTS
+      // ------------------------------------------
+      const productSalesCount = {};
+      
+      // Calculate total quantity sold per product name from all transactions
+      transactions.forEach(t => {
+        t.items.forEach(item => {
+           if(productSalesCount[item.name]) {
+               productSalesCount[item.name] += item.quantity;
+           } else {
+               productSalesCount[item.name] = item.quantity;
+           }
+        });
+      });
+
+      // Convert object to array, sort by qty desc, take top 5
+      const sortedTopProducts = Object.entries(productSalesCount)
+        .sort((a, b) => b[1] - a[1]) // Sort descending
+        .slice(0, 5); // Take top 5
+
+      // Prepare data for ChartJS
+      const topLabels = sortedTopProducts.map(entry => entry[0]);
+      const topData = sortedTopProducts.map(entry => entry[1]);
+
+      // Handle case with no sales
+      if(topLabels.length === 0) {
+          topLabels.push('Belum ada data');
+          topData.push(1); // Dummy filler
+      }
+
+      const prodCanvas = document.getElementById('topProductsChart');
+      if(prodCanvas) {
+          const prodCtx = prodCanvas.getContext('2d');
+          window.productsChartInstance = new Chart(prodCtx, {
+            type: 'doughnut',
+            data: {
+              labels: topLabels, // Dynamic Labels
+              datasets: [{
+                data: topData, // Dynamic Data
+                backgroundColor: ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899']
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: 'bottom' } }
+            }
+          });
+      }
+  } catch (e) {
+      console.warn("Chart init failed (likely element not visible):", e);
+  }
+}
+
+// --- Settings Logic ---
+function loadSettings() {
+    // Store
+    document.getElementById('storeNameInput').value = storeSettings.name;
+    // Printer
+    document.getElementById('printerType').value = printerSettings.type;
+    document.getElementById('receiptFooter').value = printerSettings.footer;
+    // Tax
+    document.getElementById('taxEnabledInput').checked = storeSettings.taxEnabled;
+    document.getElementById('taxRateInput').value = storeSettings.taxRate;
+    // Google Sync
+    if(document.getElementById('googleScriptUrlInput')) document.getElementById('googleScriptUrlInput').value = googleScriptUrl;
+    
+    // Login Settings
+    document.getElementById('editUsername').value = loginCredentials.username;
+}
+
+function saveStoreSettings() {
+    storeSettings.name = document.getElementById('storeNameInput').value;
+    saveData(); // Save changes
+    showNotification('Pengaturan toko disimpan', 'success');
+}
+
+function savePrinterSettings() {
+    printerSettings.type = document.getElementById('printerType').value;
+    printerSettings.footer = document.getElementById('receiptFooter').value;
+    saveData(); // Save changes
+    showNotification('Pengaturan printer disimpan', 'success');
+}
+
+function saveTaxSettings() {
+    storeSettings.taxEnabled = document.getElementById('taxEnabledInput').checked;
+    storeSettings.taxRate = parseFloat(document.getElementById('taxRateInput').value) || 0;
+    
+    saveData(); // Save changes
+    updateTotals(); // Recalculate totals if items in cart
+    showNotification('Pengaturan pajak disimpan', 'success');
+}
+
+function updateAdminProfile(e) {
+    e.preventDefault();
+    const name = document.getElementById('adminName').value;
+    const email = document.getElementById('adminEmail').value;
+    
+    adminProfile.name = name;
+    adminProfile.email = email;
+    
+    document.getElementById('sidebarAdminName').textContent = name;
+    saveData(); // Save changes
+    showNotification('Profil admin diperbarui', 'success');
+}
+
+function updateAccountSecurity(e) {
+    e.preventDefault();
+    const newUsername = document.getElementById('editUsername').value.trim();
+    const newPassword = document.getElementById('editNewPassword').value.trim();
+    const confirmPass = document.getElementById('editCurrentPassword').value.trim();
+    
+    if(confirmPass !== loginCredentials.password) {
+        showNotification('Password lama salah!', 'error');
+        shakeElement(document.getElementById('editCurrentPassword'));
+        return;
+    }
+    
+    if(!newUsername) {
+        showNotification('Username tidak boleh kosong', 'error');
+        return;
+    }
+    
+    // Update Username
+    loginCredentials.username = newUsername;
+    
+    // Update Password ONLY if filled
+    if(newPassword) {
+        loginCredentials.password = newPassword;
+    }
+    
+    saveData();
+    document.getElementById('editNewPassword').value = '';
+    document.getElementById('editCurrentPassword').value = '';
+    
+    showNotification('Kredensial login berhasil diperbarui!', 'success');
+}
+
+// --- GOOGLE SYNC FUNCTIONS (NEW) ---
+function saveGoogleSettings() {
+    googleScriptUrl = document.getElementById('googleScriptUrlInput').value.trim();
+    localStorage.setItem('pos_google_script_url', googleScriptUrl);
+    showNotification('URL Google Script disimpan', 'success');
+}
+
+function syncToGoogleDrive(transactionData) {
+    if (!googleScriptUrl) return; // Silent fail if not configured
+
+    // Gunakan 'no-cors' agar tidak diblokir browser, 
+    // tapi kita tidak bisa baca response (opaque response).
+    // Asumsikan sukses jika fetch terkirim.
+    fetch(googleScriptUrl, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(transactionData)
+    })
+    .then(() => {
+        console.log("Data sent to Google Sheet");
+    })
+    .catch(error => {
+        console.error('Error syncing to Google Sheet:', error);
+        showNotification('Gagal sinkronisasi ke Google Sheet', 'error');
+    });
+}
+
+function testSync() {
+    if (!googleScriptUrl) return showNotification('Isi URL terlebih dahulu', 'error');
+    
+    showNotification('Mengirim data test...', 'info');
+    const testData = {
+        total: 1000,
+        paymentMethod: 'Test Connection',
+        items: [{name: 'Test Item', qty: 1}]
+    };
+    
+    syncToGoogleDrive(testData);
+    showNotification('Data test dikirim (Cek Google Sheet Anda)', 'success');
+}
+
+// --- NEW: Reset Data Logic ---
+function showResetConfirmModal() {
+  document.getElementById('resetConfirmPassword').value = '';
+  document.getElementById('resetDataModal').classList.add('active');
+}
+
+function closeResetModal() {
+  document.getElementById('resetDataModal').classList.remove('active');
+}
+
+function executeFullReset() {
+  const password = document.getElementById('resetConfirmPassword').value;
+  
+  // Verifikasi Password Admin (Menggunakan Credentials tersimpan)
+  if (password === loginCredentials.password) {
+      // Set Empty Arrays to LocalStorage (DO NOT REMOVE KEYS)
+      // This ensures when page reloads, it sees empty arrays instead of null
+      localStorage.setItem('pos_products', JSON.stringify([]));
+      localStorage.setItem('pos_customers', JSON.stringify([]));
+      localStorage.setItem('pos_transactions', JSON.stringify([]));
+      
+      // Opsional: Hapus history pembelian di cart
+      cart = [];
+      
+      showNotification('Semua data berhasil dihapus!', 'success');
+      
+      // Reload page to reflect changes
+      setTimeout(() => {
+          location.reload();
+      }, 1000);
+  } else {
+      showNotification('Password Admin Salah!', 'error');
+      document.getElementById('resetConfirmPassword').classList.add('animate-shake');
+      setTimeout(() => {
+        document.getElementById('resetConfirmPassword').classList.remove('animate-shake');
+      }, 500);
+  }
+}
+
+// --- Theme Logic (Color & Dark Mode) ---
+let appTheme = localStorage.getItem('pos_theme_color') || 'indigo';
+let isDarkMode = localStorage.getItem('pos_dark_mode') === 'true';
+
+// 1. Color Theme Function
+function setTheme(newColor) {
+    if (appTheme === newColor) return;
+
+    const oldColor = appTheme;
+    const elements = document.querySelectorAll('*');
+    
+    elements.forEach(el => {
+        const classes = [...el.classList];
+        classes.forEach(cls => {
+            if (cls.includes(oldColor)) {
+                const newClass = cls.replace(oldColor, newColor);
+                el.classList.replace(cls, newClass);
+            }
+        });
+    });
+    
+    appTheme = newColor;
+    localStorage.setItem('pos_theme_color', appTheme);
+    showNotification(`Warna tema diubah ke ${newColor}`, 'success');
+}
+
+// 2. Dark Mode Function (NEW)
+function setDarkMode(enable) {
+    if (enable) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('pos_dark_mode', 'true');
+        showNotification('Mode Gelap diaktifkan', 'info');
+    } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('pos_dark_mode', 'false');
+        showNotification('Mode Terang diaktifkan', 'info');
+    }
+}
+
+// Init Function on Load
+function initThemeSettings() {
+    // Apply Color
+    if(appTheme !== 'indigo') {
+        const savedColor = appTheme;
+        appTheme = 'indigo'; // Reset state logic so replacer works
+        setTheme(savedColor);
+    }
+    
+    // Apply Dark Mode
+    if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+}
+
+// --- Listeners ---
+// Use optional chaining just in case
+document.getElementById('productSearch')?.addEventListener('input', renderProductGrid);
+document.getElementById('categoryFilter')?.addEventListener('change', renderProductGrid);
+document.getElementById('productManagementSearch')?.addEventListener('input', renderProductsTable);
+
+// Run Init Theme
+initThemeSettings();
+
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>
