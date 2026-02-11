@@ -1,8 +1,8 @@
 {
-  "name": "Sugeng Rawuh POS",
+  "name": "HANDSCELL POS",
   "short_name": "POS",
   "start_url": "index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
   "description": "Sistem POS Manajemen Lengkap dengan Sinkronisasi Google",
@@ -22,3 +22,4 @@
   ]
 
 }
+
