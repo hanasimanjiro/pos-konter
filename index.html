@@ -250,28 +250,53 @@ body { overflow-x: hidden; }
     padding-bottom: 10px;
 }
 
-/* --- DARK MODE OVERRIDES --- */
-html.dark body { background-color: #0f172a; color: #e2e8f0; }
-html.dark .bg-white { background-color: #1e293b; color: #e2e8f0; }
-html.dark .bg-gray-50 { background-color: #0f172a; }
-html.dark .bg-gray-100 { background-color: #334155; }
-html.dark .text-gray-900 { color: #f1f5f9; }
-html.dark .text-gray-800 { color: #f1f5f9; }
-html.dark .text-gray-700 { color: #cbd5e1; }
-html.dark .text-gray-600 { color: #94a3b8; }
-html.dark .text-gray-500 { color: #94a3b8; }
-html.dark .border-gray-200 { border-color: #334155; }
-html.dark .border-gray-300 { border-color: #475569; }
-html.dark input, html.dark select, html.dark textarea {
-    background-color: #1e293b;
-    border-color: #475569;
-    color: #f1f5f9;
+/* --- SOFT MIDNIGHT CHARCOAL THEME (Lower Contrast) --- */
+html.dark body { 
+    background-color: #1a1a1a; 
+    color: #d1d1d1; 
 }
-html.dark .shadow-custom { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3); }
-html.dark tr.hover\:bg-gray-50:hover { background-color: #334155; }
-html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #334155; }
-html.dark .modal-content { background-color: #1e293b; color: #e2e8f0; }
-html.dark .bg-indigo-900.bg-opacity-30 { background-color: rgba(30, 41, 59, 0.5); }
+html.dark .bg-white { 
+    background-color: #242424; 
+    color: #e0e0e0; 
+}
+html.dark .bg-gray-50 { background-color: #1a1a1a; }
+html.dark .bg-gray-100 { background-color: #2d2d2d; }
+
+/* Teks yang lebih lembut (tidak murni putih) */
+html.dark .text-gray-900 { color: #e5e5e5; }
+html.dark .text-gray-800 { color: #d4d4d4; }
+html.dark .text-gray-700 { color: #a3a3a3; }
+html.dark .text-gray-600 { color: #8a8a8a; }
+html.dark .text-gray-500 { color: #737373; }
+
+/* Border yang lebih samar */
+html.dark .border-gray-200 { border-color: #333333; }
+html.dark .border-gray-300 { border-color: #404040; }
+
+html.dark input, html.dark select, html.dark textarea {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e5e5e5;
+}
+
+/* Sidebar yang menyatu dengan tema soft */
+html.dark aside#sidebar {
+    background: #121212 !important;
+    border-right: 1px solid #2d2d2d;
+}
+html.dark aside#sidebar .bg-indigo-900 { background-color: transparent !important; }
+html.dark aside#sidebar .border-indigo-700 { border-color: #2d2d2d; }
+
+/* Modal tetap terbaca namun soft */
+html.dark .modal-content { 
+    background-color: #242424; 
+    color: #e0e0e0; 
+    border: 1px solid #333333; 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Hover effect yang tidak terlalu mencolok */
+html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
 </style>
 </head>
 <body class="font-body bg-gray-50 text-gray-800" style="height: auto; min-height: 100%;">
@@ -450,26 +475,35 @@ html.dark .bg-indigo-900.bg-opacity-30 { background-color: rgba(30, 41, 59, 0.5)
 
 <main class="flex-1 overflow-x-hidden flex flex-col h-full bg-gray-50">
   <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
-    <div class="px-6 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
+    <div class="px-4 sm:px-6 py-4"> <div class="flex items-center justify-between">
+        
+        <div class="flex items-center space-x-2 sm:space-x-4">
           <button class="lg:hidden text-gray-600 hover:text-gray-900 focus:outline-none" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
           </button>
-          <div class="relative hidden sm:block">
-            <input type="text" id="globalSearch" placeholder="Cari produk, pelanggan..." class="w-64 sm:w-96 pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+          
+          <div class="relative hidden md:block">
+            <input type="text" id="globalSearch" placeholder="Cari produk, pelanggan..." class="w-48 lg:w-96 pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
             <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
         </div>
-        <div class="flex items-center space-x-4">
-          <select id="languageSelector" onchange="changeLanguage(this.value)" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-small focus:ring-indigo-500 focus:border-indigo-500 block p-2">
-            <option value="en">English</option>
-            <option value="id" selected>Bahasa Indonesia</option>
+
+        <div class="flex items-center space-x-2 md:space-x-4">
+          
+          <select id="languageSelector" onchange="changeLanguage(this.value)" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-small focus:ring-indigo-500 focus:border-indigo-500 block p-2 w-20 md:w-auto">
+            <option value="en">EN</option> <option value="id" selected>ID</option>
           </select>
-          <button onclick="showView('pos')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-small font-medium shadow-custom transition-colors flex items-center space-x-2" data-lang="newSale">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Penjualan Baru</span>
+          
+          <button onclick="showAddProductModal()" class="px-3 md:px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-small font-medium shadow-custom transition-colors flex items-center justify-center">
+            <svg class="w-5 h-5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span class="hidden md:inline">Tambah Produk</span>
           </button>
+          
+          <button onclick="showView('pos')" class="px-3 md:px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-small font-medium shadow-custom transition-colors flex items-center justify-center" data-lang="newSale">
+            <svg class="w-5 h-5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span class="hidden md:inline">Penjualan Baru</span>
+          </button>
+
         </div>
       </div>
     </div>
@@ -571,67 +605,76 @@ html.dark .bg-indigo-900.bg-opacity-30 { background-color: rgba(30, 41, 59, 0.5)
     </div>
     
     <div id="pos-view" class="view-content hidden animate-fade-in">
-  <div class="mb-4">
-    <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="pointOfSale">Kasir (POS)</h2>
-  </div>
-  
-  <div class="flex flex-col lg:flex-row h-[calc(100vh-160px)] gap-4">
-    
-    <div class="w-full lg:w-3/4 h-1/2 lg:h-full flex flex-col min-h-0">
-       <div class="bg-white rounded-large shadow-sm border border-gray-200 p-3 mb-3 flex-shrink-0">
-        <div class="flex items-center space-x-3">
-          <div class="relative flex-1">
-            <input type="text" id="productSearch" placeholder="Cari produk..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:ring-2 focus:ring-indigo-500 text-sm">
-            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2" data-lang="pointOfSale">Kasir (POS)</h2>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)] relative">
+        
+        <div class="lg:col-span-2 flex flex-col h-full pb-[55vh] lg:pb-0">
+          <div class="bg-white rounded-large shadow-sm border border-gray-200 p-4 mb-4">
+            <div class="flex items-center space-x-4">
+              <div class="relative flex-1">
+                <input type="text" id="productSearch" placeholder="Cari produk..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:ring-2 focus:ring-indigo-500">
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+              <select id="categoryFilter" class="border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+                <option value="" data-lang="allCategories">Semua Kategori</option>
+              </select>
+            </div>
           </div>
-          <select id="categoryFilter" class="w-40 border border-gray-300 rounded-small px-2 py-2 focus:ring-2 focus:ring-indigo-500 text-sm">
-            <option value="" data-lang="allCategories">Semua Kategori</option>
-          </select>
+          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pr-2 pb-20" id="productGrid">
+          </div>
+        </div>
+
+        <div class="lg:col-span-1 fixed lg:static bottom-0 left-0 w-full lg:w-auto z-40 lg:z-auto flex flex-col">
+          <div class="bg-white rounded-t-3xl lg:rounded-large shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.15)] lg:shadow-custom border-t border-gray-200 lg:border p-4 flex flex-col max-h-[50vh] lg:max-h-full lg:h-full">
+            
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-3 lg:hidden"></div>
+            
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-2 lg:mb-4 pb-2 border-b" data-lang="currentOrder">Pesanan</h3>
+            
+            <div class="mb-4">
+              <select id="customerSelect" class="w-full border border-gray-300 rounded-small px-3 py-2 text-sm">
+                <option value="" data-lang="walkInCustomer">Pelanggan Umum</option>
+              </select>
+            </div>
+
+            <div class="flex-1 overflow-y-auto mb-4 pr-1 space-y-2" id="cartItems">
+              <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <p class="text-sm">Keranjang Kosong</p>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-3 lg:pt-4 space-y-2 mt-auto">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Subtotal</span>
+                <span class="font-medium text-gray-900" id="subtotal">Rp 0</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600" id="taxLabel">Pajak (10%)</span>
+                <span class="font-medium text-gray-900" id="tax">Rp 0</span>
+              </div>
+              <div class="flex justify-between text-xl font-bold text-indigo-700 pt-2 border-t">
+                <span>Total</span>
+                <span id="total">Rp 0</span>
+              </div>
+              
+             <div class="grid grid-cols-2 gap-2 pt-2">
+  <button onclick="processPayment('cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 lg:py-3 rounded-small font-medium transition-colors flex justify-center items-center">
+    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+    Tunai
+  </button>
+  
+  <button onclick="processPayment('qris')" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 lg:py-3 rounded-small font-medium transition-colors flex justify-center items-center">
+    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m-3 3h6m-6 3h6m-6 3h6m-6 3h6M5 8h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2z"></path></svg>
+    QRIS
+  </button>
+</div>
+            </div>
+          </div>
         </div>
       </div>
-      
-      <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 overflow-y-auto pr-2 flex-1 custom-scrollbar" id="productGrid">
-        </div>
-    </div>
-
-    <div class="w-full lg:w-1/4 h-1/2 lg:h-full flex flex-col min-h-0 bg-white rounded-large shadow-custom border border-gray-200 p-4">
-        <div class="flex flex-col mb-3 flex-shrink-0 border-b pb-2">
-          <h3 class="font-heading text-lg font-bold text-gray-900 mb-2" data-lang="currentOrder">Daftar Pesanan</h3>
-          <select id="customerSelect" class="w-full border border-gray-300 rounded-small px-3 py-1 text-sm">
-            <option value="" data-lang="walkInCustomer">Pelanggan Umum</option>
-          </select>
-        </div>
-
-        <div class="flex-1 overflow-y-auto mb-3 pr-1 space-y-2 custom-scrollbar" id="cartItems">
-          </div>
-
-        <div class="border-t border-gray-100 pt-3 flex-shrink-0">
-          <div class="flex flex-col space-y-3">
-            <div class="space-y-1">
-              <div class="flex justify-between text-xs text-gray-500">
-                <span>Subtotal: <span id="subtotal">Rp 0</span></span>
-                <span>Pajak: <span id="tax">Rp 0</span></span>
-              </div>
-              <div class="text-xl font-bold text-indigo-700">
-                Total: <span id="total">Rp 0</span>
-              </div>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="processPayment('cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-small font-medium text-sm flex justify-center items-center">
-                Tunai
-              </button>
-              <button onclick="processPayment('card')" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-small font-medium text-sm flex justify-center items-center">
-                Kartu
-              </button>
-              <button onclick="confirmClearCart()" class="col-span-2 border border-red-300 text-red-600 hover:bg-red-50 py-1.5 rounded-small text-xs font-medium">Batal</button>
-            </div>
-          </div>
-        </div>
-    </div>
-
-  </div>
-</div>
     </div>
 
     <div id="products-view" class="view-content hidden">
@@ -842,6 +885,23 @@ html.dark .bg-indigo-900.bg-opacity-30 { background-color: rgba(30, 41, 59, 0.5)
               <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan</button>
             </div>
           </div>
+
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pembayaran QRIS</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Upload Gambar QRIS Toko</label>
+                <input type="file" id="qrisFileInput" accept="image/*" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="previewQRIS(event)">
+                <p class="text-xs text-gray-500 mt-1">Gambar ini akan muncul saat kasir memilih pembayaran QRIS.</p>
+              </div>
+              <div class="mt-4 border-2 border-dashed border-gray-200 p-4 rounded-large text-center bg-gray-50">
+                  <img id="qrisPreviewImg" src="" alt="Preview QRIS" class="max-h-48 mx-auto hidden object-contain">
+                  <span id="qrisPreviewText" class="text-sm text-gray-400">Belum ada gambar QRIS</span>
+              </div>
+              <button onclick="saveQRISSetting()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan QRIS</button>
+            </div>
+          </div>
+			
           <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pajak (PPN)</h3>
             <div class="space-y-4">
@@ -1111,6 +1171,28 @@ html.dark .bg-indigo-900.bg-opacity-30 { background-color: rgba(30, 41, 59, 0.5)
   </div>
 </div>
 
+<div id="qrisModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-sm w-full mx-4 p-6 modal-content text-center">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-gray-900">Pembayaran QRIS</h3>
+        <button onclick="closeQRISModal()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+    <p class="text-sm text-gray-500 mb-4">Arahkan pelanggan untuk scan QRIS ini dan masukkan nominal sebesar:</p>
+    
+    <div class="bg-white p-4 border-2 border-dashed border-gray-200 rounded-large inline-block mb-4">
+      <img id="qrisImage" src="" alt="QRIS Code" class="w-48 h-48 mx-auto object-contain">
+    </div>
+    
+    <div class="text-2xl font-bold text-indigo-700 mb-6" id="qrisTotalDisplay">Rp 0</div>
+    
+    <button onclick="finalizeQRIS()" class="w-full py-3 bg-emerald-600 text-white rounded-small font-bold hover:bg-emerald-700 transition-colors shadow-custom">
+      Konfirmasi Pembayaran Selesai
+    </button>
+  </div>
+</div>
+
 <div id="receiptPrint" style="display: none;"></div>
 <div id="reportPrintArea" style="display: none;"></div>
 
@@ -1181,7 +1263,8 @@ let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
     name: 'Toko Saya',
     address: 'Jl. Merdeka No. 1',
     taxEnabled: true,
-    taxRate: 10
+    taxRate: 10,
+    qrisImage: '' 
 };
 let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
     type: '58mm', 
@@ -1198,6 +1281,94 @@ let currentLanguage = 'id';
 let confirmCallback = null;
 let currentReceiptTransaction = null;
 let reportChartInstance = null; // Variable chart baru
+
+// Simpan variabel sementara untuk data transaksi QRIS
+let tempQRISTxn = null;
+let tempQRISBase64 = ''; // Variabel sementara upload gambar
+
+function processPayment(method) {
+    if (cart.length === 0) {
+        showNotification('Keranjang masih kosong', 'error');
+        return;
+    }
+
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // Menggunakan logika pajak yang konsisten dengan pengaturan toko
+    const taxRatePercent = storeSettings.taxEnabled ? storeSettings.taxRate : 0;
+    const tax = subtotal * (taxRatePercent / 100);
+    const total = subtotal + tax;
+
+    // Jika metode adalah QRIS, tampilkan modal QRIS terlebih dahulu
+    if (method === 'qris') {
+        if (!storeSettings.qrisImage || storeSettings.qrisImage === '') {
+            showNotification('Gambar QRIS belum diatur! Silakan upload di menu Pengaturan.', 'error');
+            return;
+        }
+
+        const qrisImg = document.getElementById('qrisImage');
+        const qrisTotal = document.getElementById('qrisTotalDisplay');
+        
+        // Gunakan gambar QRIS statis dari Pengaturan
+        qrisImg.src = storeSettings.qrisImage;
+        qrisTotal.textContent = formatIDR(total);
+        
+        // Simpan data transaksi sementara
+        tempQRISTxn = { total, tax, taxRatePercent, subtotal };
+        
+        document.getElementById('qrisModal').classList.add('active');
+        return; // Jangan lanjutkan simpan transaksi dulu
+    }
+
+    // Jika Tunai (cash), langsung eksekusi seperti biasa
+    completeTransaction(total, tax, taxRatePercent, subtotal, 'Tunai');
+}
+
+function finalizeQRIS() {
+    if (!tempQRISTxn) return;
+    completeTransaction(tempQRISTxn.total, tempQRISTxn.tax, tempQRISTxn.taxRatePercent, tempQRISTxn.subtotal, 'QRIS');
+    closeQRISModal();
+}
+
+function closeQRISModal() {
+    document.getElementById('qrisModal').classList.remove('active');
+    tempQRISTxn = null;
+}
+
+// Fungsi bantu untuk menyelesaikan transaksi agar tidak duplikasi kode
+function completeTransaction(total, tax, taxRatePercent, subtotal, method) {
+    const txn = {
+        id: 'TXN-' + Date.now(),
+        date: new Date().toISOString(),
+        total: total,
+        tax: tax,
+        taxRate: taxRatePercent,
+        subtotal: subtotal,
+        method: method,
+        items: [...cart]
+    };
+
+    transactions.unshift(txn);
+
+    // Update data pelanggan jika ada
+    const customerId = document.getElementById('customerSelect').value;
+    if (customerId) {
+        const cust = customers.find(c => c.id == customerId);
+        if (cust) {
+            cust.spent += total;
+            cust.orders += 1;
+        }
+    }
+
+    saveData();
+    showNotification(`Pembayaran ${method} Berhasil! ${formatIDR(total)}`, 'success');
+    showReceiptModal(txn.id);
+    
+    // Reset keranjang
+    cart = [];
+    renderCart();
+    renderProductGrid();
+    renderDashboard();
+}
 
 // New Function: Save Data to LocalStorage
 function saveData() {
@@ -1396,7 +1567,7 @@ function showView(viewName) {
   try {
       if (viewName === 'pos') {
           renderProductGrid();
-          renderCategoryOptions(); // Ensure filters are up to date
+          renderCategoryOptions(); 
       }
       if (viewName === 'products') renderProductsTable();
       if (viewName === 'inventory') renderInventoryTable();
@@ -1418,7 +1589,6 @@ function changeLanguage(lang) {
 // --- Category Management Functions ---
 
 function renderCategoryOptions() {
-    // 1. Populate POS Filter
     const posFilter = document.getElementById('categoryFilter');
     if(posFilter) {
         const currentVal = posFilter.value;
@@ -1427,10 +1597,9 @@ function renderCategoryOptions() {
             options += `<option value="${c}">${c}</option>`;
         });
         posFilter.innerHTML = options;
-        posFilter.value = currentVal; // Restore selection if exists
+        posFilter.value = currentVal; 
     }
 
-    // 2. Populate Product Modal Select
     const prodSelect = document.getElementById('productCategory');
     if(prodSelect) {
         let options = '';
@@ -1448,7 +1617,7 @@ function openCategoryModal() {
 
 function closeCategoryModal() {
     document.getElementById('categoryModal').classList.remove('active');
-    renderCategoryOptions(); // Update selects in other modals/views
+    renderCategoryOptions(); 
 }
 
 function renderManageCategories() {
@@ -1629,66 +1798,6 @@ function updateTotals() {
   document.getElementById('total').textContent = formatIDR(total);
 }
 
-function processPayment(method) {
-  if (cart.length === 0) {
-    showNotification('Keranjang kosong!', 'error');
-    return;
-  }
-  
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
-  const taxRatePercent = storeSettings.taxEnabled ? storeSettings.taxRate : 0;
-  const tax = subtotal * (taxRatePercent / 100);
-  const total = subtotal + tax;
-  
-  cart.forEach(cartItem => {
-    const product = products.find(p => p.id === cartItem.id);
-    product.stock -= cartItem.quantity;
-  });
-  
-  const now = new Date();
-  const txn = {
-    id: 'TXN-' + Math.floor(100000 + Math.random() * 900000),
-    customer: document.getElementById('customerSelect').options[document.getElementById('customerSelect').selectedIndex].text,
-    date: now.toLocaleDateString('id-ID'), 
-    timestamp: now.getTime(), 
-    total: total,
-    tax: tax,
-    taxRate: taxRatePercent, 
-    subtotal: subtotal,
-    method: method === 'cash' ? 'Tunai' : 'Kartu',
-    items: [...cart]
-  };
-  transactions.unshift(txn);
-  
-  const customerId = document.getElementById('customerSelect').value;
-  if(customerId) {
-    const cust = customers.find(c => c.id == customerId);
-    if(cust) {
-        cust.spent += total;
-        cust.orders += 1;
-    }
-  }
-  
-  saveData();
-
-  const cloudData = {
-      total: total,
-      paymentMethod: method === 'cash' ? 'Tunai' : 'Kartu',
-      items: cart.map(item => ({name: item.name, qty: item.quantity}))
-  };
-  syncToGoogleDrive(cloudData);
-
-  showNotification(`Pembayaran Berhasil! ${formatIDR(total)}`, 'success');
-  
-  showReceiptModal(txn.id);
-
-  cart = [];
-  renderCart();
-  renderProductGrid(); 
-  renderDashboard();
-}
-
 function generateReceiptHTML(txn) {
     const width = printerSettings.type === '58mm' ? '58mm' : '80mm';
     const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
@@ -1713,7 +1822,7 @@ function generateReceiptHTML(txn) {
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span>Plg:</span>
-          <span>${txn.customer}</span>
+          <span>${txn.customer || 'Pelanggan Umum'}</span>
         </div>
       </div>
       
@@ -1755,6 +1864,7 @@ function generateReceiptHTML(txn) {
     `;
 }
 
+// --- FUNGSI TAMPIL MODAL ---
 function showReceiptModal(txnId) {
     const txn = transactions.find(t => t.id === txnId);
     if(!txn) return;
@@ -1762,25 +1872,36 @@ function showReceiptModal(txnId) {
     currentReceiptTransaction = txn;
     document.getElementById('receiptModalContent').innerHTML = generateReceiptHTML(txn);
     document.getElementById('receiptModal').classList.add('active');
-}
+} // <-- Pastikan ada kurung tutup ini sebelum membuat fungsi baru
 
+// --- FUNGSI TUTUP MODAL (Pindahkan ke luar sini agar bisa diakses tombol) ---
 function closeReceiptModal() {
     document.getElementById('receiptModal').classList.remove('active');
+    if(typeof currentReceiptTransaction !== 'undefined') {
+        currentReceiptTransaction = null;
+    }
 }
 
+// --- FUNGSI PRINT (Sudah ditambah fitur tutup otomatis) ---
 function printReceiptFromModal() {
     if(!currentReceiptTransaction) return;
     const content = generateReceiptHTML(currentReceiptTransaction);
     const printContainer = document.getElementById('receiptPrint');
     
-    printContainer.style.width = printerSettings.type === '58mm' ? '58mm' : '80mm';
+    // Penyesuaian lebar printer
+    const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
+    printContainer.style.width = width;
+    
     printContainer.innerHTML = content;
     printContainer.style.display = 'block';
     
     setTimeout(() => {
         window.print();
         printContainer.style.display = 'none';
-    }, 200);
+        
+        // Memanggil fungsi tutup setelah print selesai
+        closeReceiptModal(); 
+    }, 500); 
 }
 
 function renderProductsTable() {
@@ -1814,10 +1935,6 @@ function renderProductsTable() {
   `).join('');
 }
 
-function handleFileSelect(input) {
-   console.log("File select deprecated in favor of auto-photo");
-}
-
 function showAddProductModal() {
   document.getElementById('productModalTitle').textContent = 'Tambah Produk';
   document.getElementById('productId').value = '';
@@ -1830,7 +1947,7 @@ function showAddProductModal() {
   document.getElementById('productImageFile').value = "";
   document.getElementById('productImage').value = ""; 
   
-  renderCategoryOptions(); // Ensure categories are loaded
+  renderCategoryOptions(); 
   document.getElementById('productModal').classList.add('active');
 }
 
@@ -1841,7 +1958,7 @@ function editProduct(id) {
   document.getElementById('productName').value = p.name;
   document.getElementById('productSku').value = p.sku;
   
-  renderCategoryOptions(); // Ensure categories are loaded
+  renderCategoryOptions(); 
   document.getElementById('productCategory').value = p.category;
   
   document.getElementById('productPrice').value = p.price;
@@ -2029,7 +2146,7 @@ function renderTransactionsTable() {
   document.getElementById('allTransactionsTableBody').innerHTML = transactions.map(t => `
     <tr class="hover:bg-gray-50 border-b border-gray-100">
       <td class="px-6 py-4 font-medium text-indigo-600 text-sm">${t.id}</td>
-      <td class="px-6 py-4 text-sm">${t.customer}</td>
+      <td class="px-6 py-4 text-sm">${t.customer || 'Pelanggan Umum'}</td>
       <td class="px-6 py-4 text-sm text-gray-500">${t.date}</td>
       <td class="px-6 py-4 font-bold text-sm">${formatIDR(t.total)}</td>
       <td class="px-6 py-4 text-sm"><span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">${t.method}</span></td>
@@ -2055,7 +2172,7 @@ function renderDashboard() {
       recentTxnBody.innerHTML = recent.map(t => `
         <tr class="hover:bg-gray-50 border-b border-gray-100">
             <td class="px-6 py-4 text-sm font-medium text-indigo-600">${t.id}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">${t.customer}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">${t.customer || 'Pelanggan Umum'}</td>
             <td class="px-6 py-4 text-sm font-bold text-gray-900">${formatIDR(t.total)}</td>
             <td class="px-6 py-4 text-sm">
                 <span class="px-2 py-1 rounded-full text-xs font-semibold ${t.method === 'Tunai' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
@@ -2170,7 +2287,7 @@ function renderReports() {
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 text-sm text-gray-600">${t.date}</td>
                 <td class="px-6 py-4 text-sm font-medium text-indigo-600">${t.id}</td>
-                <td class="px-6 py-4 text-sm text-gray-700">${t.customer}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">${t.customer || 'Umum'}</td>
                 <td class="px-6 py-4 text-sm"><span class="px-2 py-1 bg-gray-100 rounded text-xs">${t.method}</span></td>
                 <td class="px-6 py-4 text-sm font-bold text-right text-gray-900">${formatIDR(t.total)}</td>
             </tr>
@@ -2235,17 +2352,14 @@ function updateReportChart(filteredTxns) {
     });
 }
 
-// --- FUNGSI CETAK LAPORAN A4 ---
 function printReportA4() {
     const startStr = document.getElementById('reportStartDate').value;
     const endStr = document.getElementById('reportEndDate').value;
     const revenue = document.getElementById('reportTotalRevenue').innerText;
     const txnParams = document.getElementById('reportTotalTransactions').innerText;
     
-    // Ambil data table saat ini (sudah difilter)
     const tableBody = document.getElementById('reportTableBody').innerHTML;
 
-    // Buat HTML Laporan A4
     const printContent = `
         <div style="font-family: Arial, sans-serif; color: black;">
             <div class="report-header">
@@ -2291,10 +2405,8 @@ function printReportA4() {
     const printArea = document.getElementById('reportPrintArea');
     printArea.innerHTML = printContent;
     
-    // Trigger Print
     window.print();
     
-    // Clear area after print (optional, but clean)
     setTimeout(() => {
         printArea.innerHTML = '';
     }, 1000);
@@ -2410,12 +2522,50 @@ function loadSettings() {
     document.getElementById('taxRateInput').value = storeSettings.taxRate;
     if(document.getElementById('googleScriptUrlInput')) document.getElementById('googleScriptUrlInput').value = googleScriptUrl;
     document.getElementById('editUsername').value = loginCredentials.username;
+
+    const previewImg = document.getElementById('qrisPreviewImg');
+    const previewText = document.getElementById('qrisPreviewText');
+    if (storeSettings.qrisImage) {
+        previewImg.src = storeSettings.qrisImage;
+        previewImg.classList.remove('hidden');
+        previewText.classList.add('hidden');
+        tempQRISBase64 = storeSettings.qrisImage;
+    } else {
+        previewImg.classList.add('hidden');
+        previewText.classList.remove('hidden');
+    } 
 }
 
 function saveStoreSettings() {
     storeSettings.name = document.getElementById('storeNameInput').value;
     saveData(); 
     showNotification('Pengaturan toko disimpan', 'success');
+}
+
+function previewQRIS(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            tempQRISBase64 = e.target.result; 
+            const previewImg = document.getElementById('qrisPreviewImg');
+            const previewText = document.getElementById('qrisPreviewText');
+            previewImg.src = tempQRISBase64;
+            previewImg.classList.remove('hidden');
+            previewText.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function saveQRISSetting() {
+    if (tempQRISBase64) {
+        storeSettings.qrisImage = tempQRISBase64;
+        saveData();
+        showNotification('Gambar QRIS berhasil disimpan', 'success');
+    } else {
+        showNotification('Silakan pilih gambar terlebih dahulu', 'error');
+    }
 }
 
 function savePrinterSettings() {
@@ -2531,7 +2681,7 @@ function executeFullReset() {
   if (password === loginCredentials.password) {
       localStorage.setItem('pos_products', JSON.stringify([]));
       localStorage.setItem('pos_customers', JSON.stringify([]));
-      localStorage.setItem('pos_categories', JSON.stringify(['Electronics', 'Fashion', 'Sports', 'Home'])); // Reset Categories too
+      localStorage.setItem('pos_categories', JSON.stringify(['Electronics', 'Fashion', 'Sports', 'Home']));
       localStorage.setItem('pos_transactions', JSON.stringify([]));
       
       cart = [];
