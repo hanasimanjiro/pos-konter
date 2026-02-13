@@ -571,72 +571,67 @@ html.dark .bg-indigo-900.bg-opacity-30 { background-color: rgba(30, 41, 59, 0.5)
     </div>
     
     <div id="pos-view" class="view-content hidden animate-fade-in">
-        <div class="mb-6">
-        <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2" data-lang="pointOfSale">Kasir (POS)</h2>
-      </div>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
-        <div class="lg:col-span-2 flex flex-col h-full">
-           <div class="bg-white rounded-large shadow-sm border border-gray-200 p-4 mb-4">
-            <div class="flex items-center space-x-4">
-              <div class="relative flex-1">
-                <input type="text" id="productSearch" placeholder="Cari produk..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:ring-2 focus:ring-indigo-500">
-                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-              </div>
-              <select id="categoryFilter" class="border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500">
-                <option value="" data-lang="allCategories">Semua Kategori</option>
-                </select>
-            </div>
+  <div class="mb-4">
+    <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="pointOfSale">Kasir (POS)</h2>
+  </div>
+  
+  <div class="flex flex-col lg:flex-row h-[calc(100vh-160px)] gap-4">
+    
+    <div class="w-full lg:w-3/4 h-1/2 lg:h-full flex flex-col min-h-0">
+       <div class="bg-white rounded-large shadow-sm border border-gray-200 p-3 mb-3 flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="relative flex-1">
+            <input type="text" id="productSearch" placeholder="Cari produk..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-small focus:ring-2 focus:ring-indigo-500 text-sm">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pr-2 pb-20" id="productGrid">
-            </div>
+          <select id="categoryFilter" class="w-40 border border-gray-300 rounded-small px-2 py-2 focus:ring-2 focus:ring-indigo-500 text-sm">
+            <option value="" data-lang="allCategories">Semua Kategori</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 overflow-y-auto pr-2 flex-1 custom-scrollbar" id="productGrid">
+        </div>
+    </div>
+
+    <div class="w-full lg:w-1/4 h-1/2 lg:h-full flex flex-col min-h-0 bg-white rounded-large shadow-custom border border-gray-200 p-4">
+        <div class="flex flex-col mb-3 flex-shrink-0 border-b pb-2">
+          <h3 class="font-heading text-lg font-bold text-gray-900 mb-2" data-lang="currentOrder">Daftar Pesanan</h3>
+          <select id="customerSelect" class="w-full border border-gray-300 rounded-small px-3 py-1 text-sm">
+            <option value="" data-lang="walkInCustomer">Pelanggan Umum</option>
+          </select>
         </div>
 
-        <div class="lg:col-span-1 h-full flex flex-col">
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-4 flex flex-col h-full">
-            <h3 class="font-heading text-lg font-bold text-gray-900 mb-4 pb-2 border-b" data-lang="currentOrder">Pesanan</h3>
+        <div class="flex-1 overflow-y-auto mb-3 pr-1 space-y-2 custom-scrollbar" id="cartItems">
+          </div>
+
+        <div class="border-t border-gray-100 pt-3 flex-shrink-0">
+          <div class="flex flex-col space-y-3">
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>Subtotal: <span id="subtotal">Rp 0</span></span>
+                <span>Pajak: <span id="tax">Rp 0</span></span>
+              </div>
+              <div class="text-xl font-bold text-indigo-700">
+                Total: <span id="total">Rp 0</span>
+              </div>
+            </div>
             
-            <div class="mb-4">
-              <select id="customerSelect" class="w-full border border-gray-300 rounded-small px-3 py-2 text-sm">
-                <option value="" data-lang="walkInCustomer">Pelanggan Umum</option>
-                </select>
-            </div>
-
-            <div class="flex-1 overflow-y-auto mb-4 pr-1 space-y-2" id="cartItems">
-              <div class="flex flex-col items-center justify-center h-full text-gray-400">
-                <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <p class="text-sm">Keranjang Kosong</p>
-              </div>
-            </div>
-
-            <div class="border-t border-gray-200 pt-4 space-y-2 mt-auto">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Subtotal</span>
-                <span class="font-medium text-gray-900" id="subtotal">Rp 0</span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600" id="taxLabel">Pajak (10%)</span>
-                <span class="font-medium text-gray-900" id="tax">Rp 0</span>
-              </div>
-              <div class="flex justify-between text-xl font-bold text-indigo-700 pt-2 border-t">
-                <span>Total</span>
-                <span id="total">Rp 0</span>
-              </div>
-              
-              <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="processPayment('cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-small font-medium transition-colors flex justify-center items-center">
-                  <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                  Tunai
-                </button>
-                <button onclick="processPayment('card')" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-small font-medium transition-colors flex justify-center items-center">
-                  <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                  Kartu
-                </button>
-                <button onclick="confirmClearCart()" class="col-span-2 border border-red-300 text-red-600 hover:bg-red-50 py-2 rounded-small font-medium transition-colors">Kosongkan Keranjang</button>
-              </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="processPayment('cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-small font-medium text-sm flex justify-center items-center">
+                Tunai
+              </button>
+              <button onclick="processPayment('card')" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-small font-medium text-sm flex justify-center items-center">
+                Kartu
+              </button>
+              <button onclick="confirmClearCart()" class="col-span-2 border border-red-300 text-red-600 hover:bg-red-50 py-1.5 rounded-small text-xs font-medium">Batal</button>
             </div>
           </div>
         </div>
-      </div>
+    </div>
+
+  </div>
+</div>
     </div>
 
     <div id="products-view" class="view-content hidden">
@@ -1278,9 +1273,9 @@ function handleLogin(e) {
                 document.getElementById('main-app').classList.remove('hidden');
                 
                 try {
-                    showView('dashboard');
+                    showView('pos');
                 } catch(err) {
-                    console.error("Dashboard render error:", err);
+                    console.error("pos render error:", err);
                 }
             }, 500);
 
