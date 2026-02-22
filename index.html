@@ -1336,30 +1336,52 @@ function closeQRISModal() {
 
 // Fungsi bantu untuk menyelesaikan transaksi agar tidak duplikasi kode
 function completeTransaction(total, tax, taxRatePercent, subtotal, method) {
-    const txn = {
-        id: 'TXN-' + Date.now(),
-        date: new Date().toISOString(),
-        total: total,
-        tax: tax,
-        taxRate: taxRatePercent,
-        subtotal: subtotal,
-        method: method,
-        items: [...cart]
-    };
-
-    transactions.unshift(txn);
-
-    // Update data pelanggan jika ada
     const customerId = document.getElementById('customerSelect').value;
+    let customerName = 'Pelanggan Umum';
+    
+    // Update data pelanggan jika ada
     if (customerId) {
         const cust = customers.find(c => c.id == customerId);
         if (cust) {
             cust.spent += total;
             cust.orders += 1;
+            customerName = cust.name;
         }
     }
 
+    // --- TAMBAHKAN KODE INI UNTUK MENGURANGI STOK ---
+    cart.forEach(cartItem => {
+        const productIndex = products.findIndex(p => p.id === cartItem.id);
+        if (productIndex !== -1) {
+            products[productIndex].stock -= cartItem.quantity;
+            
+            // Pastikan stok tidak minus (opsional untuk keamanan tambahan)
+            if (products[productIndex].stock < 0) {
+                products[productIndex].stock = 0;
+            }
+        }
+    });
+    // ------------------------------------------------
+
+    const txn = {
+        id: 'TXN-' + Date.now(),
+        customer: customerName,
+        date: new Date().toLocaleDateString('id-ID'),
+        timestamp: Date.now(),
+        total: total,
+        subtotal: subtotal,
+        tax: tax,
+        taxRate: taxRatePercent,
+        method: method,
+        items: [...cart]
+    };
+
+    transactions.unshift(txn);
     saveData();
+    
+    // Sinkronisasi ke Google Sheet jika URL tersedia
+    syncToGoogleDrive(txn); 
+
     showNotification(`Pembayaran ${method} Berhasil! ${formatIDR(total)}`, 'success');
     showReceiptModal(txn.id);
     
@@ -2632,47 +2654,44 @@ function saveGoogleSettings() {
     showNotification('URL Google Script disimpan', 'success');
 }
 
-function syncToGoogleDrive(transactionData) {
-    if (!googleScriptUrl) return; 
+// --- GANTI BAGIAN INI DI DALAM TAG <SCRIPT> PALING BAWAH HTML ANDA ---
 
-    fetch(googleScriptUrl, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(transactionData)
-    })
-    .then(() => {
-        console.log("Data sent to Google Sheet");
-    })
-    .catch(error => {
-        console.error('Error syncing to Google Sheet:', error);
-        showNotification('Gagal sinkronisasi ke Google Sheet', 'error');
-    });
-}
+async function syncToGoogleDrive(txnData) {
+    const scriptUrl = localStorage.getItem('pos_google_script_url');
+    if (!scriptUrl) return;
 
-function testSync() {
-    if (!googleScriptUrl) return showNotification('Isi URL terlebih dahulu', 'error');
-    
-    showNotification('Mengirim data test...', 'info');
-    const testData = {
-        total: 1000,
-        paymentMethod: 'Test Connection',
-        items: [{name: 'Test Item', qty: 1}]
+    // Pastikan data item tidak kosong
+    const items = txnData.items || (typeof cart !== 'undefined' ? [...cart] : []);
+    if (items.length === 0) {
+        console.error("Data item kosong, pengiriman dibatalkan.");
+        return;
+    }
+
+    const payload = {
+        date: new Date().toLocaleDateString('id-ID'),
+        time: new Date().toLocaleTimeString('id-ID'),
+        id: txnData.id || 'TRX-' + Date.now(),
+        customer: txnData.customer || "Umum",
+        method: txnData.method || "Tunai",
+        items: items.map(i => ({
+            name: i.name,
+            price: Number(i.price),
+            quantity: Number(i.quantity || i.qty || 1)
+        }))
     };
-    
-    syncToGoogleDrive(testData);
-    showNotification('Data test dikirim (Cek Google Sheet Anda)', 'success');
-}
 
-function showResetConfirmModal() {
-  document.getElementById('resetConfirmPassword').value = '';
-  document.getElementById('resetDataModal').classList.add('active');
-}
-
-function closeResetModal() {
-  document.getElementById('resetDataModal').classList.remove('active');
+    try {
+        // Menggunakan fetch standar (bukan no-cors agar kita bisa baca responnya)
+        const response = await fetch(scriptUrl, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+        
+        console.log("Status pengiriman ke Google berhasil diinisiasi.");
+    } catch (error) {
+        console.error("Koneksi gagal:", error);
+        alert("Gagal mengirim ke Google Sheets. Periksa koneksi atau URL Script Anda.");
+    }
 }
 
 function executeFullReset() {
