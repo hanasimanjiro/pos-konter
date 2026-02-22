@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" style="height: auto; min-height: 100%;">
+<html lang="id" style="height: auto; min-height: 80%;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -431,6 +431,10 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
       <span data-lang="newSale">Kasir (POS)</span>
     </a>
+    <a href="#" onclick="showView('service')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+      <span>Servis HP</span>
+    </a>
     <a href="#" onclick="showView('products')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
       <span data-lang="products">Produk</span>
@@ -442,6 +446,10 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
     <a href="#" onclick="showView('transactions')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       <span data-lang="transactions">Transaksi</span>
+    </a>
+    <a href="#" onclick="showView('expenses')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>Pengeluaran</span>
     </a>
     <a href="#" onclick="showView('customers')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -677,6 +685,62 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
       </div>
     </div>
 
+    <div id="service-view" class="view-content hidden animate-fade-in">
+      <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2">Penerimaan Servis HP</h2>
+      </div>
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+        <form id="serviceForm" onsubmit="return false;">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Nama Pelanggan</label>
+              <input type="text" id="srvCustomerName" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="Biarkan kosong untuk Umum">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Barang / Tipe HP <span class="text-red-500">*</span></label>
+              <input type="text" id="srvPhoneModel" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">IMEI / SN</label>
+              <input type="text" id="srvImei" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Kerusakan <span class="text-red-500">*</span></label>
+              <input type="text" id="srvDamage" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Biaya Servis (Rp) <span class="text-red-500">*</span></label>
+              <input type="number" id="srvCost" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required min="0">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Jangka Waktu</label>
+              <input type="text" id="srvDuration" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: 2-3 Hari">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Garansi</label>
+              <input type="text" id="srvWarranty" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: 1 Minggu">
+            </div>
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Ketentuan / Catatan Tambahan</label>
+            <textarea id="srvNotes" rows="3" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="Catatan khusus..."></textarea>
+          </div>
+          <div class="border-t border-gray-200 pt-6">
+            <div class="grid grid-cols-2 gap-4">
+              <button onclick="processServicePayment('cash')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-small font-bold transition-colors flex justify-center items-center shadow-custom">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Bayar Tunai & Cetak
+              </button>
+              <button onclick="processServicePayment('qris')" class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-small font-bold transition-colors flex justify-center items-center shadow-custom">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m-3 3h6m-6 3h6m-6 3h6m-6 3h6M5 8h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2z"></path></svg>
+                Bayar QRIS & Cetak
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div id="products-view" class="view-content hidden">
       <div class="flex justify-between items-center mb-6">
         <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="productManagement">Manajemen Produk</h2>
@@ -753,6 +817,31 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
       </div>
     </div>
 
+    <div id="expenses-view" class="view-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900">Catatan Pengeluaran</h2>
+        <button onclick="showAddExpenseModal()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-small shadow-custom flex items-center">
+           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Tambah Pengeluaran</span>
+        </button>
+      </div>
+       <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+         <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+              <tr>
+                <th class="px-6 py-3">Tanggal</th>
+                <th class="px-6 py-3">Keterangan</th>
+                <th class="px-6 py-3 text-right">Nominal</th>
+                <th class="px-6 py-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="expensesTableBody" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
      <div id="customers-view" class="view-content hidden">
       <div class="flex justify-between items-center mb-6">
         <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="customerManagement">Pelanggan</h2>
@@ -782,7 +871,7 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
     <div id="reports-view" class="view-content hidden">
       <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between">
          <div>
-            <h2 class="font-heading text-2xl font-bold text-gray-900 mb-1" data-lang="reports">Laporan Penjualan</h2>
+            <h2 class="font-heading text-2xl font-bold text-gray-900 mb-1" data-lang="reports">Laporan Penjualan & Keuangan</h2>
             <p class="text-gray-600">Analisis performa penjualan berdasarkan periode waktu.</p>
          </div>
       </div>
@@ -807,31 +896,43 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-large shadow-custom border border-gray-200 mb-6">
-          <h3 class="font-heading text-lg font-bold text-gray-900 mb-4">Grafik Penjualan Periode Ini</h3>
-          <div class="h-80 w-full relative">
-              <canvas id="reportChart"></canvas>
-          </div>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+        <div class="bg-white p-4 rounded-large shadow-custom border border-gray-100">
+            <p class="text-xs text-gray-500 font-medium mb-1">Modal Usaha</p>
+            <h3 class="text-xl font-bold text-blue-600" id="reportModalValue">Rp 0</h3>
+        </div>
+        <div class="bg-white p-4 rounded-large shadow-custom border border-gray-100">
+            <p class="text-xs text-gray-500 font-medium mb-1">Total Omzet</p>
+            <h3 class="text-xl font-bold text-indigo-700" id="reportTotalRevenue">Rp 0</h3>
+        </div>
+        <div class="bg-white p-4 rounded-large shadow-custom border border-rose-100">
+            <p class="text-xs text-rose-500 font-medium mb-1">Total Pengeluaran</p>
+            <h3 class="text-xl font-bold text-rose-600" id="reportTotalExpense">Rp 0</h3>
+        </div>
+        <div class="bg-white p-4 rounded-large shadow-custom border border-emerald-100">
+            <p class="text-xs text-emerald-600 font-medium mb-1" title="Modal + Omzet - Pengeluaran">Total Kas Bersih</p>
+            <h3 class="text-xl font-bold text-emerald-600" id="reportTotalCash">Rp 0</h3>
+        </div>
+        <div class="bg-white p-4 rounded-large shadow-custom border border-gray-100">
+            <p class="text-xs text-gray-500 font-medium mb-1">Total Transaksi</p>
+            <h3 class="text-xl font-bold text-gray-800" id="reportTotalTransactions">0</h3>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white p-5 rounded-large shadow-custom border border-gray-100">
-            <p class="text-sm text-gray-500 font-medium mb-1">Total Omzet</p>
-            <h3 class="text-2xl font-bold text-indigo-700" id="reportTotalRevenue">Rp 0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-large shadow-custom border border-gray-100">
-            <p class="text-sm text-gray-500 font-medium mb-1">Total Transaksi</p>
-            <h3 class="text-2xl font-bold text-gray-800" id="reportTotalTransactions">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-large shadow-custom border border-gray-100">
-            <p class="text-sm text-gray-500 font-medium mb-1">Rata-rata Transaksi</p>
-            <h3 class="text-2xl font-bold text-emerald-600" id="reportAvgValue">Rp 0</h3>
-        </div>
+      <div class="bg-white p-6 rounded-large shadow-custom border border-gray-200 mb-6">
+          <div class="h-64 mb-10">
+              <h3 class="font-heading text-lg font-bold text-gray-900 mb-4">Grafik Penjualan Periode Ini</h3>
+              <canvas id="reportChart"></canvas>
+          </div>
+          <div class="h-64 mt-10">
+              <h3 class="font-heading text-lg font-bold text-rose-600 mb-4">Grafik Pengeluaran Periode Ini</h3>
+              <canvas id="expenseChart"></canvas>
+          </div>
       </div>
 
       <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h3 class="font-bold text-gray-700">Rincian Transaksi</h3>
+            <h3 class="font-bold text-gray-700">Rincian Transaksi Penjualan</h3>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left">
@@ -876,16 +977,35 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
           </div>
 
           <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
-            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Toko</h3>
-            <div class="space-y-4">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Toko & Modal</h3>
+            <div class="space-y-6">
+              
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Nama Toko</label>
-                <input type="text" id="storeNameInput" value="Toko Saya" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <div class="flex space-x-2">
+                    <input type="text" id="storeNameInput" value="Toko Saya" class="flex-1 border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Nama</button>
+                </div>
               </div>
-              <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan</button>
+
+              <div class="bg-blue-50 p-5 rounded-large border border-blue-100">
+                <div class="mb-4 flex justify-between items-center border-b border-blue-200 pb-3">
+                   <span class="text-sm font-medium text-gray-700">Total Modal Saat Ini:</span>
+                   <span id="currentModalDisplay" class="text-2xl font-bold text-blue-700">Rp 0</span>
+                </div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tambah Modal Harian (Rp)</label>
+                <div class="flex space-x-2">
+                    <input type="number" id="storeModalInput" placeholder="Contoh: 150000" min="0" class="flex-1 border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="addModal()" class="px-4 py-2 bg-blue-600 text-white rounded-small hover:bg-blue-700 font-medium shadow-custom">Tambahkan Modal</button>
+                </div>
+                <div class="mt-3 flex justify-between items-center">
+                   <p class="text-xs text-gray-500">Nominal akan langsung diakumulasi dengan Total Modal Saat Ini.</p>
+                   <button onclick="resetModal()" class="text-xs text-red-500 hover:text-red-700 font-medium underline">Reset Modal ke Rp 0</button>
+                </div>
+              </div>
+
             </div>
           </div>
-
           <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pembayaran QRIS</h3>
             <div class="space-y-4">
@@ -1193,6 +1313,37 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
   </div>
 </div>
 
+<div id="expenseModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-md w-full mx-4 modal-content">
+    <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+      <h3 class="font-heading text-xl font-bold text-gray-900">Catat Pengeluaran</h3>
+      <button onclick="closeExpenseModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <form onsubmit="saveExpense(event)" class="p-6">
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+          <input type="date" id="expenseDate" class="w-full border border-gray-300 rounded-small px-4 py-2" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan (Cth: Beli Kertas, Listrik)</label>
+          <input type="text" id="expenseDesc" class="w-full border border-gray-300 rounded-small px-4 py-2" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nominal (Rp)</label>
+          <input type="number" id="expenseAmount" min="0" class="w-full border border-gray-300 rounded-small px-4 py-2" required>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-3">
+         <button type="button" onclick="closeExpenseModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-rose-600 text-white rounded-small">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div id="receiptPrint" style="display: none;"></div>
 <div id="reportPrintArea" style="display: none;"></div>
 
@@ -1214,7 +1365,7 @@ const defaultCustomers = [
 
 const hasInitialized = localStorage.getItem('pos_initialized');
 
-let products, customers, transactions, categories;
+let products, customers, transactions, categories, expenses;
 let loginCredentials; 
 
 // Initial Default Categories
@@ -1226,6 +1377,7 @@ if (!hasInitialized) {
     categories = defaultCategories; // Set default
     loginCredentials = { username: 'admin', password: 'admin123' };
     transactions = [];
+    expenses = [];
     for(let i=0; i<5; i++) {
         const sub = 150000 * (i+1);
         const date = new Date();
@@ -1249,6 +1401,7 @@ if (!hasInitialized) {
     localStorage.setItem('pos_customers', JSON.stringify(customers));
     localStorage.setItem('pos_categories', JSON.stringify(categories)); // Save categories
     localStorage.setItem('pos_transactions', JSON.stringify(transactions));
+    localStorage.setItem('pos_expenses', JSON.stringify(expenses));
     localStorage.setItem('pos_loginCredentials', JSON.stringify(loginCredentials));
 
 } else {
@@ -1256,6 +1409,7 @@ if (!hasInitialized) {
     customers = JSON.parse(localStorage.getItem('pos_customers')) || [];
     categories = JSON.parse(localStorage.getItem('pos_categories')) || defaultCategories; // Load categories
     transactions = JSON.parse(localStorage.getItem('pos_transactions')) || [];
+    expenses = JSON.parse(localStorage.getItem('pos_expenses')) || [];
     loginCredentials = JSON.parse(localStorage.getItem('pos_loginCredentials')) || { username: 'admin', password: 'admin123' };
 }
 
@@ -1264,7 +1418,8 @@ let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
     address: 'Jl. Merdeka No. 1',
     taxEnabled: true,
     taxRate: 10,
-    qrisImage: '' 
+    qrisImage: '',
+    modal: 0 // Modal Default
 };
 let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
     type: '58mm', 
@@ -1281,6 +1436,7 @@ let currentLanguage = 'id';
 let confirmCallback = null;
 let currentReceiptTransaction = null;
 let reportChartInstance = null; // Variable chart baru
+let expenseChartInstance = null;
 
 // Simpan variabel sementara untuk data transaksi QRIS
 let tempQRISTxn = null;
@@ -1313,7 +1469,7 @@ function processPayment(method) {
         qrisTotal.textContent = formatIDR(total);
         
         // Simpan data transaksi sementara
-        tempQRISTxn = { total, tax, taxRatePercent, subtotal };
+        tempQRISTxn = { isService: false, total, tax, taxRatePercent, subtotal };
         
         document.getElementById('qrisModal').classList.add('active');
         return; // Jangan lanjutkan simpan transaksi dulu
@@ -1323,9 +1479,56 @@ function processPayment(method) {
     completeTransaction(total, tax, taxRatePercent, subtotal, 'Tunai');
 }
 
+function processServicePayment(method) {
+    const customerName = document.getElementById('srvCustomerName').value || 'Pelanggan Umum';
+    const phoneModel = document.getElementById('srvPhoneModel').value;
+    const imei = document.getElementById('srvImei').value;
+    const damage = document.getElementById('srvDamage').value;
+    const cost = parseFloat(document.getElementById('srvCost').value) || 0;
+    const duration = document.getElementById('srvDuration').value;
+    const warranty = document.getElementById('srvWarranty').value;
+    const notes = document.getElementById('srvNotes').value;
+
+    if(!phoneModel || !damage || cost <= 0) {
+        showNotification('Mohon lengkapi data Barang, Kerusakan & Biaya Servis', 'error');
+        return;
+    }
+
+    const subtotal = cost;
+    const taxRatePercent = storeSettings.taxEnabled ? storeSettings.taxRate : 0;
+    const tax = subtotal * (taxRatePercent / 100);
+    const total = subtotal + tax;
+
+    if (method === 'qris') {
+        if (!storeSettings.qrisImage || storeSettings.qrisImage === '') {
+            showNotification('Gambar QRIS belum diatur! Silakan upload di menu Pengaturan.', 'error');
+            return;
+        }
+        const qrisImg = document.getElementById('qrisImage');
+        const qrisTotal = document.getElementById('qrisTotalDisplay');
+        qrisImg.src = storeSettings.qrisImage;
+        qrisTotal.textContent = formatIDR(total);
+
+        tempQRISTxn = { 
+            isService: true, 
+            total, tax, taxRatePercent, subtotal, 
+            details: { customerName, phoneModel, imei, damage, cost, duration, warranty, notes } 
+        };
+
+        document.getElementById('qrisModal').classList.add('active');
+        return;
+    }
+
+    completeServiceTransaction(total, tax, taxRatePercent, subtotal, 'Tunai', { customerName, phoneModel, imei, damage, cost, duration, warranty, notes });
+}
+
 function finalizeQRIS() {
     if (!tempQRISTxn) return;
-    completeTransaction(tempQRISTxn.total, tempQRISTxn.tax, tempQRISTxn.taxRatePercent, tempQRISTxn.subtotal, 'QRIS');
+    if (tempQRISTxn.isService) {
+        completeServiceTransaction(tempQRISTxn.total, tempQRISTxn.tax, tempQRISTxn.taxRatePercent, tempQRISTxn.subtotal, 'QRIS', tempQRISTxn.details);
+    } else {
+        completeTransaction(tempQRISTxn.total, tempQRISTxn.tax, tempQRISTxn.taxRatePercent, tempQRISTxn.subtotal, 'QRIS');
+    }
     closeQRISModal();
 }
 
@@ -1392,12 +1595,49 @@ function completeTransaction(total, tax, taxRatePercent, subtotal, method) {
     renderDashboard();
 }
 
+// Fungsi menyelesaikan transaksi untuk Servis HP
+function completeServiceTransaction(total, tax, taxRatePercent, subtotal, method, details) {
+    const txn = {
+        id: 'SRV-' + Date.now(),
+        customer: details.customerName,
+        date: new Date().toLocaleDateString('id-ID'),
+        timestamp: Date.now(),
+        total: total,
+        subtotal: subtotal,
+        tax: tax,
+        taxRate: taxRatePercent,
+        method: method,
+        items: [{
+            name: 'Servis: ' + details.phoneModel + ' (' + details.damage + ')',
+            price: details.cost,
+            quantity: 1,
+            imei: details.imei,
+            duration: details.duration,
+            warranty: details.warranty,
+            notes: details.notes
+        }]
+    };
+
+    transactions.unshift(txn);
+    saveData();
+    syncToGoogleDrive(txn);
+
+    showNotification(`Pembayaran Servis ${method} Berhasil! ${formatIDR(total)}`, 'success');
+    showReceiptModal(txn.id);
+
+    // clear form
+    document.getElementById('serviceForm').reset();
+    renderDashboard();
+    renderTransactionsTable();
+}
+
 // New Function: Save Data to LocalStorage
 function saveData() {
     localStorage.setItem('pos_products', JSON.stringify(products));
     localStorage.setItem('pos_customers', JSON.stringify(customers));
     localStorage.setItem('pos_categories', JSON.stringify(categories)); // Save updated categories
     localStorage.setItem('pos_transactions', JSON.stringify(transactions));
+    localStorage.setItem('pos_expenses', JSON.stringify(expenses));
     localStorage.setItem('pos_storeSettings', JSON.stringify(storeSettings));
     localStorage.setItem('pos_printerSettings', JSON.stringify(printerSettings));
     localStorage.setItem('pos_adminProfile', JSON.stringify(adminProfile));
@@ -1594,6 +1834,7 @@ function showView(viewName) {
       if (viewName === 'products') renderProductsTable();
       if (viewName === 'inventory') renderInventoryTable();
       if (viewName === 'transactions') renderTransactionsTable();
+      if (viewName === 'expenses') renderExpensesTable();
       if (viewName === 'customers') renderCustomersTable();
       if (viewName === 'dashboard') renderDashboard();
       if (viewName === 'reports') renderReports(); 
@@ -1854,6 +2095,10 @@ function generateReceiptHTML(txn) {
         ${txn.items.map(item => `
           <div style="margin-bottom: 5px;">
             <div>${item.name}</div>
+            ${item.imei ? `<div style="font-size: 0.85em; color: #555; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
+            ${item.duration ? `<div style="font-size: 0.85em; color: #555;">Waktu: ${item.duration}</div>` : ''}
+            ${item.warranty ? `<div style="font-size: 0.85em; color: #555;">Garansi: ${item.warranty}</div>` : ''}
+            ${item.notes ? `<div style="font-size: 0.85em; color: #555; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
             <div style="display: flex; justify-content: space-between;">
               <span>${item.quantity} x ${formatIDR(item.price)}</span>
               <span>${formatIDR(item.quantity * item.price)}</span>
@@ -2108,6 +2353,98 @@ function saveStockAdjustment() {
   }
 }
 
+// --- FUNGSI PENGELUARAN ---
+function renderExpensesTable() {
+  const tbody = document.getElementById('expensesTableBody');
+  if(expenses.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada catatan pengeluaran.</td></tr>`;
+      return;
+  }
+  tbody.innerHTML = expenses.sort((a,b) => b.timestamp - a.timestamp).map(e => `
+    <tr class="hover:bg-gray-50 border-b border-gray-100">
+      <td class="px-6 py-4 text-sm text-gray-500">${e.date}</td>
+      <td class="px-6 py-4 font-medium text-gray-800">${e.desc}</td>
+      <td class="px-6 py-4 font-bold text-rose-600 text-right">${formatIDR(e.amount)}</td>
+      <td class="px-6 py-4 text-center">
+        <button onclick="deleteExpense('${e.id}')" class="text-red-600 hover:text-red-900 text-sm">Hapus</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function showAddExpenseModal() {
+  document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('expenseDesc').value = '';
+  document.getElementById('expenseAmount').value = '';
+  document.getElementById('expenseModal').classList.add('active');
+}
+
+function closeExpenseModal() { 
+  document.getElementById('expenseModal').classList.remove('active'); 
+}
+
+function saveExpense(e) {
+  e.preventDefault();
+  const dateVal = document.getElementById('expenseDate').value;
+  const parts = dateVal.split('-');
+  const data = {
+    id: 'EXP-' + Date.now(),
+    date: `${parts[2]}/${parts[1]}/${parts[0]}`,
+    timestamp: new Date(dateVal).getTime(),
+    desc: document.getElementById('expenseDesc').value,
+    amount: parseInt(document.getElementById('expenseAmount').value) || 0
+  };
+  expenses.push(data);
+  saveData();
+  closeExpenseModal();
+  renderExpensesTable();
+  if(!document.getElementById('reports-view').classList.contains('hidden')) renderReports();
+  showNotification('Pengeluaran berhasil dicatat', 'success');
+}
+
+function deleteExpense(id) {
+  if(confirm('Hapus pengeluaran ini?')) {
+    expenses = expenses.filter(e => e.id != id);
+    saveData(); 
+    renderExpensesTable();
+    if(!document.getElementById('reports-view').classList.contains('hidden')) renderReports();
+  }
+}
+
+// --- GRAFIK PENGELUARAN ---
+function updateExpenseChart(filteredExpenses) {
+    const ctx = document.getElementById('expenseChart');
+    if(!ctx) return;
+    
+    if (expenseChartInstance) { expenseChartInstance.destroy(); }
+    
+    const grouped = {};
+    filteredExpenses.forEach(e => {
+        if(!grouped[e.date]) grouped[e.date] = 0;
+        grouped[e.date] += e.amount;
+    });
+
+    const labels = Object.keys(grouped).sort((a,b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-')));
+    const data = labels.map(l => grouped[l]);
+
+    expenseChartInstance = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Pengeluaran (Rp)',
+                data: data,
+                backgroundColor: 'rgba(225, 29, 72, 0.2)',
+                borderColor: 'rgb(225, 29, 72)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
 function renderCustomersTable() {
   const tbody = document.getElementById('customersTableBody');
   const select = document.getElementById('customerSelect');
@@ -2302,13 +2639,22 @@ function renderReports() {
         return tDate >= start && tDate <= end;
     });
 
+    const filteredExpenses = expenses.filter(e => {
+        let eDate = e.timestamp ? new Date(e.timestamp) : new Date(e.date.split('/').reverse().join('-'));
+        return eDate >= start && eDate <= end;
+    });
+
     // 1. Update Cards
     const totalRev = filteredTxns.reduce((sum, t) => sum + t.total, 0);
-    const avgVal = filteredTxns.length > 0 ? totalRev / filteredTxns.length : 0;
+    const totalExp = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const modalUsaha = parseFloat(storeSettings.modal) || 0;
+    const totalKas = modalUsaha + totalRev - totalExp; // Modal + Omzet - Pengeluaran
     
+    document.getElementById('reportModalValue').textContent = formatIDR(modalUsaha);
     document.getElementById('reportTotalRevenue').textContent = formatIDR(totalRev);
+    document.getElementById('reportTotalExpense').textContent = formatIDR(totalExp);
+    document.getElementById('reportTotalCash').textContent = formatIDR(totalKas);
     document.getElementById('reportTotalTransactions').textContent = filteredTxns.length;
-    document.getElementById('reportAvgValue').textContent = formatIDR(avgVal);
 
     // 2. Render Table
     const tbody = document.getElementById('reportTableBody');
@@ -2326,8 +2672,9 @@ function renderReports() {
         `).join('');
     }
 
-    // 3. Render/Update Report Chart
+    // 3. Render/Update Report Charts
     updateReportChart(filteredTxns);
+    updateExpenseChart(filteredExpenses);
 }
 
 function updateReportChart(filteredTxns) {
@@ -2388,7 +2735,10 @@ function printReportA4() {
     const startStr = document.getElementById('reportStartDate').value;
     const endStr = document.getElementById('reportEndDate').value;
     const revenue = document.getElementById('reportTotalRevenue').innerText;
+    const expensesValue = document.getElementById('reportTotalExpense').innerText;
     const txnParams = document.getElementById('reportTotalTransactions').innerText;
+    const modalValue = document.getElementById('reportModalValue').innerText;
+    const totalCashValue = document.getElementById('reportTotalCash').innerText;
     
     const tableBody = document.getElementById('reportTableBody').innerHTML;
 
@@ -2396,18 +2746,30 @@ function printReportA4() {
         <div style="font-family: Arial, sans-serif; color: black;">
             <div class="report-header">
                 <h1 style="margin: 0; font-size: 24px;">${storeSettings.name}</h1>
-                <p style="margin: 5px 0 0 0;">Laporan Penjualan</p>
+                <p style="margin: 5px 0 0 0;">Laporan Penjualan & Keuangan</p>
                 <p style="font-size: 14px; color: #555;">Periode: ${startStr} s/d ${endStr}</p>
             </div>
             
             <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <div style="border: 1px solid #ccc; padding: 10px; width: 48%;">
-                    <strong>Total Omzet:</strong><br>
-                    <span style="font-size: 18px;">${revenue}</span>
+                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
+                    <strong>Modal Awal:</strong><br>
+                    <span style="font-size: 14px;">${modalValue}</span>
                 </div>
-                <div style="border: 1px solid #ccc; padding: 10px; width: 48%;">
-                    <strong>Total Transaksi:</strong><br>
-                    <span style="font-size: 18px;">${txnParams}</span>
+                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
+                    <strong>Total Omzet:</strong><br>
+                    <span style="font-size: 14px;">${revenue}</span>
+                </div>
+                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
+                    <strong>Pengeluaran:</strong><br>
+                    <span style="font-size: 14px;">${expensesValue}</span>
+                </div>
+                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
+                    <strong>Estimasi Kas:</strong><br>
+                    <span style="font-size: 14px;">${totalCashValue}</span>
+                </div>
+                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
+                    <strong>Transaksi:</strong><br>
+                    <span style="font-size: 14px;">${txnParams}</span>
                 </div>
             </div>
 
@@ -2546,8 +2908,20 @@ function initCharts() {
   }
 }
 
+// --- PERUBAHAN FUNGSI PENGATURAN MODAL ---
 function loadSettings() {
     document.getElementById('storeNameInput').value = storeSettings.name;
+    
+    // Tampilkan Total Modal ke text (bukan ke dalam input agar tidak bingung)
+    const currentModal = storeSettings.modal || 0;
+    if(document.getElementById('currentModalDisplay')) {
+        document.getElementById('currentModalDisplay').textContent = formatIDR(currentModal);
+    }
+    // Kosongkan input tambah modal
+    if(document.getElementById('storeModalInput')) {
+        document.getElementById('storeModalInput').value = '';
+    }
+
     document.getElementById('printerType').value = printerSettings.type;
     document.getElementById('receiptFooter').value = printerSettings.footer;
     document.getElementById('taxEnabledInput').checked = storeSettings.taxEnabled;
@@ -2571,8 +2945,40 @@ function loadSettings() {
 function saveStoreSettings() {
     storeSettings.name = document.getElementById('storeNameInput').value;
     saveData(); 
-    showNotification('Pengaturan toko disimpan', 'success');
+    showNotification('Nama Toko berhasil disimpan', 'success');
 }
+
+// Fungsi Baru: Menambahkan Modal
+function addModal() {
+    const inputField = document.getElementById('storeModalInput');
+    const addedAmount = parseFloat(inputField.value);
+    
+    if (isNaN(addedAmount) || addedAmount <= 0) {
+        showNotification('Masukkan nominal yang valid!', 'error');
+        return;
+    }
+    
+    // Akumulasi modal
+    storeSettings.modal = (storeSettings.modal || 0) + addedAmount;
+    saveData();
+    
+    // Perbarui Tampilan
+    document.getElementById('currentModalDisplay').textContent = formatIDR(storeSettings.modal);
+    inputField.value = ''; // Reset input text
+    
+    showNotification(`Modal Rp ${addedAmount.toLocaleString('id-ID')} berhasil ditambahkan`, 'success');
+}
+
+// Fungsi Baru: Reset Modal
+function resetModal() {
+    showConfirm('Apakah Anda yakin ingin mengatur ulang Total Modal menjadi Rp 0?', () => {
+        storeSettings.modal = 0;
+        saveData();
+        document.getElementById('currentModalDisplay').textContent = formatIDR(0);
+        showNotification('Total Modal berhasil direset ke Rp 0', 'success');
+    });
+}
+// ------------------------------------------
 
 function previewQRIS(event) {
     const file = event.target.files[0];
@@ -2712,6 +3118,7 @@ function executeFullReset() {
       localStorage.setItem('pos_customers', JSON.stringify([]));
       localStorage.setItem('pos_categories', JSON.stringify(['Electronics', 'Fashion', 'Sports', 'Home']));
       localStorage.setItem('pos_transactions', JSON.stringify([]));
+      localStorage.setItem('pos_expenses', JSON.stringify([]));
       
       cart = [];
       
