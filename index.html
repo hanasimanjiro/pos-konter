@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id" style="height: auto; min-height: 80%;">
+<html lang="id" style="height: auto; min-height: 75%;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem POS - Manajemen Lengkap (Google Sync)</title>
+<title>Sistem POS - Manajemen Lengkap </title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
 <link rel="apple-touch-icon" href="assets/images/logo-192.png">
@@ -3068,6 +3068,19 @@ function saveGoogleSettings() {
     googleScriptUrl = document.getElementById('googleScriptUrlInput').value.trim();
     localStorage.setItem('pos_google_script_url', googleScriptUrl);
     showNotification('URL Google Script disimpan', 'success');
+}
+
+// --- FUNGSI MODAL RESET DATA ---
+function showResetConfirmModal() {
+  // Kosongkan kolom password setiap kali modal dibuka
+  document.getElementById('resetConfirmPassword').value = ''; 
+  // Tampilkan modal
+  document.getElementById('resetDataModal').classList.add('active');
+}
+
+function closeResetModal() {
+  // Sembunyikan modal
+  document.getElementById('resetDataModal').classList.remove('active');
 }
 
 // --- GANTI BAGIAN INI DI DALAM TAG <SCRIPT> PALING BAWAH HTML ANDA ---
