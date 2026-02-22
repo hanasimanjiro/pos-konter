@@ -1351,7 +1351,7 @@ function completeTransaction(total, tax, taxRatePercent, subtotal, method) {
 
     // --- TAMBAHKAN KODE INI UNTUK MENGURANGI STOK ---
     cart.forEach(cartItem => {
-        const productIndex = products.findIndex(p => p.id === cartItem.id);
+        const productIndex = products.findIndex(p => p.id == cartItem.id);
         if (productIndex !== -1) {
             products[productIndex].stock -= cartItem.quantity;
             
@@ -1698,7 +1698,7 @@ function renderProductGrid() {
   });
   
   grid.innerHTML = filtered.map(p => `
-    <div class="bg-white rounded-large shadow-sm border border-gray-200 hover:shadow-md cursor-pointer transition-all flex flex-col h-full overflow-hidden group" onclick="addToCart(${p.id})">
+    <div class="bg-white rounded-large shadow-sm border border-gray-200 hover:shadow-md cursor-pointer transition-all flex flex-col h-full overflow-hidden group" onclick="addToCart('${p.id}')">
       <div class="h-32 overflow-hidden relative">
         <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
         ${p.stock <= 5 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">Sisa Sedikit</span>' : ''}
@@ -1716,13 +1716,15 @@ function renderProductGrid() {
 }
 
 function addToCart(id) {
-  const product = products.find(p => p.id === id);
+  const product = products.find(p => p.id == id);
+  if (!product) return;
+  
   if (product.stock <= 0) {
     showNotification('Stok produk habis!', 'error');
     return;
   }
   
-  const existing = cart.find(item => item.id === id);
+  const existing = cart.find(item => item.id == id);
   if (existing) {
     if (existing.quantity < product.stock) {
       existing.quantity++;
@@ -1754,11 +1756,11 @@ function renderCart() {
           <p class="text-xs text-gray-500">${formatIDR(item.price)}</p>
         </div>
         <div class="flex items-center space-x-2">
-          <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 flex items-center justify-center">-</button>
+          <button onclick="updateQty('${item.id}', -1)" class="w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 flex items-center justify-center">-</button>
           <span class="text-sm font-bold w-6 text-center">${item.quantity}</span>
-          <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 flex items-center justify-center">+</button>
+          <button onclick="updateQty('${item.id}', 1)" class="w-6 h-6 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 flex items-center justify-center">+</button>
         </div>
-        <button onclick="removeFromCart(${item.id})" class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onclick="removeFromCart('${item.id}')" class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
       </div>
@@ -1769,8 +1771,8 @@ function renderCart() {
 }
 
 function updateQty(id, change) {
-  const item = cart.find(i => i.id === id);
-  const product = products.find(p => p.id === id);
+  const item = cart.find(i => i.id == id);
+  const product = products.find(p => p.id == id);
   
   const newQty = item.quantity + change;
   if (newQty > product.stock) {
@@ -1787,7 +1789,7 @@ function updateQty(id, change) {
 }
 
 function removeFromCart(id) {
-  cart = cart.filter(i => i.id !== id);
+  cart = cart.filter(i => i.id != id);
   renderCart();
 }
 
@@ -1950,8 +1952,8 @@ function renderProductsTable() {
         </span>
       </td>
       <td class="px-6 py-4 text-sm">
-        <button onclick="editProduct(${p.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-        <button onclick="deleteProduct(${p.id})" class="text-red-600 hover:text-red-900">Hapus</button>
+        <button onclick="editProduct('${p.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+        <button onclick="deleteProduct('${p.id}')" class="text-red-600 hover:text-red-900">Hapus</button>
       </td>
     </tr>
   `).join('');
@@ -1974,7 +1976,8 @@ function showAddProductModal() {
 }
 
 function editProduct(id) {
-  const p = products.find(x => x.id === id);
+  const p = products.find(x => x.id == id);
+  if(!p) return;
   document.getElementById('productModalTitle').textContent = 'Edit Produk';
   document.getElementById('productId').value = p.id;
   document.getElementById('productName').value = p.name;
@@ -2040,7 +2043,7 @@ function closeProductModal() {
 
 function deleteProduct(id) {
   showConfirm('Hapus produk ini secara permanen?', () => {
-    products = products.filter(p => p.id !== id);
+    products = products.filter(p => p.id != id);
     saveData(); 
     renderProductsTable();
     renderProductGrid();
@@ -2064,22 +2067,26 @@ function renderInventoryTable() {
         </span>
       </td>
       <td class="px-6 py-4">
-        <button onclick="openStockModal(${p.id})" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Sesuaikan</button>
+        <button onclick="openStockModal('${p.id}')" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Sesuaikan</button>
       </td>
     </tr>
   `).join('');
 }
 
 function openStockModal(id) {
-  const p = products.find(x => x.id === id);
-  document.getElementById('stockAdjustId').value = id;
-  document.getElementById('currentStockDisplay').value = p.stock;
-  document.getElementById('newStockInput').value = p.stock;
-  document.getElementById('stockModal').classList.add('active');
+  const p = products.find(x => x.id == id);
+  if(p) {
+    document.getElementById('stockAdjustId').value = p.id;
+    document.getElementById('currentStockDisplay').value = p.stock;
+    document.getElementById('newStockInput').value = p.stock;
+    document.getElementById('stockModal').classList.add('active');
+  } else {
+    showNotification('Produk tidak ditemukan', 'error');
+  }
 }
 
 function saveStockAdjustment() {
-  const id = parseInt(document.getElementById('stockAdjustId').value);
+  const id = document.getElementById('stockAdjustId').value;
   const newStock = parseInt(document.getElementById('newStockInput').value);
   
   if(isNaN(newStock) || newStock < 0) {
@@ -2087,14 +2094,17 @@ function saveStockAdjustment() {
     return;
   }
   
-  const idx = products.findIndex(p => p.id === id);
+  const idx = products.findIndex(p => p.id == id);
   if(idx > -1) {
     products[idx].stock = newStock;
     saveData(); 
     renderInventoryTable();
     renderProductGrid();
+    renderProductsTable(); // Diperbarui agar tabel pada halaman Produk juga tersinkron
     showNotification('Stok diperbarui', 'success');
     document.getElementById('stockModal').classList.remove('active');
+  } else {
+    showNotification('Gagal memperbarui stok', 'error');
   }
 }
 
@@ -2117,7 +2127,7 @@ function renderCustomersTable() {
       <td class="px-6 py-4 text-gray-500">${c.phone}</td>
       <td class="px-6 py-4 font-bold text-gray-800">${formatIDR(c.spent)}</td>
       <td class="px-6 py-4">
-        <button onclick="deleteCustomer(${c.id})" class="text-red-600 hover:text-red-900 text-sm">Hapus</button>
+        <button onclick="deleteCustomer('${c.id}')" class="text-red-600 hover:text-red-900 text-sm">Hapus</button>
       </td>
     </tr>
   `).join('');
@@ -2156,7 +2166,7 @@ function saveCustomer(e) {
 
 function deleteCustomer(id) {
   showConfirm('Hapus data pelanggan ini?', () => {
-    customers = customers.filter(c => c.id !== id);
+    customers = customers.filter(c => c.id != id);
     saveData(); 
     renderCustomersTable();
     renderDashboard();
