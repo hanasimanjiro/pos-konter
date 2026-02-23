@@ -2,7 +2,7 @@
 <html lang="id" style="height: auto; min-height: 100%;">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Sistem POS - Manajemen Lengkap (Google Sync)</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
@@ -297,6 +297,48 @@ html.dark .modal-content {
 
 /* Hover effect yang tidak terlalu mencolok */
 html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
+
+/* ========================================= */
+/* --- FIX KHUSUS iOS / SAFARI (IPHONE) --- */
+/* ========================================= */
+
+/* 1. Fix tinggi layar Safari (100dvh) & efek kaca (Glassmorphism) */
+@supports (-webkit-touch-callout: none) {
+  .h-screen { height: 100dvh !important; }
+  .min-h-screen { min-height: 100dvh !important; }
+  .h-\\[calc\\(100vh-140px\\)\\] { height: calc(100dvh - 140px) !important; }
+  .modal, .glass-card { -webkit-backdrop-filter: blur(10px); }
+}
+
+/* 2. Cegah layar Auto-Zoom saat mengetik di pencarian/form */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* 3. Menghapus gaya desain bawaan Apple (memperbaiki tombol/input aneh) */
+input[type="text"], input[type="password"], input[type="number"], input[type="email"], input[type="tel"], input[type="date"], textarea {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* 4. Cegah layar mantul-mantul saat di scroll (Bounce Effect) */
+html, body {
+  overscroll-behavior-y: none;
+}
+
+/* 5. Safe Area: Menyesuaikan jarak untuk Poni (Notch) & Garis Bawah Layar iPhone */
+header { 
+  padding-top: max(0px, env(safe-area-inset-top)); 
+}
+aside#sidebar > div:first-child { 
+  padding-top: max(1.5rem, env(safe-area-inset-top)); 
+}
+#pos-view .lg\:col-span-1 > div { /* Area Keranjang Bawah Kasir */
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+}
+#pos-view .lg\:col-span-2 { /* Jarak Produk dengan Keranjang */
+  padding-bottom: calc(55vh + env(safe-area-inset-bottom)) !important;
+}
 </style>
 </head>
 <body class="font-body bg-gray-50 text-gray-800" style="height: auto; min-height: 100%;">
