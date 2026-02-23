@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id" style="height: auto; min-height: 75%;">
+<html lang="id" style="height: auto; min-height: 100%;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem POS - Manajemen Lengkap </title>
+<title>Sistem POS - Manajemen Lengkap (Google Sync)</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
 <link rel="apple-touch-icon" href="assets/images/logo-192.png">
@@ -980,12 +980,20 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Toko & Modal</h3>
             <div class="space-y-6">
               
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nama Toko</label>
-                <div class="flex space-x-2">
-                    <input type="text" id="storeNameInput" value="Toko Saya" class="flex-1 border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Nama</button>
+             <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nama Toko</label>
+                  <input type="text" id="storeNameInput" value="Toko Saya" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Toko</label>
+                  <input type="text" id="storeAddressInput" placeholder="Contoh: Jl. Merdeka No. 1" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP / WA</label>
+                  <input type="text" id="storePhoneInput" placeholder="Contoh: 081234567890" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Profil Toko</button>
               </div>
 
               <div class="bg-blue-50 p-5 rounded-large border border-blue-100">
@@ -1000,7 +1008,7 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
                 </div>
                 <div class="mt-3 flex justify-between items-center">
                    <p class="text-xs text-gray-500">Nominal akan langsung diakumulasi dengan Total Modal Saat Ini.</p>
-                   <button onclick="resetModal()" class="text-xs text-red-500 hover:text-red-700 font-medium underline">Reset Modal ke Rp 0</button>
+                   
                 </div>
               </div>
 
@@ -1191,6 +1199,10 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
          <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Min Stok</label>
           <input type="number" id="productMinStock" min="0" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Garansi</label>
+          <input type="text" id="productWarranty" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="Default: none">
         </div>
       </div>
       
@@ -1974,7 +1986,8 @@ function addToCart(id) {
       return;
     }
   } else {
-    cart.push({...product, quantity: 1});
+    // Memastikan garansi ikut tersimpan pada cart, default "none" jika tidak ada
+    cart.push({...product, quantity: 1, warranty: product.warranty || 'none'});
   }
   renderCart();
 }
@@ -2073,7 +2086,9 @@ function generateReceiptHTML(txn) {
     <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
       <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
         <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
-        <p style="margin: 2px 0;">STRUK PEMBAYARAN</p>
+        ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
+        ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
+        <p style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</p>
       </div>
       
       <div style="margin-bottom: 10px;">
@@ -2212,6 +2227,7 @@ function showAddProductModal() {
   document.getElementById('productPrice').value = '';
   document.getElementById('productStock').value = '';
   document.getElementById('productMinStock').value = '';
+  document.getElementById('productWarranty').value = '';
   
   document.getElementById('productImageFile').value = "";
   document.getElementById('productImage').value = ""; 
@@ -2234,6 +2250,7 @@ function editProduct(id) {
   document.getElementById('productPrice').value = p.price;
   document.getElementById('productStock').value = p.stock;
   document.getElementById('productMinStock').value = p.minStock;
+  document.getElementById('productWarranty').value = p.warranty || 'none';
   
   document.getElementById('productImageFile').value = ""; 
   document.getElementById('productImage').value = p.image;
@@ -2264,6 +2281,7 @@ function saveProduct(e) {
     price: parseInt(document.getElementById('productPrice').value) || 0,
     stock: parseInt(document.getElementById('productStock').value) || 0,
     minStock: parseInt(document.getElementById('productMinStock').value) || 0,
+    warranty: document.getElementById('productWarranty').value.trim() || 'none',
     image: imagePath
   };
   
@@ -2911,6 +2929,8 @@ function initCharts() {
 // --- PERUBAHAN FUNGSI PENGATURAN MODAL ---
 function loadSettings() {
     document.getElementById('storeNameInput').value = storeSettings.name;
+	if(document.getElementById('storeAddressInput')) document.getElementById('storeAddressInput').value = storeSettings.address || '';
+if(document.getElementById('storePhoneInput')) document.getElementById('storePhoneInput').value = storeSettings.phone || '';
     
     // Tampilkan Total Modal ke text (bukan ke dalam input agar tidak bingung)
     const currentModal = storeSettings.modal || 0;
@@ -2944,8 +2964,10 @@ function loadSettings() {
 
 function saveStoreSettings() {
     storeSettings.name = document.getElementById('storeNameInput').value;
+    if(document.getElementById('storeAddressInput')) storeSettings.address = document.getElementById('storeAddressInput').value;
+    if(document.getElementById('storePhoneInput')) storeSettings.phone = document.getElementById('storePhoneInput').value;
     saveData(); 
-    showNotification('Nama Toko berhasil disimpan', 'success');
+    showNotification('Profil Toko berhasil disimpan', 'success');
 }
 
 // Fungsi Baru: Menambahkan Modal
@@ -2969,15 +2991,7 @@ function addModal() {
     showNotification(`Modal Rp ${addedAmount.toLocaleString('id-ID')} berhasil ditambahkan`, 'success');
 }
 
-// Fungsi Baru: Reset Modal
-function resetModal() {
-    showConfirm('Apakah Anda yakin ingin mengatur ulang Total Modal menjadi Rp 0?', () => {
-        storeSettings.modal = 0;
-        saveData();
-        document.getElementById('currentModalDisplay').textContent = formatIDR(0);
-        showNotification('Total Modal berhasil direset ke Rp 0', 'success');
-    });
-}
+
 // ------------------------------------------
 
 function previewQRIS(event) {
