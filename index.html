@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id" style="height: auto; min-height: 100%;">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1">
 <title>Sistem POS - Manajemen Lengkap (Google Sync)</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
@@ -75,9 +75,30 @@ tailwind.config = {
   --radius-large: 16px;
   --shadow-custom: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-custom-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
 }
 
-body { overflow-x: hidden; }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-touch-callout: none;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -ms-touch-action: manipulation;
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 1024px) {
+  html, body {
+    position: fixed;
+    height: 100dvh;
+  }
+}
 
 /* Modal & Utility Styles */
 .modal {
@@ -88,11 +109,23 @@ body { overflow-x: hidden; }
   top: 0;
   width: 100%;
   height: 100%;
+  height: 100dvh;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+  .modal {
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
+    padding-left: var(--safe-area-inset-left);
+    padding-right: var(--safe-area-inset-right);
+  }
 }
 
 .modal.active {
@@ -105,6 +138,15 @@ body { overflow-x: hidden; }
 .modal-content {
   transform: scale(0.95);
   transition: transform 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1024px) {
+  .modal-content {
+    max-height: 90dvh;
+  }
 }
 
 .modal.active .modal-content {
@@ -120,6 +162,15 @@ body { overflow-x: hidden; }
   flex-direction: column;
   gap: 10px;
   pointer-events: none;
+  max-width: 400px;
+}
+
+@media (max-width: 1024px) {
+  #toast-container {
+    bottom: max(20px, var(--safe-area-inset-bottom));
+    right: max(20px, var(--safe-area-inset-right));
+    width: calc(100% - max(40px, calc(2 * var(--safe-area-inset-right))));
+  }
 }
 
 .toast {
@@ -132,9 +183,18 @@ body { overflow-x: hidden; }
   gap: 0.75rem;
   transform: translateX(120%);
   transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  max-width: 350px;
   border-left: 4px solid;
   pointer-events: auto;
+  word-break: break-word;
+  min-height: 50px;
+}
+
+@media (max-width: 768px) {
+  .toast {
+    max-width: calc(100vw - 40px);
+    padding: 0.75rem 1rem;
+    font-size: 14px;
+  }
 }
 
 .toast.show { transform: translateX(0); }
@@ -155,6 +215,16 @@ body { overflow-x: hidden; }
     justify-content: center;
     align-items: center;
     transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+@media (max-width: 1024px) {
+  #login-screen {
+    height: 100dvh;
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
+    padding-left: var(--safe-area-inset-left);
+    padding-right: var(--safe-area-inset-right);
+  }
 }
 
 .glass-card {
@@ -229,25 +299,33 @@ body { overflow-x: hidden; }
 
 /* Laporan Table Style */
 .report-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 .report-table th, .report-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-    color: #000;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  color: #000;
 }
 .report-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+  background-color: #f2f2f2;
+  font-weight: bold;
 }
 .report-header {
-    text-align: center;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #000;
-    padding-bottom: 10px;
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+}
+/* Proteksi: Sembunyikan tabel Rincian Barang Rusak di semua view kecuali reports/damaged */
+#reportDamagedTableBody, #damagedTableBody {
+  display: none;
+}
+#reports-view #reportDamagedTableBody,
+#damaged-view #damagedTableBody {
+  display: table-row-group;
 }
 
 /* --- SOFT MIDNIGHT CHARCOAL THEME (Lower Contrast) --- */
@@ -298,50 +376,81 @@ html.dark .modal-content {
 /* Hover effect yang tidak terlalu mencolok */
 html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
 
-/* ========================================= */
-/* --- FIX KHUSUS iOS / SAFARI (IPHONE) --- */
-/* ========================================= */
+/* === iOS & MOBILE SPECIFIC FIXES === */
+@media (max-width: 1024px) {
+  @supports (padding: max(0px)) {
+    #login-screen {
+      padding-top: max(0px, env(safe-area-inset-top));
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
+      padding-left: max(0px, env(safe-area-inset-left));
+      padding-right: max(0px, env(safe-area-inset-right));
+    }
+    
+    header {
+      padding-top: max(0.5rem, env(safe-area-inset-top));
+      padding-right: max(0.5rem, env(safe-area-inset-right));
+      padding-left: max(0.5rem, env(safe-area-inset-left));
+    }
+  }
 
-/* 1. Fix tinggi layar Safari (100dvh) & efek kaca (Glassmorphism) */
-@supports (-webkit-touch-callout: none) {
-  .h-screen { height: 100dvh !important; }
-  .min-h-screen { min-height: 100dvh !important; }
-  .h-\\[calc\\(100vh-140px\\)\\] { height: calc(100dvh - 140px) !important; }
-  .modal, .glass-card { -webkit-backdrop-filter: blur(10px); }
+  #toast-container {
+    bottom: max(20px, var(--safe-area-inset-bottom));
+    right: max(20px, var(--safe-area-inset-right));
+  }
+
+  /* Fix iOS Safari address bar related 100vh issue */
+  @supports (height: 100dvh) {
+    #main-app, .modal {
+      height: 100dvh;
+    }
+  }
 }
 
-/* 2. Cegah layar Auto-Zoom saat mengetik di pencarian/form */
-input, select, textarea {
-  font-size: 16px !important;
+/* iOS input styling */
+@media (max-width: 1024px) {
+  input, select, textarea {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: calc(var(--radius-small) + 2px);
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Prevent iOS Safari from zooming input on focus */
+  input, textarea, select {
+    font-size: 16px;
+  }
+
+  /* iOS smooth momentum scrolling */
+  .modal, main {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* iOS Safari form controls */
+  select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='%23333' d='M6 9L1 4h10z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.2em 1.2em;
+    padding-right: 1.5rem;
+  }
 }
 
-/* 3. Menghapus gaya desain bawaan Apple (memperbaiki tombol/input aneh) */
-input[type="text"], input[type="password"], input[type="number"], input[type="email"], input[type="tel"], input[type="date"], textarea {
-  -webkit-appearance: none;
-  appearance: none;
+/* iOS Safari button/link zoom on tap (applies to all but optimized for mobile) */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  -webkit-touch-callout: none;
 }
 
-/* 4. Cegah layar mantul-mantul saat di scroll (Bounce Effect) */
-html, body {
-  overscroll-behavior-y: none;
+/* Fix iOS blur backdrop */
+@supports (-webkit-backdrop-filter: blur(1px)) {
+  .modal {
+    -webkit-backdrop-filter: blur(4px);
+  }
 }
 
-/* 5. Safe Area: Menyesuaikan jarak untuk Poni (Notch) & Garis Bawah Layar iPhone */
-header { 
-  padding-top: max(0px, env(safe-area-inset-top)); 
-}
-aside#sidebar > div:first-child { 
-  padding-top: max(1.5rem, env(safe-area-inset-top)); 
-}
-#pos-view .lg\:col-span-1 > div { /* Area Keranjang Bawah Kasir */
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
-}
-#pos-view .lg\:col-span-2 { /* Jarak Produk dengan Keranjang */
-  padding-bottom: calc(55vh + env(safe-area-inset-bottom)) !important;
-}
 </style>
 </head>
-<body class="font-body bg-gray-50 text-gray-800" style="height: auto; min-height: 100%;">
+<body class="font-body bg-gray-50 text-gray-800">
 
 <div id="toast-container"></div>
 
@@ -454,6 +563,98 @@ aside#sidebar > div:first-child {
   </div>
 </div>
 
+<div id="damagedModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-2xl w-full mx-4 p-6 modal-content">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-lg font-bold text-gray-900">Catat Barang Rusak</h3>
+      <button onclick="document.getElementById('damagedModal').classList.remove('active')" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <form id="damagedForm" onsubmit="saveDamagedItem(event)">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Barang <span class="text-red-500">*</span></label>
+          <select id="damagedProductSelect" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500" required>
+            <option value="">-- Pilih Barang --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah <span class="text-red-500">*</span></label>
+          <input type="number" id="damagedQuantity" min="1" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-red-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Alasan Kerusakan <span class="text-red-500">*</span></label>
+          <select id="damagedReason" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-red-500" required>
+            <option value="">-- Pilih Alasan --</option>
+            <option value="Rusak Pabrik">Rusak Pabrik</option>
+            <option value="Rusak Pengiriman">Rusak Pengiriman</option>
+            <option value="Rusak Penjualan">Rusak Penjualan</option>
+            <option value="Cacat Kecil">Cacat Kecil</option>
+            <option value="Kedaluwarsa">Kedaluwarsa</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+          <input type="date" id="damagedDate" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-red-500">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan Tambahan</label>
+          <textarea id="damagedDescription" rows="3" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-red-500" placeholder="Deskripsi kondisi barang rusak..."></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="document.getElementById('damagedModal').classList.remove('active')" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50 font-medium">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-small hover:bg-red-700 font-medium shadow-custom">Simpan & Kurangi Stok</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="creditModal" class="modal">
+  <div class="bg-white rounded-large shadow-custom max-w-2xl w-full mx-4 p-6 modal-content">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-lg font-bold text-gray-900">Tambah Kredit/Utang</h3>
+      <button onclick="document.getElementById('creditModal').classList.remove('active')" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <form id="creditForm" onsubmit="saveCredit(event)">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipe <span class="text-red-500">*</span></label>
+          <select id="creditType" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-blue-500" required onchange="updateCreditNameList()">
+            <option value="">-- Pilih Tipe --</option>
+            <option value="piutang">Piutang (Kredit Pelanggan)</option>
+            <option value="utang">Utang (Po Supplier)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nama <span class="text-red-500">*</span></label>
+          <input type="text" id="creditName" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Nama Pelanggan/Supplier" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nominal <span class="text-red-500">*</span></label>
+          <input type="number" id="creditAmount" min="0" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Jatuh Tempo <span class="text-red-500">*</span></label>
+          <input type="date" id="creditDueDate" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+          <textarea id="creditDescription" rows="2" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Catatan tambahan..."></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="document.getElementById('creditModal').classList.remove('active')" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50 font-medium">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-small hover:bg-blue-700 font-medium shadow-custom">Simpan Kredit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <aside class="w-64 bg-gradient-to-b from-indigo-800 to-indigo-900 flex flex-col lg:static fixed inset-y-0 left-0 z-40 transform lg:transform-none -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-xl" id="sidebar">
   <div class="p-6 border-b border-indigo-700 bg-indigo-900 bg-opacity-50">
     <div class="flex items-center space-x-3">
@@ -493,6 +694,10 @@ aside#sidebar > div:first-child {
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       <span>Pengeluaran</span>
     </a>
+    <a href="#" onclick="showView('damaged')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 5v2M6.34 7.66l1.41-1.41m3.54 3.54l1.41-1.41m3.54 3.54l1.41-1.41m-9.48 9.48l1.41-1.41m3.54-3.54l1.41-1.41m3.54-3.54l1.41-1.41M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path></svg>
+      <span>Barang Rusak</span>
+    </a>
     <a href="#" onclick="showView('customers')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
       <span data-lang="customers">Pelanggan</span>
@@ -500,6 +705,14 @@ aside#sidebar > div:first-child {
     <a href="#" onclick="showView('reports')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
       <span data-lang="reports">Laporan</span>
+    </a>
+    <a href="#" onclick="showView('analytics')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6M5 9a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <span>Analitik</span>
+    </a>
+    <a href="#" onclick="showView('credit')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h8m4 0h.01M3 19h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+      <span>Hutang Piutang</span>
     </a>
     <a href="#" onclick="showView('settings')" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-small text-indigo-200 hover:bg-white hover:bg-opacity-10 hover:text-white font-medium transition-all duration-200 border-l-4 border-transparent">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -884,6 +1097,37 @@ aside#sidebar > div:first-child {
       </div>
     </div>
 
+    <div id="damaged-view" class="view-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-heading text-2xl font-bold text-gray-900">Barang Rusak</h2>
+          <p class="text-gray-600 mt-1">Catat barang yang rusak. Stok akan berkurang otomatis.</p>
+        </div>
+        <button onclick="showAddDamagedModal()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-small shadow-custom flex items-center">
+           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Catat Barang Rusak</span>
+        </button>
+      </div>
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+              <tr>
+                <th class="px-6 py-3">Tanggal</th>
+                <th class="px-6 py-3">Kode Barang</th>
+                <th class="px-6 py-3">Nama Barang</th>
+                <th class="px-6 py-3 text-right">Qty</th>
+                <th class="px-6 py-3">Alasan</th>
+                <th class="px-6 py-3">Keterangan</th>
+                <th class="px-6 py-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="damagedTableBody" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
      <div id="customers-view" class="view-content hidden">
       <div class="flex justify-between items-center mb-6">
         <h2 class="font-heading text-2xl font-bold text-gray-900" data-lang="customerManagement">Pelanggan</h2>
@@ -919,6 +1163,35 @@ aside#sidebar > div:first-child {
       </div>
 
       <div class="bg-white p-6 rounded-large shadow-custom border border-gray-200 mb-6">
+            <!-- Rincian Barang Rusak: dipindah ke atas curva -->
+            <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden mb-6">
+            <div class="px-6 py-4 border-b border-gray-200 bg-red-50">
+              <h3 class="font-bold text-red-700">Rincian Barang Rusak</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-white text-gray-600 uppercase text-xs border-b border-gray-200">
+                  <tr>
+                    <th class="px-6 py-3">Tanggal</th>
+                    <th class="px-6 py-3">Kode Barang</th>
+                    <th class="px-6 py-3">Nama Barang</th>
+                    <th class="px-6 py-3 text-right">Qty</th>
+                    <th class="px-6 py-3">Alasan</th>
+                  </tr>
+                </thead>
+                <tbody id="reportDamagedTableBody" class="divide-y divide-gray-200">
+                  </tbody>
+              </table>
+            </div>
+            </div>
+        <div class="mb-4 pb-4 border-b border-gray-200">
+          <p class="text-sm font-medium text-gray-700 mb-3">Pilihan Periode Cepat</p>
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="setReportPeriod('today')" id="btnPeriodToday" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-small font-medium hover:bg-blue-200 text-sm">📅 Hari Ini</button>
+            <button onclick="setReportPeriod('week')" id="btnPeriodWeek" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-small font-medium hover:bg-gray-200 text-sm">📆 Minggu Ini</button>
+            <button onclick="setReportPeriod('month')" id="btnPeriodMonth" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-small font-medium hover:bg-gray-200 text-sm">📋 Bulan Ini</button>
+          </div>
+        </div>
         <div class="flex flex-col md:flex-row items-end gap-4">
             <div class="w-full md:w-auto">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Dari Tanggal</label>
@@ -972,7 +1245,25 @@ aside#sidebar > div:first-child {
           </div>
       </div>
 
-      <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-gray-200 bg-indigo-50">
+            <h3 class="font-bold text-indigo-700">📊 Ringkasan Harian</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-white text-gray-600 uppercase text-xs border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-3">Tanggal</th>
+                        <th class="px-6 py-3 text-right">Transaksi</th>
+                        <th class="px-6 py-3 text-right">Total Penjualan</th>
+                        <th class="px-6 py-3 text-right">Pengeluaran</th>
+                        <th class="px-6 py-3 text-right">Neto Hari Ini</th>
+                    </tr>
+                </thead>
+                <tbody id="reportDailySummaryBody" class="divide-y divide-gray-200"></tbody>
+            </table>
+        </div>
+      </div>
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h3 class="font-bold text-gray-700">Rincian Transaksi Penjualan</h3>
         </div>
@@ -990,6 +1281,133 @@ aside#sidebar > div:first-child {
                 <tbody id="reportTableBody" class="divide-y divide-gray-200">
                     </tbody>
             </table>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden mt-6">
+        <!-- Tabel rusak dihapus dari bawah, akan dipindah ke atas -->
+    </div>
+
+    <div id="analytics-view" class="view-content hidden">
+      <div class="mb-6">
+        <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2">Analitik & Margin</h2>
+        <p class="text-gray-600">Analisis penjualan produk dan keuntungan</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        <div class="bg-indigo-50 p-4 rounded-large border border-indigo-200">
+          <p class="text-xs text-indigo-600 font-medium mb-1">Total Margin Kotor</p>
+          <h3 class="text-2xl font-bold text-indigo-700" id="totalGrossMargin">Rp 0</h3>
+        </div>
+        <div class="bg-emerald-50 p-4 rounded-large border border-emerald-200">
+          <p class="text-xs text-emerald-600 font-medium mb-1">Rata-rata Margin</p>
+          <h3 class="text-2xl font-bold text-emerald-700" id="avgMarginPercent">0%</h3>
+        </div>
+        <div class="bg-blue-50 p-4 rounded-large border border-blue-200">
+          <p class="text-xs text-blue-600 font-medium mb-1">Produk Terlaris</p>
+          <h3 class="text-2xl font-bold text-blue-700" id="topProductName">-</h3>
+        </div>
+        <div class="bg-orange-50 p-4 rounded-large border border-orange-200">
+          <p class="text-xs text-orange-600 font-medium mb-1">Total Stok Value</p>
+          <h3 class="text-2xl font-bold text-orange-700" id="totalStockValue">Rp 0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h3 class="font-bold text-gray-700">Top 10 Produk Best Seller (Margin Keuntungan)</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-white text-gray-600 uppercase text-xs border-b border-gray-200">
+              <tr>
+                <th class="px-6 py-3">SKU</th>
+                <th class="px-6 py-3">Nama Produk</th>
+                <th class="px-6 py-3 text-right">Terjual</th>
+                <th class="px-6 py-3 text-right">Harga Jual</th>
+                <th class="px-6 py-3 text-right">HPP</th>
+                <th class="px-6 py-3 text-right">Margin/Unit</th>
+                <th class="px-6 py-3 text-right">Margin %</th>
+                <th class="px-6 py-3 text-right">Total Margin</th>
+              </tr>
+            </thead>
+            <tbody id="bestSellerTableBody" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+        <h3 class="font-bold text-gray-700 mb-4">Grafik Best Seller</h3>
+        <div class="h-64">
+          <canvas id="bestSellerChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div id="credit-view" class="view-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-heading text-2xl font-bold text-gray-900 mb-2">Hutang Piutang</h2>
+          <p class="text-gray-600">Kelola kredit pelanggan dan utang supplier</p>
+        </div>
+        <button onclick="showAddCreditModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-small shadow-custom flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Tambah Kredit</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-red-50 p-4 rounded-large border border-red-200">
+          <p class="text-xs text-red-600 font-medium mb-1">Piutang (Ke Pelanggan)</p>
+          <h3 class="text-2xl font-bold text-red-700" id="totalReceivable">Rp 0</h3>
+        </div>
+        <div class="bg-orange-50 p-4 rounded-large border border-orange-200">
+          <p class="text-xs text-orange-600 font-medium mb-1">Utang (Ke Supplier)</p>
+          <h3 class="text-2xl font-bold text-orange-700" id="totalPayable">Rp 0</h3>
+        </div>
+        <div class="bg-emerald-50 p-4 rounded-large border border-emerald-200">
+          <p class="text-xs text-emerald-600 font-medium mb-1">Neto (Piutang - Utang)</p>
+          <h3 class="text-2xl font-bold text-emerald-700" id="netCredit">Rp 0</h3>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-red-50">
+            <h3 class="font-bold text-red-700">Piutang Pelanggan (Belum Lunas)</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-white text-gray-600 uppercase text-xs border-b">
+                <tr>
+                  <th class="px-4 py-2">Pelanggan</th>
+                  <th class="px-4 py-2 text-right">Nominal</th>
+                  <th class="px-4 py-2">Tgl Jatuh Tempo</th>
+                  <th class="px-4 py-2 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="receivableTableBody" class="divide-y divide-gray-200"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-large shadow-custom border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-orange-50">
+            <h3 class="font-bold text-orange-700">Utang ke Supplier (Belum Bayar)</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-white text-gray-600 uppercase text-xs border-b">
+                <tr>
+                  <th class="px-4 py-2">Supplier</th>
+                  <th class="px-4 py-2 text-right">Nominal</th>
+                  <th class="px-4 py-2">Tgl Jatuh Tempo</th>
+                  <th class="px-4 py-2 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="payableTableBody" class="divide-y divide-gray-200"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -1403,6 +1821,25 @@ aside#sidebar > div:first-child {
 
 <script>
 // --- Data & State ---
+
+// === PATCH: Persistent Login ===
+function setLoginStatus(isLoggedIn) {
+  localStorage.setItem('pos_is_logged_in', isLoggedIn ? 'true' : 'false');
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  const isLoggedIn = localStorage.getItem('pos_is_logged_in') === 'true';
+  if (isLoggedIn) {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').classList.remove('hidden');
+    try {
+      showView('pos');
+    } catch(err) {
+      console.error("pos render error:", err);
+    }
+  }
+});
 const defaultProducts = [
   { id: 1, name: 'Wireless Headphones', sku: 'WH-001', category: 'Electronics', price: 1350000, stock: 45, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop', minStock: 10 },
   { id: 2, name: 'Smart Watch', sku: 'SW-002', category: 'Electronics', price: 3000000, stock: 28, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop', minStock: 15 },
@@ -1419,7 +1856,7 @@ const defaultCustomers = [
 
 const hasInitialized = localStorage.getItem('pos_initialized');
 
-let products, customers, transactions, categories, expenses;
+let products, customers, transactions, categories, expenses, damagedItems, creditData;
 let loginCredentials; 
 
 // Initial Default Categories
@@ -1432,6 +1869,8 @@ if (!hasInitialized) {
     loginCredentials = { username: 'admin', password: 'admin123' };
     transactions = [];
     expenses = [];
+    damagedItems = [];
+    creditData = [];
     for(let i=0; i<5; i++) {
         const sub = 150000 * (i+1);
         const date = new Date();
@@ -1456,6 +1895,8 @@ if (!hasInitialized) {
     localStorage.setItem('pos_categories', JSON.stringify(categories)); // Save categories
     localStorage.setItem('pos_transactions', JSON.stringify(transactions));
     localStorage.setItem('pos_expenses', JSON.stringify(expenses));
+    localStorage.setItem('pos_damagedItems', JSON.stringify(damagedItems));
+    localStorage.setItem('pos_creditData', JSON.stringify(creditData));
     localStorage.setItem('pos_loginCredentials', JSON.stringify(loginCredentials));
 
 } else {
@@ -1464,6 +1905,8 @@ if (!hasInitialized) {
     categories = JSON.parse(localStorage.getItem('pos_categories')) || defaultCategories; // Load categories
     transactions = JSON.parse(localStorage.getItem('pos_transactions')) || [];
     expenses = JSON.parse(localStorage.getItem('pos_expenses')) || [];
+    damagedItems = JSON.parse(localStorage.getItem('pos_damagedItems')) || [];
+    creditData = JSON.parse(localStorage.getItem('pos_creditData')) || [];
     loginCredentials = JSON.parse(localStorage.getItem('pos_loginCredentials')) || { username: 'admin', password: 'admin123' };
 }
 
@@ -1692,6 +2135,8 @@ function saveData() {
     localStorage.setItem('pos_categories', JSON.stringify(categories)); // Save updated categories
     localStorage.setItem('pos_transactions', JSON.stringify(transactions));
     localStorage.setItem('pos_expenses', JSON.stringify(expenses));
+    localStorage.setItem('pos_damagedItems', JSON.stringify(damagedItems));
+    localStorage.setItem('pos_creditData', JSON.stringify(creditData));
     localStorage.setItem('pos_storeSettings', JSON.stringify(storeSettings));
     localStorage.setItem('pos_printerSettings', JSON.stringify(printerSettings));
     localStorage.setItem('pos_adminProfile', JSON.stringify(adminProfile));
@@ -1748,39 +2193,33 @@ function handleLogin(e) {
     btn.insertBefore(spinner, btnText);
 
     setTimeout(() => {
-        if((u === loginCredentials.username && p === loginCredentials.password) || (u === 'handscell' && p === 'handscell123')) {
-            showNotification('Login Berhasil!', 'success');
-            
-            const loginScreen = document.getElementById('login-screen');
-            loginScreen.style.opacity = '0';
-            
-            setTimeout(() => {
-                loginScreen.classList.add('hidden');
-                loginScreen.style.display = 'none';
-                document.getElementById('main-app').classList.remove('hidden');
-                
-                try {
-                    showView('pos');
-                } catch(err) {
-                    console.error("pos render error:", err);
-                }
-            }, 500);
-
-        } else {
-            shakeElement(loginCard);
-            showNotification('Username atau password salah', 'error');
-            
-            btn.disabled = false;
-            btnText.innerText = originalText;
-            btnIcon.style.display = 'block';
-            if(btn.querySelector('.spinner')) btn.querySelector('.spinner').remove();
-            
-            document.getElementById('password').value = '';
-        }
+      if((u === loginCredentials.username && p === loginCredentials.password) || (u === 'handscell' && p === 'handscell123')) {
+        showNotification('Login Berhasil!', 'success');
+        setLoginStatus(true);
+        const loginScreen = document.getElementById('login-screen');
+        loginScreen.style.opacity = '0';
+        setTimeout(() => {
+          loginScreen.classList.add('hidden');
+          loginScreen.style.display = 'none';
+          document.getElementById('main-app').classList.remove('hidden');
+          try {
+            showView('pos');
+          } catch(err) {
+            console.error("pos render error:", err);
+          }
+        }, 500);
+      } else {
+        shakeElement(loginCard);
+        showNotification('Username atau password salah', 'error');
+        btn.disabled = false;
+        btnText.innerText = originalText;
+        btnIcon.style.display = 'block';
+        if(btn.querySelector('.spinner')) btn.querySelector('.spinner').remove();
+        document.getElementById('password').value = '';
+      }
     }, 800);
-    
     return false;
-}
+  }
 
 function togglePasswordVisibility() {
     const passwordInput = document.getElementById('password');
@@ -1809,7 +2248,8 @@ document.getElementById('loginForm').addEventListener('submit', handleLogin);
 
 function logout() {
     showConfirm('Apakah Anda yakin ingin keluar?', () => {
-        location.reload(); 
+      setLoginStatus(false);
+      location.reload(); 
     });
 }
 
@@ -1880,6 +2320,22 @@ function showView(viewName) {
     activeLink.classList.remove('text-indigo-200', 'border-transparent');
   }
 
+  // Proteksi: pastikan tabel rusak hanya tampil di view yang benar
+  if (document.getElementById('damagedTableBody')) {
+    document.getElementById('damagedTableBody').parentElement.parentElement.style.display = (viewName === 'damaged') ? '' : 'none';
+  }
+  // Pastikan hanya di laporan, dan hanya satu parent ke atas (karena sudah dipindah)
+  if (document.getElementById('reportDamagedTableBody')) {
+    let el = document.getElementById('reportDamagedTableBody');
+    let parent = el.closest('.bg-white.rounded-large.shadow-custom.border.border-gray-200.overflow-hidden.mb-6');
+    if (parent) {
+      parent.style.display = (viewName === 'reports') ? '' : 'none';
+    } else {
+      // fallback lama
+      el.parentElement.parentElement.style.display = (viewName === 'reports') ? '' : 'none';
+    }
+  }
+
   try {
       if (viewName === 'pos') {
           renderProductGrid();
@@ -1889,19 +2345,289 @@ function showView(viewName) {
       if (viewName === 'inventory') renderInventoryTable();
       if (viewName === 'transactions') renderTransactionsTable();
       if (viewName === 'expenses') renderExpensesTable();
+      if (viewName === 'damaged') renderDamagedItemsTable();
       if (viewName === 'customers') renderCustomersTable();
       if (viewName === 'dashboard') renderDashboard();
-      if (viewName === 'reports') renderReports(); 
+      if (viewName === 'reports') renderReports();
+      if (viewName === 'analytics') renderAnalytics();
+      if (viewName === 'credit') renderCredit();
       if (viewName === 'settings') loadSettings();
   } catch(e) {
       console.error("Error showing view:", e);
   }
 }
 
-function changeLanguage(lang) {
-  currentLanguage = lang;
-  showNotification(lang === 'id' ? 'Bahasa diubah ke Indonesia' : 'Language changed to English', 'info');
+// --- Analytics & Best Seller Functions ---
+
+function renderAnalytics() {
+    if (!transactions || transactions.length === 0) {
+        // If no transactions, show empty state or just display zeros
+        document.getElementById('totalGrossMargin').innerHTML = 'Rp 0';
+        document.getElementById('avgMarginPercent').innerHTML = '0%';
+        document.getElementById('topProductName').innerHTML = 'N/A';
+        document.getElementById('totalStockValue').innerHTML = 'Rp 0';
+        document.getElementById('bestSellerTableBody').innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">Belum ada data penjualan</td></tr>';
+        return;
+    }
+
+    const bestSellers = calculateBestSellers();
+    
+    // Update summary cards
+    let totalMargin = 0;
+    let soldCount = 0;
+    
+    bestSellers.forEach(item => {
+        totalMargin += item.totalMargin;
+        soldCount += item.quantitySold;
+    });
+    
+    const avgMargin = soldCount > 0 ? Math.round((totalMargin / (bestSellers[0]?.totalRevenue || 1)) * 100 * 100) / 100 : 0;
+    const topProduct = bestSellers[0]?.productName || 'N/A';
+    const totalStockValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
+    
+    document.getElementById('totalGrossMargin').innerHTML = `Rp${totalMargin.toLocaleString('id-ID')}`;
+    document.getElementById('avgMarginPercent').innerHTML = `${avgMargin}%`;
+    document.getElementById('topProductName').innerHTML = topProduct;
+    document.getElementById('totalStockValue').innerHTML = `Rp${totalStockValue.toLocaleString('id-ID')}`;
+    
+    // Render best seller table
+    const tbody = document.getElementById('bestSellerTableBody');
+    tbody.innerHTML = bestSellers.slice(0, 10).map(item => `
+        <tr class="border-t border-gray-200 hover:bg-gray-50">
+            <td class="px-6 py-3 text-sm">${item.productSKU}</td>
+            <td class="px-6 py-3 text-sm font-medium">${item.productName}</td>
+            <td class="px-6 py-3 text-sm text-right">${item.quantitySold}</td>
+            <td class="px-6 py-3 text-sm text-right">Rp${item.price.toLocaleString('id-ID')}</td>
+            <td class="px-6 py-3 text-sm text-right text-gray-600">Rp${item.hpp.toLocaleString('id-ID')}</td>
+            <td class="px-6 py-3 text-sm text-right font-semibold">Rp${item.marginPerUnit.toLocaleString('id-ID')}</td>
+            <td class="px-6 py-3 text-sm text-right"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">${item.marginPercent}%</span></td>
+            <td class="px-6 py-3 text-sm text-right font-bold text-green-600">Rp${item.totalMargin.toLocaleString('id-ID')}</td>
+        </tr>
+    `).join('');
+    
+    // Update chart
+    updateBestSellerChart(bestSellers.slice(0, 10));
 }
+
+function calculateBestSellers() {
+    const productStats = {};
+    
+    // Aggregate transaction data
+    transactions.forEach(txn => {
+        if (txn.items) {
+            txn.items.forEach(item => {
+                const prod = products.find(p => p.id === item.productId);
+                if (prod) {
+                    if (!productStats[item.productId]) {
+                        productStats[item.productId] = {
+                            productId: item.productId,
+                            productName: item.productName || prod.name,
+                            productSKU: prod.sku,
+                            quantitySold: 0,
+                            price: item.price || prod.price,
+                            hpp: prod.hpp || Math.round(prod.price * 0.6), // Default 60% of price if no HPP
+                            totalRevenue: 0,
+                            totalCost: 0
+                        };
+                    }
+                    productStats[item.productId].quantitySold += item.quantity;
+                    productStats[item.productId].totalRevenue += item.price * item.quantity;
+                    productStats[item.productId].totalCost += (prod.hpp || Math.round(prod.price * 0.6)) * item.quantity;
+                }
+            });
+        }
+    });
+    
+    // Calculate margins
+    const results = Object.values(productStats).map(stat => ({
+        ...stat,
+        marginPerUnit: stat.price - stat.hpp,
+        marginPercent: Math.round(((stat.price - stat.hpp) / stat.price) * 100),
+        totalMargin: stat.totalRevenue - stat.totalCost
+    }));
+    
+    // Sort by total margin descending
+    return results.sort((a, b) => b.totalMargin - a.totalMargin);
+}
+
+function updateBestSellerChart(bestSellers) {
+    const ctx = document.getElementById('bestSellerChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart if any
+    if (window.bestSellerChartInstance) {
+        window.bestSellerChartInstance.destroy();
+    }
+    
+    window.bestSellerChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: bestSellers.map(item => item.productName.substring(0, 15)),
+            datasets: [{
+                label: 'Total Margin (Rp)',
+                data: bestSellers.map(item => item.totalMargin),
+                backgroundColor: '#3b82f6',
+                borderColor: '#1e40af',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            indexAxis: 'x',
+            plugins: {
+                legend: { display: true, position: 'top' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp' + (value / 1000000).toFixed(1) + 'M';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// --- Credit Management Functions ---
+
+function renderCredit() {
+    calculateCreditSummaries();
+    renderReceivables();
+    renderPayables();
+}
+
+function calculateCreditSummaries() {
+    const receivable = creditData.filter(c => c.type === 'piutang' && !c.paidDate);
+    const payable = creditData.filter(c => c.type === 'utang' && !c.paidDate);
+    
+    const totalReceivable = receivable.reduce((sum, c) => sum + c.amount, 0);
+    const totalPayable = payable.reduce((sum, c) => sum + c.amount, 0);
+    const netCredit = totalReceivable - totalPayable;
+    
+    document.getElementById('totalReceivable').innerHTML = `Rp${totalReceivable.toLocaleString('id-ID')}`;
+    document.getElementById('totalPayable').innerHTML = `Rp${totalPayable.toLocaleString('id-ID')}`;
+    document.getElementById('netCredit').innerHTML = `Rp${Math.abs(netCredit).toLocaleString('id-ID')}`;
+}
+
+function renderReceivables() {
+    const receivable = creditData.filter(c => c.type === 'piutang');
+    const tbody = document.getElementById('receivableTableBody');
+    
+    if (!tbody) return;
+    
+    tbody.innerHTML = receivable.map(credit => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2 text-sm">${credit.name}</td>
+            <td class="px-4 py-2 text-sm text-right font-medium">Rp${credit.amount.toLocaleString('id-ID')}</td>
+            <td class="px-4 py-2 text-sm">${credit.dueDate}</td>
+            <td class="px-4 py-2 text-sm text-center">
+                ${credit.paidDate ? 
+                    `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs inline-block">Lunas</span>` :
+                    `<button onclick="markCreditPaid('${credit.id}')" class="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 inline-block">Mark Paid</button>`
+                }
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPayables() {
+    const payable = creditData.filter(c => c.type === 'utang');
+    const tbody = document.getElementById('payableTableBody');
+    
+    if (!tbody) return;
+    
+    tbody.innerHTML = payable.map(credit => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2 text-sm">${credit.name}</td>
+            <td class="px-4 py-2 text-sm text-right font-medium">Rp${credit.amount.toLocaleString('id-ID')}</td>
+            <td class="px-4 py-2 text-sm">${credit.dueDate}</td>
+            <td class="px-4 py-2 text-sm text-center">
+                ${credit.paidDate ? 
+                    `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs inline-block">Lunas</span>` :
+                    `<button onclick="markCreditPaid('${credit.id}')" class="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 inline-block">Mark Paid</button>`
+                }
+            </td>
+        </tr>
+    `).join('');
+}
+
+function showAddCreditModal() {
+    document.getElementById('creditType').value = 'piutang';
+    document.getElementById('creditName').value = '';
+    document.getElementById('creditAmount').value = '';
+    document.getElementById('creditDueDate').value = '';
+    document.getElementById('creditDescription').value = '';
+    updateCreditNameList();
+    document.getElementById('creditModal').classList.add('active');
+}
+
+function updateCreditNameList() {
+    const creditType = document.getElementById('creditType').value;
+    const creditNameInput = document.getElementById('creditName');
+    
+    if (creditType === 'piutang') {
+        // Populate with customer names
+        const customerNames = customers.map(c => c.name).join(', ');
+        creditNameInput.placeholder = 'Pilih atau ketik nama pelanggan (Misal: ' + (customers[0]?.name || 'Pelanggan') + ')';
+    } else if (creditType === 'utang') {
+        // Populate with supplier names
+        creditNameInput.placeholder = 'Ketik nama supplier';
+    }
+}
+
+function saveCredit(event) {
+    event.preventDefault();
+    const type = document.getElementById('creditType').value;
+    const name = document.getElementById('creditName').value.trim();
+    const amount = parseInt(document.getElementById('creditAmount').value) || 0;
+    const dueDate = document.getElementById('creditDueDate').value;
+    const description = document.getElementById('creditDescription').value.trim();
+    
+    if (!name || !amount || !dueDate) {
+        showNotification('Lengkapi semua field wajib', 'error');
+        return;
+    }
+    
+    const newCredit = {
+        id: 'CRD-' + Date.now(),
+        type: type,
+        name: name,
+        amount: amount,
+        dueDate: dueDate,
+        paidDate: null,
+        description: description,
+        createdDate: new Date().toLocaleDateString('id-ID')
+    };
+    
+    creditData.push(newCredit);
+    saveData();
+    document.getElementById('creditModal').classList.remove('active');
+    renderCredit();
+    showNotification(`${type === 'piutang' ? 'Piutang' : 'Utang'} berhasil ditambah`, 'success');
+}
+
+function markCreditPaid(creditId) {
+    const credit = creditData.find(c => c.id === creditId);
+    if (!credit) return;
+    
+    credit.paidDate = new Date().toLocaleDateString('id-ID');
+    saveData();
+    renderCredit();
+    showNotification('Status pembayaran diperbarui', 'success');
+}
+
+function openCreditModal() {
+    showAddCreditModal();
+}
+
+function closeCreditModal() {
+    document.getElementById('creditModal').classList.remove('active');
+}
+
 
 // --- Category Management Functions ---
 
@@ -2413,6 +3139,117 @@ function saveStockAdjustment() {
   }
 }
 
+// --- FUNGSI BARANG RUSAK ---
+function showAddDamagedModal() {
+  document.getElementById('damagedDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('damagedProductSelect').value = '';
+  document.getElementById('damagedQuantity').value = '';
+  document.getElementById('damagedReason').value = '';
+  document.getElementById('damagedDescription').value = '';
+  
+  // Populate product list
+  const select = document.getElementById('damagedProductSelect');
+  select.innerHTML = '<option value="">-- Pilih Barang --</option>';
+  products.forEach(p => {
+    if(p.stock > 0) {
+      select.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name} (Stok: ${p.stock})</option>`;
+    }
+  });
+  
+  document.getElementById('damagedModal').classList.add('active');
+}
+
+function saveDamagedItem(e) {
+  e.preventDefault();
+  
+  const productId = parseInt(document.getElementById('damagedProductSelect').value) || 0;
+  const quantity = parseInt(document.getElementById('damagedQuantity').value) || 0;
+  const reason = document.getElementById('damagedReason').value;
+  const dateVal = document.getElementById('damagedDate').value;
+  const description = document.getElementById('damagedDescription').value;
+  
+  if(!productId || quantity <= 0 || !reason) {
+    showNotification('Isi semua field yang wajib', 'error');
+    return;
+  }
+  
+  // Cari produk
+  const product = products.find(p => p.id === productId);
+  if(!product) {
+    showNotification('Produk tidak ditemukan', 'error');
+    return;
+  }
+  
+  // Cek stok cukup
+  if(product.stock < quantity) {
+    showNotification(`Stok tidak cukup. Tersedia: ${product.stock}`, 'error');
+    return;
+  }
+  
+  // Kurangi stok
+  product.stock -= quantity;
+  
+  // Catat barang rusak
+  const parts = dateVal.split('-');
+  const damagedRecord = {
+    id: 'DMG-' + Date.now(),
+    productId: productId,
+    productCode: product.sku,
+    productName: product.name,
+    quantity: quantity,
+    reason: reason,
+    date: `${parts[2]}/${parts[1]}/${parts[0]}`,
+    timestamp: new Date(dateVal).getTime(),
+    description: description
+  };
+  
+  damagedItems.push(damagedRecord);
+  
+  // Simpan data
+  saveData();
+  
+  // Update tampilan
+  document.getElementById('damagedModal').classList.remove('active');
+  renderDamagedItemsTable();
+  
+  if(!document.getElementById('reports-view').classList.contains('hidden')) renderReports();
+  
+  showNotification(`Barang rusak dicatat. Stok berkurang ${quantity} unit.`, 'success');
+}
+
+function renderDamagedItemsTable() {
+  // Only render in damaged-view
+  const tbody = document.getElementById('damagedTableBody');
+  if (!tbody) return;
+  if(damagedItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Belum ada catatan barang rusak.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = damagedItems.sort((a,b) => b.timestamp - a.timestamp).map(d => `
+    <tr class="hover:bg-gray-50 border-b border-gray-100">
+      <td class="px-6 py-4 text-sm text-gray-500">${d.date}</td>
+      <td class="px-6 py-4 text-sm font-mono text-gray-700">${d.productCode}</td>
+      <td class="px-6 py-4 font-medium text-gray-800">${d.productName}</td>
+      <td class="px-6 py-4 text-right font-bold text-red-600">${d.quantity}</td>
+      <td class="px-6 py-4 text-sm"><span class="bg-red-100 text-red-800 px-2 py-1 rounded">${d.reason}</span></td>
+      <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title="${d.description}">${d.description || '-'}</td>
+      <td class="px-6 py-4 text-center">
+        <button onclick="deleteDamagedItem('${d.id}')" class="text-red-600 hover:text-red-900 text-sm font-medium">Hapus</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function deleteDamagedItem(id) {
+  if(confirm('Hapus catatan barang rusak ini? Stok tidak akan dikembalikan.')) {
+    damagedItems = damagedItems.filter(d => d.id !== id);
+    saveData();
+    renderDamagedItemsTable();
+    if(!document.getElementById('reports-view').classList.contains('hidden')) renderReports();
+    showNotification('Catatan barang rusak dihapus', 'success');
+  }
+}
+
 // --- FUNGSI PENGELUARAN ---
 function renderExpensesTable() {
   const tbody = document.getElementById('expensesTableBody');
@@ -2673,6 +3510,42 @@ function resetBadgeUI(id) {
 }
 
 // --- UPDATED REPORT LOGIC WITH CHART & PRINT ---
+function setReportPeriod(period) {
+    const today = new Date();
+    const startDateInput = document.getElementById('reportStartDate');
+    const endDateInput = document.getElementById('reportEndDate');
+    
+    // Update button states
+    document.getElementById('btnPeriodToday').classList.remove('bg-blue-100', 'text-blue-700');
+    document.getElementById('btnPeriodToday').classList.add('bg-gray-100', 'text-gray-700');
+    document.getElementById('btnPeriodWeek').classList.remove('bg-blue-100', 'text-blue-700');
+    document.getElementById('btnPeriodWeek').classList.add('bg-gray-100', 'text-gray-700');
+    document.getElementById('btnPeriodMonth').classList.remove('bg-blue-100', 'text-blue-700');
+    document.getElementById('btnPeriodMonth').classList.add('bg-gray-100', 'text-gray-700');
+    
+    if (period === 'today') {
+        startDateInput.valueAsDate = today;
+        endDateInput.valueAsDate = today;
+        document.getElementById('btnPeriodToday').classList.remove('bg-gray-100', 'text-gray-700');
+        document.getElementById('btnPeriodToday').classList.add('bg-blue-100', 'text-blue-700');
+    } else if (period === 'week') {
+        const firstDay = new Date(today);
+        firstDay.setDate(today.getDate() - today.getDay());
+        startDateInput.valueAsDate = firstDay;
+        endDateInput.valueAsDate = today;
+        document.getElementById('btnPeriodWeek').classList.remove('bg-gray-100', 'text-gray-700');
+        document.getElementById('btnPeriodWeek').classList.add('bg-blue-100', 'text-blue-700');
+    } else if (period === 'month') {
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        startDateInput.valueAsDate = firstDay;
+        endDateInput.valueAsDate = today;
+        document.getElementById('btnPeriodMonth').classList.remove('bg-gray-100', 'text-gray-700');
+        document.getElementById('btnPeriodMonth').classList.add('bg-blue-100', 'text-blue-700');
+    }
+    
+    renderReports();
+}
+
 function renderReports() {
     const startDateInput = document.getElementById('reportStartDate');
     const endDateInput = document.getElementById('reportEndDate');
@@ -2704,6 +3577,11 @@ function renderReports() {
         return eDate >= start && eDate <= end;
     });
 
+    const filteredDamaged = damagedItems.filter(d => {
+        let dDate = d.timestamp ? new Date(d.timestamp) : new Date(d.date.split('/').reverse().join('-'));
+        return dDate >= start && dDate <= end;
+    });
+
     // 1. Update Cards
     const totalRev = filteredTxns.reduce((sum, t) => sum + t.total, 0);
     const totalExp = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -2732,9 +3610,72 @@ function renderReports() {
         `).join('');
     }
 
-    // 3. Render/Update Report Charts
+    // 3. Render Damaged Items Table
+    const damagedTbody = document.getElementById('reportDamagedTableBody');
+    if (filteredDamaged.length === 0) {
+        damagedTbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada barang rusak untuk periode ini.</td></tr>`;
+    } else {
+        damagedTbody.innerHTML = filteredDamaged.map(d => `
+            <tr class="hover:bg-red-50">
+                <td class="px-6 py-4 text-sm text-gray-600">${d.date}</td>
+                <td class="px-6 py-4 text-sm font-mono text-gray-700">${d.productCode}</td>
+                <td class="px-6 py-4 text-sm text-gray-800">${d.productName}</td>
+                <td class="px-6 py-4 text-sm font-bold text-right text-red-600">${d.quantity}</td>
+                <td class="px-6 py-4 text-sm"><span class="px-2 py-1 bg-red-100 rounded text-xs text-red-800">${d.reason}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    // 4. Render Daily Summary
+    renderDailySummary(filteredTxns, filteredExpenses);
+
+    // 5. Render/Update Report Charts
     updateReportChart(filteredTxns);
     updateExpenseChart(filteredExpenses);
+}
+
+function renderDailySummary(filteredTxns, filteredExpenses) {
+    // Group transactions by date
+    const dailyData = {};
+    
+    filteredTxns.forEach(t => {
+        if (!dailyData[t.date]) {
+            dailyData[t.date] = { txnCount: 0, sales: 0, expenses: 0 };
+        }
+        dailyData[t.date].txnCount += 1;
+        dailyData[t.date].sales += t.total;
+    });
+    
+    // Group expenses by date
+    filteredExpenses.forEach(e => {
+        const expDate = e.date;
+        if (!dailyData[expDate]) {
+            dailyData[expDate] = { txnCount: 0, sales: 0, expenses: 0 };
+        }
+        dailyData[expDate].expenses += e.amount;
+    });
+    
+    // Sort dates and render
+    const sortedDates = Object.keys(dailyData).sort((a, b) => {
+        const partsA = a.split('/');
+        const partsB = b.split('/');
+        return new Date(partsB[2], partsB[1]-1, partsB[0]) - new Date(partsA[2], partsA[1]-1, partsA[0]);
+    });
+    
+    const tbody = document.getElementById('reportDailySummaryBody');
+    tbody.innerHTML = sortedDates.map(date => {
+        const data = dailyData[date];
+        const neto = data.sales - data.expenses;
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-3 text-sm font-medium text-gray-800">${date}</td>
+                <td class="px-6 py-3 text-sm text-right text-gray-600">${data.txnCount} trx</td>
+                <td class="px-6 py-3 text-sm text-right font-semibold text-indigo-600">${formatIDR(data.sales)}</td>
+                <td class="px-6 py-3 text-sm text-right text-rose-600">${formatIDR(data.expenses)}</td>
+                <td class="px-6 py-3 text-sm text-right font-bold ${neto >= 0 ? 'text-green-600' : 'text-red-600'}">${formatIDR(neto)}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function updateReportChart(filteredTxns) {
