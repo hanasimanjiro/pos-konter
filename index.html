@@ -1523,8 +1523,15 @@ button, a, [role="button"] {
                 <label class="block text-sm font-medium text-gray-700 mb-2">Footer Struk</label>
                 <textarea id="receiptFooter" rows="2" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">Terima kasih atas kunjungan Anda!</textarea>
               </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nama Perangkat Bluetooth Printer</label>
+                <input type="text" id="bluetoothDeviceName" placeholder="Masukkan nama perangkat Bluetooth (contoh: MP58A1)" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div class="flex items-center space-x-4">
+                <button onclick="connectBluetoothPrinter()" class="px-4 py-2 bg-green-600 text-white rounded-small hover:bg-green-700 font-medium shadow-custom">Connect Bluetooth Printer</button>
+                <span id="bluetoothStatus" class="text-sm text-gray-600">Status: Tidak terhubung</span>
+              </div>
               <button onclick="savePrinterSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan Printer</button>
-            </div>
           </div>
           
           <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
@@ -1920,8 +1927,11 @@ let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
 };
 let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
     type: '58mm', 
-    footer: 'Terima kasih atas kunjungan Anda!'
+    footer: 'Terima kasih atas kunjungan Anda!',
+    bluetoothDeviceName: ''
 };
+let bluetoothDevice = null;
+let bluetoothCharacteristic = null;
 let adminProfile = JSON.parse(localStorage.getItem('pos_adminProfile')) || {
     name: 'Hands Flasher',
     email: 'admin@tokopos.com'
@@ -2937,23 +2947,32 @@ function closeReceiptModal() {
 // --- FUNGSI PRINT (Sudah ditambah fitur tutup otomatis) ---
 function printReceiptFromModal() {
     if(!currentReceiptTransaction) return;
-    const content = generateReceiptHTML(currentReceiptTransaction);
-    const printContainer = document.getElementById('receiptPrint');
     
-    // Penyesuaian lebar printer
-    const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
-    printContainer.style.width = width;
-    
-    printContainer.innerHTML = content;
-    printContainer.style.display = 'block';
-    
-    setTimeout(() => {
-        window.print();
-        printContainer.style.display = 'none';
+    if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+        // Print via Bluetooth
+        const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
+        sendDataToPrinter(escPosData);
+        closeReceiptModal();
+    } else {
+        // Print via browser
+        const content = generateReceiptHTML(currentReceiptTransaction);
+        const printContainer = document.getElementById('receiptPrint');
         
-        // Memanggil fungsi tutup setelah print selesai
-        closeReceiptModal(); 
-    }, 500); 
+        // Penyesuaian lebar printer
+        const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
+        printContainer.style.width = width;
+        
+        printContainer.innerHTML = content;
+        printContainer.style.display = 'block';
+        
+        setTimeout(() => {
+            window.print();
+            printContainer.style.display = 'none';
+            
+            // Memanggil fungsi tutup setelah print selesai
+            closeReceiptModal(); 
+        }, 500);
+    }
 }
 
 function renderProductsTable() {
@@ -3927,6 +3946,8 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
 
     document.getElementById('printerType').value = printerSettings.type;
     document.getElementById('receiptFooter').value = printerSettings.footer;
+    document.getElementById('bluetoothDeviceName').value = printerSettings.bluetoothDeviceName || '';
+    document.getElementById('bluetoothStatus').textContent = bluetoothDevice ? 'Status: Terhubung ke ' + bluetoothDevice.name : 'Status: Tidak terhubung';
     document.getElementById('taxEnabledInput').checked = storeSettings.taxEnabled;
     document.getElementById('taxRateInput').value = storeSettings.taxRate;
     if(document.getElementById('googleScriptUrlInput')) document.getElementById('googleScriptUrlInput').value = googleScriptUrl;
@@ -4006,8 +4027,97 @@ function saveQRISSetting() {
 function savePrinterSettings() {
     printerSettings.type = document.getElementById('printerType').value;
     printerSettings.footer = document.getElementById('receiptFooter').value;
+    printerSettings.bluetoothDeviceName = document.getElementById('bluetoothDeviceName').value;
     saveData(); 
     showNotification('Pengaturan printer disimpan', 'success');
+}
+
+async function connectBluetoothPrinter() {
+    if (!navigator.bluetooth) {
+        showNotification('Web Bluetooth tidak didukung di browser ini', 'error');
+        return;
+    }
+    
+    try {
+        const deviceName = printerSettings.bluetoothDeviceName || 'MP58A1';
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // ESC/POS service UUID, adjust if needed
+        });
+        
+        const server = await bluetoothDevice.gatt.connect();
+        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+        bluetoothCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+        
+        bluetoothDevice.addEventListener('gattserverdisconnected', () => {
+            document.getElementById('bluetoothStatus').textContent = 'Status: Terputus';
+            bluetoothDevice = null;
+            bluetoothCharacteristic = null;
+        });
+        
+        document.getElementById('bluetoothStatus').textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
+        showNotification('Printer Bluetooth terhubung', 'success');
+    } catch (error) {
+        console.error('Error connecting to Bluetooth printer:', error);
+        showNotification('Gagal menghubungkan ke printer Bluetooth', 'error');
+    }
+}
+
+async function sendDataToPrinter(data) {
+    if (!bluetoothCharacteristic) {
+        showNotification('Printer Bluetooth tidak terhubung', 'error');
+        return;
+    }
+    
+    try {
+        await bluetoothCharacteristic.writeValue(data);
+        showNotification('Nota berhasil dicetak', 'success');
+    } catch (error) {
+        console.error('Error sending data to printer:', error);
+        showNotification('Gagal mengirim data ke printer', 'error');
+    }
+}
+
+function generateReceiptESC_POS(transaction) {
+    let commands = [];
+    
+    // Initialize printer
+    commands.push(0x1B, 0x40); // ESC @
+    
+    // Center align
+    commands.push(0x1B, 0x61, 0x01); // ESC a 1
+    
+    // Header
+    commands.push(...new TextEncoder().encode('TOKO POS\n'));
+    commands.push(...new TextEncoder().encode('Jl. Contoh No. 123\n\n'));
+    
+    // Left align
+    commands.push(0x1B, 0x61, 0x00); // ESC a 0
+    
+    // Transaction details
+    commands.push(...new TextEncoder().encode(`Tanggal: ${new Date(transaction.date).toLocaleString()}\n`));
+    commands.push(...new TextEncoder().encode(`No. Transaksi: ${transaction.id}\n\n`));
+    
+    // Items
+    transaction.items.forEach(item => {
+        const line = `${item.name} x${item.quantity} ${item.price.toLocaleString()}\n`;
+        commands.push(...new TextEncoder().encode(line));
+    });
+    
+    commands.push(...new TextEncoder().encode('\n'));
+    
+    // Total
+    commands.push(0x1B, 0x61, 0x02); // Right align
+    commands.push(...new TextEncoder().encode(`Total: Rp ${transaction.total.toLocaleString()}\n`));
+    
+    // Footer
+    commands.push(0x1B, 0x61, 0x01); // Center
+    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n\n`));
+    
+    // Cut paper
+    commands.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0
+    
+    return new Uint8Array(commands);
 }
 
 function saveTaxSettings() {
