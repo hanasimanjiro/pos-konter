@@ -3098,11 +3098,21 @@ function printReceiptFromModal() {
         const content = generateReceiptHTML(currentReceiptTransaction);
         const printContainer = document.getElementById('receiptPrint');
         
-        // Penyesuaian lebar printer
+        // include inline styles to ensure font & layout during print
+        const styleBlock = `
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+            .receipt-container {font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4;}
+            .receipt-container h2 {font-family: 'Orbitron', sans-serif; font-weight: 900;}
+            @media print { .receipt-container { width: ${printerSettings.type === '80mm' ? '80mm' : '58mm'}; }}
+          </style>
+        `;
+        
+        // set width explicitly again
         const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
         printContainer.style.width = width;
         
-        printContainer.innerHTML = content;
+        printContainer.innerHTML = styleBlock + content;
         printContainer.style.display = 'block';
         
         setTimeout(() => {
