@@ -2164,6 +2164,11 @@ function completeTransaction(total, tax, taxRatePercent, subtotal, method) {
     showNotification(`Pembayaran ${method} Berhasil! ${formatIDR(total)}`, 'success');
     showReceiptModal(txn.id);
     
+    // Auto print receipt after payment
+    setTimeout(() => {
+        printReceiptFromModal();
+    }, 1000); // Delay 1 second to allow modal to show
+    
     // Reset keranjang
     cart = [];
     renderCart();
@@ -2200,6 +2205,11 @@ function completeServiceTransaction(total, tax, taxRatePercent, subtotal, method
 
     showNotification(`Pembayaran Servis ${method} Berhasil! ${formatIDR(total)}`, 'success');
     showReceiptModal(txn.id);
+    
+    // Auto print receipt after payment
+    setTimeout(() => {
+        printReceiptFromModal();
+    }, 1000);
 
     // clear form
     document.getElementById('serviceForm').reset();
@@ -2953,6 +2963,7 @@ function generateReceiptHTML(txn) {
     return `
     <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
       <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+        <div style="font-size: 1.5em; margin-bottom: 5px;">🏪</div>
         <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
         ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
         ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
@@ -4037,7 +4048,14 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
     document.getElementById('printerType').value = printerSettings.type;
     document.getElementById('receiptFooter').value = printerSettings.footer;
     document.getElementById('bluetoothDeviceName').value = printerSettings.bluetoothDeviceName || '';
-    document.getElementById('bluetoothStatus').textContent = bluetoothDevice ? 'Status: Terhubung ke ' + bluetoothDevice.name : 'Status: Tidak terhubung';
+    const statusEl = document.getElementById('bluetoothStatus');
+    if (bluetoothDevice) {
+        statusEl.textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
+    } else if (printerSettings.bluetoothDeviceName) {
+        statusEl.textContent = 'Status: Printer tersimpan - ' + printerSettings.bluetoothDeviceName;
+    } else {
+        statusEl.textContent = 'Status: Tidak terhubung';
+    }
     document.getElementById('taxEnabledInput').checked = storeSettings.taxEnabled;
     document.getElementById('taxRateInput').value = storeSettings.taxRate;
     if(document.getElementById('googleScriptUrlInput')) document.getElementById('googleScriptUrlInput').value = googleScriptUrl;
@@ -4140,13 +4158,24 @@ async function connectBluetoothPrinter() {
         bluetoothCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
         
         bluetoothDevice.addEventListener('gattserverdisconnected', () => {
-            document.getElementById('bluetoothStatus').textContent = 'Status: Terputus';
+            document.getElementById('bluetoothStatus').textContent = 'Status: Terputus - Mencoba reconnect...';
             bluetoothDevice = null;
             bluetoothCharacteristic = null;
+            
+            // Auto reconnect after 2 seconds
+            setTimeout(() => {
+                if (printerSettings.bluetoothDeviceName) {
+                    connectBluetoothPrinter();
+                }
+            }, 2000);
         });
         
         document.getElementById('bluetoothStatus').textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
         showNotification('Printer Bluetooth terhubung', 'success');
+        
+        // Save device name for auto reconnect
+        printerSettings.bluetoothDeviceName = bluetoothDevice.name;
+        saveData();
     } catch (error) {
         console.error('Error connecting to Bluetooth printer:', error);
         showNotification('Gagal menghubungkan ke printer Bluetooth', 'error');
@@ -4178,8 +4207,10 @@ function generateReceiptESC_POS(transaction) {
     commands.push(0x1B, 0x61, 0x01); // ESC a 1
     
     // Header
-    commands.push(...new TextEncoder().encode('TOKO POS\n'));
-    commands.push(...new TextEncoder().encode('Jl. Contoh No. 123\n\n'));
+    commands.push(...new TextEncoder().encode(`${storeSettings.name}\n`));
+    if (storeSettings.address) commands.push(...new TextEncoder().encode(`${storeSettings.address}\n`));
+    if (storeSettings.phone) commands.push(...new TextEncoder().encode(`HP/WA: ${storeSettings.phone}\n`));
+    commands.push(...new TextEncoder().encode('\nSTRUK PEMBAYARAN\n\n'));
     
     // Left align
     commands.push(0x1B, 0x61, 0x00); // ESC a 0
