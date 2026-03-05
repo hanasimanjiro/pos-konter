@@ -1517,6 +1517,16 @@ button, a, [role="button"] {
                   <input type="text" id="storeNameInput" value="Toko Saya" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Logo Toko</label>
+                  <div class="flex items-center space-x-4">
+                    <img id="logoPreviewImg" src="" class="w-20 h-20 object-contain border border-gray-200 rounded hidden" alt="Logo Preview">
+                    <div class="flex-1">
+                      <input type="file" id="logoInput" accept="image/*" onchange="previewLogo(event)" class="w-full text-sm" />
+                      <button type="button" onclick="saveLogoSetting()" class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-small hover:bg-blue-700 text-xs">Simpan Logo</button>
+                    </div>
+                  </div>
+                </div>
+                <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Toko</label>
                   <input type="text" id="storeAddressInput" placeholder="Contoh: Jl. Merdeka No. 1" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
@@ -1524,15 +1534,7 @@ button, a, [role="button"] {
                   <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP / WA</label>
                   <input type="text" id="storePhoneInput" placeholder="Contoh: 081234567890" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Upload Logo Toko</label>
-                  <input type="file" id="storeLogo" accept="image/*" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="handleLogoUpload(event)">
-                  <p class="text-xs text-gray-500 mt-1">Logo akan ditampilkan di atas nama toko pada nota cetak.</p>
-                  <div id="logoPreview" class="mt-3 flex justify-center">
-                    <img id="logoPreviewImg" src="" alt="Logo Preview" style="max-height: 80px; display: none;">
-                  </div>
-                </div>
-                <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom w-full">Simpan Profil Toko</button>
+                <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Profil Toko</button>
               </div>
 
               <div class="bg-blue-50 p-5 rounded-large border border-blue-100">
@@ -2000,6 +2002,7 @@ let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
     taxEnabled: true,
     taxRate: 10,
     qrisImage: '',
+    logo: '',
     modal: 0 // Modal Default
 };
 let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
@@ -2172,11 +2175,6 @@ function completeTransaction(total, tax, taxRatePercent, subtotal, method) {
     showNotification(`Pembayaran ${method} Berhasil! ${formatIDR(total)}`, 'success');
     showReceiptModal(txn.id);
     
-    // Auto print receipt after payment
-    setTimeout(() => {
-        printReceiptFromModal();
-    }, 1000); // Delay 1 second to allow modal to show
-    
     // Reset keranjang
     cart = [];
     renderCart();
@@ -2213,11 +2211,6 @@ function completeServiceTransaction(total, tax, taxRatePercent, subtotal, method
 
     showNotification(`Pembayaran Servis ${method} Berhasil! ${formatIDR(total)}`, 'success');
     showReceiptModal(txn.id);
-    
-    // Auto print receipt after payment
-    setTimeout(() => {
-        printReceiptFromModal();
-    }, 1000);
 
     // clear form
     document.getElementById('serviceForm').reset();
@@ -2967,13 +2960,15 @@ function generateReceiptHTML(txn) {
     const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
     
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
-    const logoHTML = storeSettings.logo ? `<div style="text-align: center; margin-bottom: 8px;"><img src="${storeSettings.logo}" style="max-height: 60px; max-width: 60px;"></div>` : '<div style="font-size: 1.5em; margin-bottom: 5px;">🏪</div>';
+    const logoSrc = storeSettings.logo || 'assets/images/logo-192.png';
     
     return `
     <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
+      <div style="text-align: center; margin-bottom: 10px;">
+        <img src="${logoSrc}" style="max-width:100px; max-height:100px; display:block; margin:0 auto 5px;" alt="Logo">
+      </div>
       <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
-        ${logoHTML}
-        <h2 style="margin: 0; font-size: 1.6em; font-weight: bold; font-family: 'Arial','Helvetica','sans-serif';">${storeSettings.name}</h2>
+        <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
         ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
         ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
         <p style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</p>
@@ -3011,30 +3006,26 @@ function generateReceiptHTML(txn) {
       </div>
       
       <div style="margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between; font-weight: bold;">
-          <span>Subtotal</span>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Subtotal:</span>
           <span>${formatIDR(txn.subtotal)}</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-          <span>VAT: ${txnTaxRate}%</span>
+          <span>Pajak (${txnTaxRate}%):</span>
           <span>${formatIDR(txn.tax)}</span>
         </div>
-        <div style="border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em;">
-          <span>Jumlah</span>
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; margin-top: 5px;">
+          <span>TOTAL:</span>
           <span>${formatIDR(txn.total)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-          <span style="font-weight: bold;">${txn.method}</span>
-          <span>${formatIDR(txn.total)}</span>
+        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px;">
+          <span>Metode:</span>
+          <span>${txn.method}</span>
         </div>
       </div>
       
       <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
-        <p style="margin: 5px 0; font-size: 0.95em;">${printerSettings.footer}</p>
-        <p style="margin: 5px 0; font-size: 0.85em; color: #666;">
-          ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}
-        </p>
-        <p style="margin: 5px 0; font-size: 0.85em;">No: ${txn.id}</p>
+        <p>${printerSettings.footer}</p>
       </div>
     </div>
     `;
@@ -3048,25 +3039,33 @@ function showReceiptModal(txnId) {
     currentReceiptTransaction = txn;
     document.getElementById('receiptModalContent').innerHTML = generateReceiptHTML(txn);
     document.getElementById('receiptModal').classList.add('active');
+
+    // auto print and auto-close sequence
+    setTimeout(() => {
+        printReceiptFromModal(true);
+    }, 500);
+    setTimeout(() => {
+        closeReceiptModal();
+    }, 3500); // 3 seconds display time
+    
+    // otomatis print setelah sebentar, lalu tutup modal setelah 3 detik
+    setTimeout(() => {
+        printReceiptFromModal(true);
+    }, 500);
+    setTimeout(() => {
+        closeReceiptModal();
+    }, 3500);
 } // <-- Pastikan ada kurung tutup ini sebelum membuat fungsi baru
 
 // --- FUNGSI TUTUP MODAL (Pindahkan ke luar sini agar bisa diakses tombol) ---
-function closeReceiptModal() {
-    document.getElementById('receiptModal').classList.remove('active');
-    if(typeof currentReceiptTransaction !== 'undefined') {
-        currentReceiptTransaction = null;
-    }
-}
-
-// --- FUNGSI PRINT (Sudah ditambah fitur tutup otomatis) ---
-function printReceiptFromModal() {
+function closeReceiptModal() {auto=false) {
     if(!currentReceiptTransaction) return;
     
     if (bluetoothDevice && bluetoothDevice.gatt.connected) {
         // Print via Bluetooth
         const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
         sendDataToPrinter(escPosData);
-        closeReceiptModal();
+        if (!auto) closeReceiptModal();
     } else {
         // Print via browser
         const content = generateReceiptHTML(currentReceiptTransaction);
@@ -3084,10 +3083,20 @@ function printReceiptFromModal() {
             printContainer.style.display = 'none';
             
             // Memanggil fungsi tutup setelah print selesai
-            closeReceiptModal(); 
+            if (!auto)ntContainer.innerHTML = content;
+        printContainer.style.display = 'block';
+        
+        setTimeout(() => {
+            window.print();
+            printContainer.style.display = 'none';
+            
+            if (!auto) {
+                // Memanggil fungsi tutup setelah print selesai
+                closeReceiptModal(); 
+            }
         }, 500);
     }
-}
+} 
 
 function renderProductsTable() {
   const searchInput = document.getElementById('productManagementSearch');
@@ -4061,27 +4070,11 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
     document.getElementById('printerType').value = printerSettings.type;
     document.getElementById('receiptFooter').value = printerSettings.footer;
     document.getElementById('bluetoothDeviceName').value = printerSettings.bluetoothDeviceName || '';
-    const statusEl = document.getElementById('bluetoothStatus');
-    if (bluetoothDevice) {
-        statusEl.textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
-    } else if (printerSettings.bluetoothDeviceName) {
-        statusEl.textContent = 'Status: Printer tersimpan - ' + printerSettings.bluetoothDeviceName;
-    } else {
-        statusEl.textContent = 'Status: Tidak terhubung';
-    }
+    document.getElementById('bluetoothStatus').textContent = bluetoothDevice ? 'Status: Terhubung ke ' + bluetoothDevice.name : 'Status: Tidak terhubung';
     document.getElementById('taxEnabledInput').checked = storeSettings.taxEnabled;
     document.getElementById('taxRateInput').value = storeSettings.taxRate;
     if(document.getElementById('googleScriptUrlInput')) document.getElementById('googleScriptUrlInput').value = googleScriptUrl;
     document.getElementById('editUsername').value = loginCredentials.username;
-
-    // Load logo preview
-    const logoPreviewImg = document.getElementById('logoPreviewImg');
-    if (storeSettings.logo) {
-        logoPreviewImg.src = storeSettings.logo;
-        logoPreviewImg.style.display = 'block';
-    } else {
-        logoPreviewImg.style.display = 'none';
-    }
 
     const previewImg = document.getElementById('qrisPreviewImg');
     const previewText = document.getElementById('qrisPreviewText');
@@ -4096,29 +4089,14 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
     } 
 }
 
-function handleLogoUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const logoBase64 = e.target.result;
-        storeSettings.logo = logoBase64;
-        
-        // Show preview
-        const logoPreviewImg = document.getElementById('logoPreviewImg');
-        logoPreviewImg.src = logoBase64;
-        logoPreviewImg.style.display = 'block';
-        
-        showNotification('Logo berhasil diupload', 'success');
-    };
-    reader.readAsDataURL(file);
-}
-
 function saveStoreSettings() {
     storeSettings.name = document.getElementById('storeNameInput').value;
     if(document.getElementById('storeAddressInput')) storeSettings.address = document.getElementById('storeAddressInput').value;
     if(document.getElementById('storePhoneInput')) storeSettings.phone = document.getElementById('storePhoneInput').value;
+    // juga simpan logo jika sudah dipreview
+    if (tempLogoBase64) {
+        storeSettings.logo = tempLogoBase64;
+    }
     saveData(); 
     showNotification('Profil Toko berhasil disimpan', 'success');
 }
@@ -4163,6 +4141,32 @@ function previewQRIS(event) {
     }
 }
 
+// logo preview/save for settings
+let tempLogoBase64 = '';
+function previewLogo(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            tempLogoBase64 = e.target.result;
+            const preview = document.getElementById('logoPreviewImg');
+            preview.src = tempLogoBase64;
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function saveLogoSetting() {
+    if (tempLogoBase64) {
+        storeSettings.logo = tempLogoBase64;
+        saveData();
+        showNotification('Logo berhasil disimpan', 'success');
+    } else {
+        showNotification('Silakan pilih gambar terlebih dahulu', 'error');
+    }
+} 
+
 function saveQRISSetting() {
     if (tempQRISBase64) {
         storeSettings.qrisImage = tempQRISBase64;
@@ -4199,24 +4203,13 @@ async function connectBluetoothPrinter() {
         bluetoothCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
         
         bluetoothDevice.addEventListener('gattserverdisconnected', () => {
-            document.getElementById('bluetoothStatus').textContent = 'Status: Terputus - Mencoba reconnect...';
+            document.getElementById('bluetoothStatus').textContent = 'Status: Terputus';
             bluetoothDevice = null;
             bluetoothCharacteristic = null;
-            
-            // Auto reconnect after 2 seconds
-            setTimeout(() => {
-                if (printerSettings.bluetoothDeviceName) {
-                    connectBluetoothPrinter();
-                }
-            }, 2000);
         });
         
         document.getElementById('bluetoothStatus').textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
         showNotification('Printer Bluetooth terhubung', 'success');
-        
-        // Save device name for auto reconnect
-        printerSettings.bluetoothDeviceName = bluetoothDevice.name;
-        saveData();
     } catch (error) {
         console.error('Error connecting to Bluetooth printer:', error);
         showNotification('Gagal menghubungkan ke printer Bluetooth', 'error');
@@ -4248,80 +4241,31 @@ function generateReceiptESC_POS(transaction) {
     commands.push(0x1B, 0x61, 0x01); // ESC a 1
     
     // Header
-    // enlarge name using ESC/POS select character size (double width & height)
-    commands.push(0x1B,0x21,0x11); // ESC ! 0x11 = double width & double height
-    commands.push(...new TextEncoder().encode(`${storeSettings.name}\n`));
-    commands.push(0x1B,0x21,0x00); // reset
-    if (storeSettings.address) commands.push(...new TextEncoder().encode(`${storeSettings.address}\n`));
-    if (storeSettings.phone) commands.push(...new TextEncoder().encode(`HP/WA: ${storeSettings.phone}\n`));
-    commands.push(...new TextEncoder().encode('================\n'));
+    commands.push(...new TextEncoder().encode('TOKO POS\n'));
+    commands.push(...new TextEncoder().encode('Jl. Contoh No. 123\n\n'));
     
     // Left align
     commands.push(0x1B, 0x61, 0x00); // ESC a 0
     
-    // Transaction info
-    const txnDate = new Date(transaction.timestamp).toLocaleDateString('id-ID');
-    const txnTime = new Date(transaction.timestamp).toLocaleTimeString('id-ID');
-    commands.push(...new TextEncoder().encode(`Order: ${transaction.id}\n`));
-    commands.push(...new TextEncoder().encode(`Tanggal: ${txnDate}\n`));
-    commands.push(...new TextEncoder().encode(`Jam: ${txnTime}\n`));
-    commands.push(...new TextEncoder().encode(`Pelanggan: ${transaction.customer}\n`));
-    commands.push(...new TextEncoder().encode('================\n\n'));
+    // Transaction details
+    commands.push(...new TextEncoder().encode(`Tanggal: ${new Date(transaction.date).toLocaleString()}\n`));
+    commands.push(...new TextEncoder().encode(`No. Transaksi: ${transaction.id}\n\n`));
     
-    // Items with better formatting
+    // Items
     transaction.items.forEach(item => {
-        const itemTotal = item.quantity * item.price;
-        const itemName = item.name.length > 25 ? item.name.substring(0, 25) : item.name;
-        commands.push(...new TextEncoder().encode(`${itemName}\n`));
-        
-        const qtyPrice = `${item.quantity} x Rp${item.price.toLocaleString('id-ID')}`;
-        const priceStr = `Rp${itemTotal.toLocaleString('id-ID')}`;
-        
-        // Format: qty x price (left) and total price (right)
-        const spacer = ' '.repeat(Math.max(0, 30 - qtyPrice.length - priceStr.length));
-        commands.push(...new TextEncoder().encode(`${qtyPrice}${spacer}${priceStr}\n`));
+        const line = `${item.name} x${item.quantity} ${item.price.toLocaleString()}\n`;
+        commands.push(...new TextEncoder().encode(line));
     });
     
-    commands.push(...new TextEncoder().encode('================\n'));
-    
-    // Subtotal and Tax
-    const taxRate = transaction.taxRate || 10;
-    const subtotalStr = `Subtotal`;
-    const subtotalPrice = `Rp${transaction.subtotal.toLocaleString('id-ID')}`;
-    let spacer = ' '.repeat(Math.max(0, 30 - subtotalStr.length - subtotalPrice.length));
-    commands.push(...new TextEncoder().encode(`${subtotalStr}${spacer}${subtotalPrice}\n`));
-    
-    const taxStr = `VAT: ${taxRate}%`;
-    const taxPrice = `Rp${transaction.tax.toLocaleString('id-ID')}`;
-    spacer = ' '.repeat(Math.max(0, 30 - taxStr.length - taxPrice.length));
-    commands.push(...new TextEncoder().encode(`${taxStr}${spacer}${taxPrice}\n`));
-    
-    commands.push(...new TextEncoder().encode('================\n'));
-    
-    // Total (bold/emphasized)
-    const totalStr = `JUMLAH`;
-    const totalPrice = `Rp${transaction.total.toLocaleString('id-ID')}`;
-    spacer = ' '.repeat(Math.max(0, 30 - totalStr.length - totalPrice.length));
-    commands.push(...new TextEncoder().encode(`${totalStr}${spacer}${totalPrice}\n`));
     commands.push(...new TextEncoder().encode('\n'));
     
-    // Payment method
-    const paymentStr = `${transaction.method}`;
-    commands.push(...new TextEncoder().encode(`${paymentStr}\n`));
-    const paymentPrice = `Rp${transaction.total.toLocaleString('id-ID')}`;
-    commands.push(...new TextEncoder().encode(`${paymentPrice}\n`));
+    // Total
+    commands.push(0x1B, 0x61, 0x02); // Right align
+    commands.push(...new TextEncoder().encode(`Total: Rp ${transaction.total.toLocaleString()}\n`));
     
-    // Center align for footer
-    commands.push(0x1B, 0x61, 0x01); // ESC a 1
-    
-    // Footer message
-    commands.push(...new TextEncoder().encode('\n'));
-    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n`));
-    commands.push(...new TextEncoder().encode('\n'));
-    
-    // Timestamp footer
-    commands.push(...new TextEncoder().encode(`${txnDate} ${txnTime}\n`));
-    commands.push(...new TextEncoder().encode(`No: ${transaction.id}\n`));
+    // Footer
+    commands.push(0x1B, 0x61, 0x01); // Center
+    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n\n`));
     
     // Cut paper
     commands.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0
