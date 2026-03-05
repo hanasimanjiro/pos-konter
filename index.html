@@ -3012,19 +3012,19 @@ function generateReceiptHTML(txn) {
       </div>
       
       <div style="margin-bottom: 8px;">
-        ${txn.items.map(item => `
-          <div style="margin-bottom: 5px; line-height: 1.4;">
-            <div style="font-weight: bold;">${item.name}</div>
-            ${item.imei ? `<div style="font-size: 0.85em;">IMEI/SN: ${item.imei}</div>` : ''}
-            ${item.warranty ? `<div style="font-size: 0.85em;">Garansi: ${item.warranty}</div>` : ''}
-            ${item.duration ? `<div style="font-size: 0.85em;">Waktu: ${item.duration}</div>` : ''}
-            ${item.notes ? `<div style="font-size: 0.85em;">Ket: ${item.notes}</div>` : ''}
-            <div style="display: flex; justify-content: space-between; font-size: 0.95em; margin-top: 2px;">
-              <span>${item.quantity} x ${formatIDR(item.price)}</span>
-              <span>${formatIDR(item.quantity * item.price)}</span>
-            </div>
-          </div>
-        `).join('')}
+        ${txn.items.map(item => {
+          let itemHTML = '<div style="margin-bottom: 5px; line-height: 1.4;">';
+          itemHTML += '<div style="font-weight: bold;">' + item.name + '</div>';
+          if (item.imei) itemHTML += '<div style="font-size: 0.85em;">IMEI/SN: ' + item.imei + '</div>';
+          if (item.warranty) itemHTML += '<div style="font-size: 0.85em;">Garansi: ' + item.warranty + '</div>';
+          if (item.duration) itemHTML += '<div style="font-size: 0.85em;">Waktu: ' + item.duration + '</div>';
+          if (item.notes) itemHTML += '<div style="font-size: 0.85em;">Ket: ' + item.notes + '</div>';
+          itemHTML += '<div style="display: flex; justify-content: space-between; font-size: 0.95em; margin-top: 2px;">';
+          itemHTML += '<span>' + item.quantity + ' x ' + formatIDR(item.price) + '</span>';
+          itemHTML += '<span>' + formatIDR(item.quantity * item.price) + '</span>';
+          itemHTML += '</div></div>';
+          return itemHTML;
+        }).join('')}
       </div>
       
       <div style="border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 5px 0; margin-bottom: 6px; font-size: 0.8em; letter-spacing: 0.5px; text-align: center;">
@@ -3058,7 +3058,7 @@ function generateReceiptHTML(txn) {
       </div>
       
       <div style="border-top: 1px solid #000; padding-top: 8px; margin-top: 6px; text-align: center;">
-        <p style="margin: 4px 0; font-size: 0.9em; font-weight: bold;">${printerSettings.footer}</p>
+        <p style="margin: 4px 0; font-size: 0.9em; font-weight: bold;">${printerSettings.footer || 'Terima kasih atas kunjungan Anda!'}</p>
         <p style="margin: 4px 0; font-size: 0.85em;">${txnDate} ${txnTime}</p>
         <p style="margin: 2px 0; font-size: 0.85em;">No: ${txn.id}</p>
       </div>
@@ -4348,7 +4348,7 @@ function generateReceiptESC_POS(transaction) {
     
     // Footer message
     commands.push(...new TextEncoder().encode('\n'));
-    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n`));
+    commands.push(...new TextEncoder().encode(`${printerSettings.footer || 'Terima kasih atas kunjungan Anda!'}\n`));
     commands.push(...new TextEncoder().encode('\n'));
     
     // Timestamp footer
