@@ -1517,16 +1517,6 @@ button, a, [role="button"] {
                   <input type="text" id="storeNameInput" value="Toko Saya" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Logo Toko</label>
-                  <div class="flex items-center space-x-4">
-                    <img id="logoPreviewImg" src="" class="w-20 h-20 object-contain border border-gray-200 rounded hidden" alt="Logo Preview">
-                    <div class="flex-1">
-                      <input type="file" id="logoInput" accept="image/*" onchange="previewLogo(event)" class="w-full text-sm" />
-                      <button type="button" onclick="saveLogoSetting()" class="mt-2 px-3 py-1 bg-blue-600 text-white rounded-small hover:bg-blue-700 text-xs">Simpan Logo</button>
-                    </div>
-                  </div>
-                </div>
-                <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Toko</label>
                   <input type="text" id="storeAddressInput" placeholder="Contoh: Jl. Merdeka No. 1" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
@@ -1566,6 +1556,22 @@ button, a, [role="button"] {
                   <span id="qrisPreviewText" class="text-sm text-gray-400">Belum ada gambar QRIS</span>
               </div>
               <button onclick="saveQRISSetting()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan QRIS</button>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Logo Toko</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Upload Gambar Logo Toko</label>
+                <input type="file" id="logoInput" accept="image/*" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="previewLogo(event)">
+                <p class="text-xs text-gray-500 mt-1">Logo ini akan muncul di bagian atas nota cetak.</p>
+              </div>
+              <div class="mt-4 border-2 border-dashed border-gray-200 p-4 rounded-large text-center bg-gray-50">
+                  <img id="logoPreviewImg" src="" alt="Preview Logo" class="max-h-48 mx-auto hidden object-contain">
+                  <span id="logoPreviewText" class="text-sm text-gray-400">Belum ada logo toko</span>
+              </div>
+              <button onclick="saveLogoSetting()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Logo</button>
             </div>
           </div>
 			
@@ -4086,6 +4092,22 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
     } else {
         previewImg.classList.add('hidden');
         previewText.classList.remove('hidden');
+    }
+    
+    // logo preview
+    const logoPreview = document.getElementById('logoPreviewImg');
+    const logoText = document.getElementById('logoPreviewText');
+    if (logoPreview && storeSettings.logo) {
+        logoPreview.src = storeSettings.logo;
+        logoPreview.classList.remove('hidden');
+        logoText.classList.add('hidden');
+        tempLogoBase64 = storeSettings.logo;
+    } else {
+        logoPreview.classList.add('hidden');
+        logoText.classList.remove('hidden');
+    } else {
+        previewImg.classList.add('hidden');
+        previewText.classList.remove('hidden');
     } 
 }
 
@@ -4093,10 +4115,6 @@ function saveStoreSettings() {
     storeSettings.name = document.getElementById('storeNameInput').value;
     if(document.getElementById('storeAddressInput')) storeSettings.address = document.getElementById('storeAddressInput').value;
     if(document.getElementById('storePhoneInput')) storeSettings.phone = document.getElementById('storePhoneInput').value;
-    // juga simpan logo jika sudah dipreview
-    if (tempLogoBase64) {
-        storeSettings.logo = tempLogoBase64;
-    }
     saveData(); 
     showNotification('Profil Toko berhasil disimpan', 'success');
 }
