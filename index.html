@@ -1558,22 +1558,6 @@ button, a, [role="button"] {
               <button onclick="saveQRISSetting()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan QRIS</button>
             </div>
           </div>
-          
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
-            <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Logo Toko</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Upload Gambar Logo Toko</label>
-                <input type="file" id="logoInput" accept="image/*" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="previewLogo(event)">
-                <p class="text-xs text-gray-500 mt-1">Logo ini akan muncul di bagian atas nota cetak.</p>
-              </div>
-              <div class="mt-4 border-2 border-dashed border-gray-200 p-4 rounded-large text-center bg-gray-50">
-                  <img id="logoPreviewImg" src="" alt="Preview Logo" class="max-h-48 mx-auto hidden object-contain">
-                  <span id="logoPreviewText" class="text-sm text-gray-400">Belum ada logo toko</span>
-              </div>
-              <button onclick="saveLogoSetting()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Logo</button>
-            </div>
-          </div>
 			
           <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pajak (PPN)</h3>
@@ -2008,7 +1992,6 @@ let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
     taxEnabled: true,
     taxRate: 10,
     qrisImage: '',
-    logo: '',
     modal: 0 // Modal Default
 };
 let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
@@ -2966,13 +2949,9 @@ function generateReceiptHTML(txn) {
     const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
     
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
-    const logoSrc = storeSettings.logo || 'assets/images/logo-192.png';
     
     return `
     <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
-      <div style="text-align: center; margin-bottom: 10px;">
-        <img src="${logoSrc}" style="max-width:100px; max-height:100px; display:block; margin:0 auto 5px;" alt="Logo">
-      </div>
       <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
         <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
         ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
@@ -3045,33 +3024,25 @@ function showReceiptModal(txnId) {
     currentReceiptTransaction = txn;
     document.getElementById('receiptModalContent').innerHTML = generateReceiptHTML(txn);
     document.getElementById('receiptModal').classList.add('active');
-
-    // auto print and auto-close sequence
-    setTimeout(() => {
-        printReceiptFromModal(true);
-    }, 500);
-    setTimeout(() => {
-        closeReceiptModal();
-    }, 3500); // 3 seconds display time
-    
-    // otomatis print setelah sebentar, lalu tutup modal setelah 3 detik
-    setTimeout(() => {
-        printReceiptFromModal(true);
-    }, 500);
-    setTimeout(() => {
-        closeReceiptModal();
-    }, 3500);
 } // <-- Pastikan ada kurung tutup ini sebelum membuat fungsi baru
 
 // --- FUNGSI TUTUP MODAL (Pindahkan ke luar sini agar bisa diakses tombol) ---
-function closeReceiptModal() {auto=false) {
+function closeReceiptModal() {
+    document.getElementById('receiptModal').classList.remove('active');
+    if(typeof currentReceiptTransaction !== 'undefined') {
+        currentReceiptTransaction = null;
+    }
+}
+
+// --- FUNGSI PRINT (Sudah ditambah fitur tutup otomatis) ---
+function printReceiptFromModal() {
     if(!currentReceiptTransaction) return;
     
     if (bluetoothDevice && bluetoothDevice.gatt.connected) {
         // Print via Bluetooth
         const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
         sendDataToPrinter(escPosData);
-        if (!auto) closeReceiptModal();
+        closeReceiptModal();
     } else {
         // Print via browser
         const content = generateReceiptHTML(currentReceiptTransaction);
@@ -3089,20 +3060,10 @@ function closeReceiptModal() {auto=false) {
             printContainer.style.display = 'none';
             
             // Memanggil fungsi tutup setelah print selesai
-            if (!auto)ntContainer.innerHTML = content;
-        printContainer.style.display = 'block';
-        
-        setTimeout(() => {
-            window.print();
-            printContainer.style.display = 'none';
-            
-            if (!auto) {
-                // Memanggil fungsi tutup setelah print selesai
-                closeReceiptModal(); 
-            }
+            closeReceiptModal(); 
         }, 500);
     }
-} 
+}
 
 function renderProductsTable() {
   const searchInput = document.getElementById('productManagementSearch');
@@ -4092,22 +4053,6 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
     } else {
         previewImg.classList.add('hidden');
         previewText.classList.remove('hidden');
-    }
-    
-    // logo preview
-    const logoPreview = document.getElementById('logoPreviewImg');
-    const logoText = document.getElementById('logoPreviewText');
-    if (logoPreview && storeSettings.logo) {
-        logoPreview.src = storeSettings.logo;
-        logoPreview.classList.remove('hidden');
-        logoText.classList.add('hidden');
-        tempLogoBase64 = storeSettings.logo;
-    } else {
-        logoPreview.classList.add('hidden');
-        logoText.classList.remove('hidden');
-    } else {
-        previewImg.classList.add('hidden');
-        previewText.classList.remove('hidden');
     } 
 }
 
@@ -4158,32 +4103,6 @@ function previewQRIS(event) {
         reader.readAsDataURL(file);
     }
 }
-
-// logo preview/save for settings
-let tempLogoBase64 = '';
-function previewLogo(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            tempLogoBase64 = e.target.result;
-            const preview = document.getElementById('logoPreviewImg');
-            preview.src = tempLogoBase64;
-            preview.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-function saveLogoSetting() {
-    if (tempLogoBase64) {
-        storeSettings.logo = tempLogoBase64;
-        saveData();
-        showNotification('Logo berhasil disimpan', 'success');
-    } else {
-        showNotification('Silakan pilih gambar terlebih dahulu', 'error');
-    }
-} 
 
 function saveQRISSetting() {
     if (tempQRISBase64) {
