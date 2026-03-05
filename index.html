@@ -11,6 +11,7 @@
 <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
 <script src="assets/js/tailwind.js"></script>
 <script>
@@ -310,6 +311,11 @@ html, body {
   line-height: 1.4;
   margin: 0 auto;
   background: white;
+}
+
+.receipt-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
 }
 
 /* Laporan Table Style */
@@ -1524,7 +1530,15 @@ button, a, [role="button"] {
                   <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP / WA</label>
                   <input type="text" id="storePhoneInput" placeholder="Contoh: 081234567890" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Profil Toko</button>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Upload Logo Toko</label>
+                  <input type="file" id="storeLogo" accept="image/*" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="handleLogoUpload(event)">
+                  <p class="text-xs text-gray-500 mt-1">Logo akan ditampilkan di atas nama toko pada nota cetak.</p>
+                  <div id="logoPreview" class="mt-3 flex justify-center">
+                    <img id="logoPreviewImg" src="" alt="Logo Preview" style="max-height: 80px; display: none;">
+                  </div>
+                </div>
+                <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom w-full">Simpan Profil Toko</button>
               </div>
 
               <div class="bg-blue-50 p-5 rounded-large border border-blue-100">
@@ -2959,15 +2973,16 @@ function generateReceiptHTML(txn) {
     const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
     
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
+    const logoHTML = storeSettings.logo ? `<div style="text-align: center; margin-bottom: 8px;"><img src="${storeSettings.logo}" style="max-height: 60px; max-width: 60px;"></div>` : '<div style="font-size: 1.5em; margin-bottom: 5px;">🏪</div>';
     
     return `
     <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
       <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
-        <div style="font-size: 1.5em; margin-bottom: 5px;">🏪</div>
-        <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
+        ${logoHTML}
+        <h2 style="margin: 0; font-size: 1.8em; font-weight: 900; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-transform: uppercase;">${storeSettings.name}</h2>
         ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
         ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
-        <p style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</p>
+        <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 0.95em;">STRUK PEMBAYARAN</p>
       </div>
       
       <div style="margin-bottom: 10px;">
@@ -3002,26 +3017,30 @@ function generateReceiptHTML(txn) {
       </div>
       
       <div style="margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between;">
-          <span>Subtotal:</span>
+        <div style="display: flex; justify-content: space-between; font-weight: bold;">
+          <span>Subtotal</span>
           <span>${formatIDR(txn.subtotal)}</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-          <span>Pajak (${txnTaxRate}%):</span>
+          <span>VAT: ${txnTaxRate}%</span>
           <span>${formatIDR(txn.tax)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; margin-top: 5px;">
-          <span>TOTAL:</span>
+        <div style="border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em;">
+          <span>Jumlah</span>
           <span>${formatIDR(txn.total)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px;">
-          <span>Metode:</span>
-          <span>${txn.method}</span>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+          <span style="font-weight: bold;">${txn.method}</span>
+          <span>${formatIDR(txn.total)}</span>
         </div>
       </div>
       
       <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
-        <p>${printerSettings.footer}</p>
+        <p style="margin: 5px 0; font-size: 0.95em;">${printerSettings.footer}</p>
+        <p style="margin: 5px 0; font-size: 0.85em; color: #666;">
+          ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}
+        </p>
+        <p style="margin: 5px 0; font-size: 0.85em;">No: ${txn.id}</p>
       </div>
     </div>
     `;
@@ -4061,6 +4080,15 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
     if(document.getElementById('googleScriptUrlInput')) document.getElementById('googleScriptUrlInput').value = googleScriptUrl;
     document.getElementById('editUsername').value = loginCredentials.username;
 
+    // Load logo preview
+    const logoPreviewImg = document.getElementById('logoPreviewImg');
+    if (storeSettings.logo) {
+        logoPreviewImg.src = storeSettings.logo;
+        logoPreviewImg.style.display = 'block';
+    } else {
+        logoPreviewImg.style.display = 'none';
+    }
+
     const previewImg = document.getElementById('qrisPreviewImg');
     const previewText = document.getElementById('qrisPreviewText');
     if (storeSettings.qrisImage) {
@@ -4072,6 +4100,25 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
         previewImg.classList.add('hidden');
         previewText.classList.remove('hidden');
     } 
+}
+
+function handleLogoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const logoBase64 = e.target.result;
+        storeSettings.logo = logoBase64;
+        
+        // Show preview
+        const logoPreviewImg = document.getElementById('logoPreviewImg');
+        logoPreviewImg.src = logoBase64;
+        logoPreviewImg.style.display = 'block';
+        
+        showNotification('Logo berhasil diupload', 'success');
+    };
+    reader.readAsDataURL(file);
 }
 
 function saveStoreSettings() {
@@ -4207,33 +4254,86 @@ function generateReceiptESC_POS(transaction) {
     commands.push(0x1B, 0x61, 0x01); // ESC a 1
     
     // Header
-    commands.push(...new TextEncoder().encode(`${storeSettings.name}\n`));
+    // Make store name bold and enlarged
+    commands.push(0x1B, 0x45, 0x01); // ESC E 1 - Bold on
+    commands.push(0x1D, 0x21, 0x11); // GS ! - Double size (1x width, 1x height multiplier)
+    
+    const storeName = storeSettings.name.toUpperCase();
+    commands.push(...new TextEncoder().encode(`${storeName}\n`));
+    
+    commands.push(0x1B, 0x45, 0x00); // ESC E 0 - Bold off
+    commands.push(0x1D, 0x21, 0x00); // GS ! 0 - Normal size
+    
     if (storeSettings.address) commands.push(...new TextEncoder().encode(`${storeSettings.address}\n`));
     if (storeSettings.phone) commands.push(...new TextEncoder().encode(`HP/WA: ${storeSettings.phone}\n`));
-    commands.push(...new TextEncoder().encode('\nSTRUK PEMBAYARAN\n\n'));
+    commands.push(...new TextEncoder().encode('================\n'));
     
     // Left align
     commands.push(0x1B, 0x61, 0x00); // ESC a 0
     
-    // Transaction details
-    commands.push(...new TextEncoder().encode(`Tanggal: ${new Date(transaction.date).toLocaleString()}\n`));
-    commands.push(...new TextEncoder().encode(`No. Transaksi: ${transaction.id}\n\n`));
+    // Transaction info
+    const txnDate = new Date(transaction.timestamp).toLocaleDateString('id-ID');
+    const txnTime = new Date(transaction.timestamp).toLocaleTimeString('id-ID');
+    commands.push(...new TextEncoder().encode(`Order: ${transaction.id}\n`));
+    commands.push(...new TextEncoder().encode(`Tanggal: ${txnDate}\n`));
+    commands.push(...new TextEncoder().encode(`Jam: ${txnTime}\n`));
+    commands.push(...new TextEncoder().encode(`Pelanggan: ${transaction.customer}\n`));
+    commands.push(...new TextEncoder().encode('================\n\n'));
     
-    // Items
+    // Items with better formatting
     transaction.items.forEach(item => {
-        const line = `${item.name} x${item.quantity} ${item.price.toLocaleString()}\n`;
-        commands.push(...new TextEncoder().encode(line));
+        const itemTotal = item.quantity * item.price;
+        const itemName = item.name.length > 25 ? item.name.substring(0, 25) : item.name;
+        commands.push(...new TextEncoder().encode(`${itemName}\n`));
+        
+        const qtyPrice = `${item.quantity} x Rp${item.price.toLocaleString('id-ID')}`;
+        const priceStr = `Rp${itemTotal.toLocaleString('id-ID')}`;
+        
+        // Format: qty x price (left) and total price (right)
+        const spacer = ' '.repeat(Math.max(0, 30 - qtyPrice.length - priceStr.length));
+        commands.push(...new TextEncoder().encode(`${qtyPrice}${spacer}${priceStr}\n`));
     });
     
+    commands.push(...new TextEncoder().encode('================\n'));
+    
+    // Subtotal and Tax
+    const taxRate = transaction.taxRate || 10;
+    const subtotalStr = `Subtotal`;
+    const subtotalPrice = `Rp${transaction.subtotal.toLocaleString('id-ID')}`;
+    let spacer = ' '.repeat(Math.max(0, 30 - subtotalStr.length - subtotalPrice.length));
+    commands.push(...new TextEncoder().encode(`${subtotalStr}${spacer}${subtotalPrice}\n`));
+    
+    const taxStr = `VAT: ${taxRate}%`;
+    const taxPrice = `Rp${transaction.tax.toLocaleString('id-ID')}`;
+    spacer = ' '.repeat(Math.max(0, 30 - taxStr.length - taxPrice.length));
+    commands.push(...new TextEncoder().encode(`${taxStr}${spacer}${taxPrice}\n`));
+    
+    commands.push(...new TextEncoder().encode('================\n'));
+    
+    // Total (bold/emphasized)
+    const totalStr = `JUMLAH`;
+    const totalPrice = `Rp${transaction.total.toLocaleString('id-ID')}`;
+    spacer = ' '.repeat(Math.max(0, 30 - totalStr.length - totalPrice.length));
+    commands.push(...new TextEncoder().encode(`${totalStr}${spacer}${totalPrice}\n`));
     commands.push(...new TextEncoder().encode('\n'));
     
-    // Total
-    commands.push(0x1B, 0x61, 0x02); // Right align
-    commands.push(...new TextEncoder().encode(`Total: Rp ${transaction.total.toLocaleString()}\n`));
+    // Payment method
+    const paymentStr = `${transaction.method}`;
+    commands.push(...new TextEncoder().encode(`${paymentStr}\n`));
+    const paymentPrice = `Rp${transaction.total.toLocaleString('id-ID')}`;
+    commands.push(...new TextEncoder().encode(`${paymentPrice}\n`));
     
-    // Footer
-    commands.push(0x1B, 0x61, 0x01); // Center
-    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n\n`));
+    // Center align for footer
+    commands.push(0x1B, 0x61, 0x01); // ESC a 1
+    
+    // Footer message
+    commands.push(...new TextEncoder().encode('\n'));
+    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n`));
+    commands.push(...new TextEncoder().encode('\n'));
+    
+    // Timestamp footer
+    commands.push(...new TextEncoder().encode(`${txnDate} ${txnTime}\n`));
+    commands.push(...new TextEncoder().encode(`No: ${transaction.id}\n`));
     
     // Cut paper
     commands.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0
