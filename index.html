@@ -450,6 +450,56 @@ html.dark tr.hover\:bg-gray-50:hover { background-color: #2d2d2d; }
   }
 }
 
+/* Kasir page mobile optimizations */
+@media (max-width: 1024px) {
+  #pos-view .grid-cols-1 {
+    gap: 1rem;
+  }
+  
+  #productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding-bottom: 5rem; /* Kurangi dari pb-20 */
+  }
+  
+  #productGrid > div {
+    height: auto;
+  }
+  
+  #productGrid img {
+    height: 80px;
+  }
+  
+  #productGrid .p-3 {
+    padding: 0.5rem;
+  }
+  
+  #productGrid h4 {
+    font-size: 12px;
+  }
+  
+  #productGrid p {
+    font-size: 11px;
+  }
+  
+  #productGrid span {
+    font-size: 11px;
+  }
+  
+  /* Cart mobile adjustments */
+  #pos-view > .grid > .fixed {
+    max-height: 45vh;
+  }
+  
+  #cartItems {
+    space-y: 0.5rem;
+  }
+  
+  #cartItems > div > div {
+    padding: 0.5rem;
+  }
+}
+
 /* iOS Safari button/link zoom on tap (applies to all but optimized for mobile) */
 button, a, [role="button"] {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
