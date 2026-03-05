@@ -11,7 +11,6 @@
 <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
 <script src="assets/js/tailwind.js"></script>
 <script>
@@ -289,19 +288,9 @@ html, body {
 @media print {
   body * { visibility: hidden; }
   
-  /* Print Receipt (Struk Kecil) - Desain Thermal Printer */
+  /* Print Receipt (Struk Kecil) */
   #receiptPrint, #receiptPrint * { visibility: visible; }
-  #receiptPrint { 
-      position: absolute; 
-      left: 0; 
-      top: 0; 
-      width: 58mm; /* Ukuran default kertas kasir */
-      margin: 0;
-      padding: 0;
-  }
-  
-  /* Hilangkan margin default dari browser */
-  @page { margin: 0; }
+  #receiptPrint { position: absolute; left: 0; top: 0; width: 100%; }
   
   /* Print Report (Laporan A4) */
   #reportPrintArea, #reportPrintArea * { visibility: visible; }
@@ -315,14 +304,12 @@ html, body {
   }
 }
 
-/* Base style untuk struk thermal */
 .receipt-container {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Courier New', monospace;
   font-size: 12px;
   line-height: 1.4;
   margin: 0 auto;
   background: white;
-  color: #000;
 }
 
 /* Laporan Table Style */
@@ -2977,81 +2964,78 @@ function updateTotals() {
 
 function generateReceiptHTML(txn) {
     const width = printerSettings.type === '58mm' ? '58mm' : '80mm';
-    const txnDate = new Date(txn.timestamp || Date.now()).toLocaleDateString('id-ID');
-    const txnTime = new Date(txn.timestamp || Date.now()).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
-    const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
+    const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
     
-    // Looping item keranjang
-    let itemsHTML = '';
-    txn.items.forEach(item => {
-        const itemTotal = formatIDR(item.quantity * item.price);
-        const itemPrice = formatIDR(item.price);
-        
-        // Keterangan tambahan untuk servis HP (jika ada)
-        let extraInfo = '';
-        if (item.imei) extraInfo += `<div style="font-size: 10px;">IMEI/SN: ${item.imei}</div>`;
-        if (item.warranty) extraInfo += `<div style="font-size: 10px;">Garansi: ${item.warranty}</div>`;
-        if (item.notes) extraInfo += `<div style="font-size: 10px;">Ket: ${item.notes}</div>`;
-
-        itemsHTML += `
-            <div style="text-align: left; margin-bottom: 2px;">${item.name}</div>
-            ${extraInfo}
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                <span>${item.quantity} x ${itemPrice}</span>
-                <span>${itemTotal}</span>
-            </div>
-        `;
-    });
-
+    const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
+    const logoHTML = storeSettings.logo ? `<div style="text-align: center; margin-bottom: 8px;"><img src="${storeSettings.logo}" style="max-height: 60px; max-width: 60px;"></div>` : '<div style="font-size: 1.5em; margin-bottom: 5px;">🏪</div>';
+    
     return `
-    <div class="receipt-container" style="width: ${width}; padding: 10px 5px; margin: 0 auto;">
-        <div style="text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 4px;">
-            ${storeSettings.name.toUpperCase()}
+    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
+      <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+        ${logoHTML}
+        <h2 style="margin: 0; font-size: 1.6em; font-weight: bold; font-family: 'Arial','Helvetica','sans-serif';">${storeSettings.name}</h2>
+        ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
+        ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
+        <p style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</p>
+      </div>
+      
+      <div style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>No:</span>
+          <span style="font-weight: bold;">${txn.id}</span>
         </div>
-        ${storeSettings.address ? `<div style="text-align: center; font-size: 11px;">${storeSettings.address}</div>` : ''}
-        ${storeSettings.phone ? `<div style="text-align: center; font-size: 11px;">Telp: ${storeSettings.phone}</div>` : ''}
-        
-        <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
-        
-        <div style="display: flex; justify-content: space-between; font-size: 11px;">
-            <span>Tgl: ${txnDate}</span>
-            <span>${txnTime}</span>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Tgl:</span>
+          <span>${txn.date}</span>
         </div>
-        <div style="text-align: left; font-size: 11px;">No: ${txn.id}</div>
-        <div style="text-align: left; font-size: 11px;">Kasir: ${adminProfile.name}</div>
-        <div style="text-align: left; font-size: 11px;">Plg: ${txn.customer || 'Umum'}</div>
-        
-        <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
-        
-        <div style="font-size: 11px;">
-            ${itemsHTML}
+        <div style="display: flex; justify-content: space-between;">
+          <span>Plg:</span>
+          <span>${txn.customer || 'Pelanggan Umum'}</span>
         </div>
-        
-        <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
-        
-        <div style="display: flex; justify-content: space-between; font-size: 11px;">
-            <span>Subtotal:</span>
-            <span>${formatIDR(txn.subtotal)}</span>
+      </div>
+      
+      <div style="border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px;">
+        ${txn.items.map(item => `
+          <div style="margin-bottom: 5px;">
+            <div>${item.name}</div>
+            ${item.imei ? `<div style="font-size: 0.85em; color: #555; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
+            ${item.duration ? `<div style="font-size: 0.85em; color: #555;">Waktu: ${item.duration}</div>` : ''}
+            ${item.warranty ? `<div style="font-size: 0.85em; color: #555;">Garansi: ${item.warranty}</div>` : ''}
+            ${item.notes ? `<div style="font-size: 0.85em; color: #555; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
+            <div style="display: flex; justify-content: space-between;">
+              <span>${item.quantity} x ${formatIDR(item.price)}</span>
+              <span>${formatIDR(item.quantity * item.price)}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; font-weight: bold;">
+          <span>Subtotal</span>
+          <span>${formatIDR(txn.subtotal)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px;">
-            <span>Pajak (${txnTaxRate}%):</span>
-            <span>${formatIDR(txn.tax)}</span>
+        <div style="display: flex; justify-content: space-between;">
+          <span>VAT: ${txnTaxRate}%</span>
+          <span>${formatIDR(txn.tax)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-top: 4px;">
-            <span>Total:</span>
-            <span>${formatIDR(txn.total)}</span>
+        <div style="border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em;">
+          <span>Jumlah</span>
+          <span>${formatIDR(txn.total)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
-            <span>Bayar (${txn.method}):</span>
-            <span>${formatIDR(txn.total)}</span>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+          <span style="font-weight: bold;">${txn.method}</span>
+          <span>${formatIDR(txn.total)}</span>
         </div>
-        
-        <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
-        
-        <div style="text-align: center; font-size: 10px; margin-top: 8px;">
-            ${printerSettings.footer || 'Terima kasih atas kunjungan Anda!'}
-        </div>
-        <br><br>
+      </div>
+      
+      <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
+        <p style="margin: 5px 0; font-size: 0.95em;">${printerSettings.footer}</p>
+        <p style="margin: 5px 0; font-size: 0.85em; color: #666;">
+          ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}
+        </p>
+        <p style="margin: 5px 0; font-size: 0.85em;">No: ${txn.id}</p>
+      </div>
     </div>
     `;
 }
@@ -3088,21 +3072,11 @@ function printReceiptFromModal() {
         const content = generateReceiptHTML(currentReceiptTransaction);
         const printContainer = document.getElementById('receiptPrint');
         
-        // include inline styles to ensure font & layout during print
-        const styleBlock = `
-          <style>
-            @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
-            .receipt-container {font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4;}
-            .receipt-container h2 {font-family: 'Orbitron', sans-serif; font-weight: 900;}
-            @media print { .receipt-container { width: ${printerSettings.type === '80mm' ? '80mm' : '58mm'}; }}
-          </style>
-        `;
-        
-        // set width explicitly again
+        // Penyesuaian lebar printer
         const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
         printContainer.style.width = width;
         
-        printContainer.innerHTML = styleBlock + content;
+        printContainer.innerHTML = content;
         printContainer.style.display = 'block';
         
         setTimeout(() => {
@@ -4274,16 +4248,10 @@ function generateReceiptESC_POS(transaction) {
     commands.push(0x1B, 0x61, 0x01); // ESC a 1
     
     // Header
-    // Make store name bold and enlarged
-    commands.push(0x1B, 0x45, 0x01); // ESC E 1 - Bold on
-    commands.push(0x1D, 0x21, 0x11); // GS ! - Double size (1x width, 1x height multiplier)
-    
-    const storeName = storeSettings.name.toUpperCase();
-    commands.push(...new TextEncoder().encode(`${storeName}\n`));
-    
-    commands.push(0x1B, 0x45, 0x00); // ESC E 0 - Bold off
-    commands.push(0x1D, 0x21, 0x00); // GS ! 0 - Normal size
-    
+    // enlarge name using ESC/POS select character size (double width & height)
+    commands.push(0x1B,0x21,0x11); // ESC ! 0x11 = double width & double height
+    commands.push(...new TextEncoder().encode(`${storeSettings.name}\n`));
+    commands.push(0x1B,0x21,0x00); // reset
     if (storeSettings.address) commands.push(...new TextEncoder().encode(`${storeSettings.address}\n`));
     if (storeSettings.phone) commands.push(...new TextEncoder().encode(`HP/WA: ${storeSettings.phone}\n`));
     commands.push(...new TextEncoder().encode('================\n'));
@@ -4348,7 +4316,7 @@ function generateReceiptESC_POS(transaction) {
     
     // Footer message
     commands.push(...new TextEncoder().encode('\n'));
-    commands.push(...new TextEncoder().encode(`${printerSettings.footer || 'Terima kasih atas kunjungan Anda!'}\n`));
+    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n`));
     commands.push(...new TextEncoder().encode('\n'));
     
     // Timestamp footer
