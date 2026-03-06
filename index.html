@@ -27,7 +27,6 @@
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js" onerror="window.chartLoadError=true"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 tailwind.config = {
   darkMode: 'class', 
@@ -286,53 +285,100 @@ html, body {
   100% { transform: rotate(360deg); }
 }
 
-/* --- UPDATE PRINT CSS UNTUK LAPORAN --- */
+/* --- UPDATE PRINT CSS UNTUK LAPORAN & THERMAL PRINTER --- */
+
+/* Default page size (untuk laporan A4) */
+@page {
+  size: auto;
+  margin: 10mm;
+}
+
+/* Page size untuk struk thermal 58mm */
+@page receipt-58mm {
+  size: 58mm auto;
+  margin: 0mm;
+}
+
+/* Page size untuk struk thermal 80mm */
+@page receipt-80mm {
+  size: 80mm auto;
+  margin: 0mm;
+}
+
 @media print {
-  /* Sembunyikan elemen utama dan modal selama print */
-  body > div:not(#receiptPrint):not(#reportPrintArea) {
-      display: none !important;
-  }
-  aside, header, main, .modal {
-      display: none !important;
-  }
+  body * { visibility: hidden; }
   
-  body { background: white !important; padding: 0 !important; margin: 0 !important; }
-
   /* Print Receipt (Struk Kecil) */
-  #receiptPrint { 
-      display: block !important; 
-      visibility: visible !important; 
-      position: relative !important; 
-      left: 0; top: 0; width: 100%; 
+  #receiptPrint, #receiptPrint * { 
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
-
-  /* Print Report (Laporan A4) */
-  #reportPrintArea { 
-      display: block !important;
-      visibility: visible !important;
-      position: relative !important; 
-      left: 0; top: 0; width: 100%; 
-      background: white;
+  #receiptPrint img {
+    display: inline-block !important;
+    visibility: visible !important;
+    max-width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #receiptPrint { 
+    position: fixed !important;
+    left: 0 !important; 
+    top: 0 !important; 
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+  #receiptPrint.size-58mm {
+    width: 58mm !important;
+    max-width: 58mm !important;
+    page: receipt-58mm;
+  }
+  #receiptPrint.size-80mm {
+    width: 80mm !important;
+    max-width: 80mm !important;
+    page: receipt-80mm;
+  }
+  /* Fallback jika tidak ada class */
+  #receiptPrint:not(.size-58mm):not(.size-80mm) {
+    width: 58mm !important;
+    max-width: 58mm !important;
   }
   
-  /* Pastikan gambar / warna ikut tercetak (Penting!) */
-  * {
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
+  /* Print Report (Laporan A4) */
+  #reportPrintArea, #reportPrintArea * { visibility: visible; }
+  #reportPrintArea { 
+      position: absolute; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      background: white;
+      padding: 20px;
   }
 }
 
 .receipt-container {
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  line-height: 1.4;
-  margin: 0 auto;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
   background: white;
+  color: #000;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .receipt-container h2 {
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 900;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 1.3em;
+  letter-spacing: 1px;
+  margin: 0 0 4px 0;
 }
 
 /* Laporan Table Style */
@@ -1850,20 +1896,27 @@ button, a, [role="button"] {
 </div>
 
 <div id="receiptModal" class="modal">
-  <div class="bg-white rounded-large shadow-custom max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto modal-content">
-    <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+  <div class="bg-white rounded-large shadow-custom max-w-sm w-full mx-4 max-h-[92vh] overflow-y-auto modal-content" style="min-width:320px;">
+    <!-- Header -->
+    <div class="px-6 pt-6 pb-4 flex items-center justify-between">
       <h3 class="font-heading text-xl font-bold text-gray-900">Struk Belanja</h3>
-      <button onclick="closeReceiptModal()" class="text-gray-400 hover:text-gray-600">
+      <button onclick="closeReceiptModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
-    <div class="p-6 bg-gray-50 flex justify-center">
-        <div id="receiptModalContent" class="bg-white shadow-sm"></div>
+    <hr class="border-gray-200">
+    <!-- Receipt Preview Area -->
+    <div class="px-4 py-5 bg-gray-50 flex justify-center" style="min-height:200px;">
+      <div id="receiptModalContent" class="bg-white shadow" style="width:220px;border-radius:4px;padding:12px 10px;overflow:hidden;"></div>
     </div>
-    <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
-      <button onclick="closeReceiptModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50">Tutup</button>
-      <button onclick="printReceiptFromModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 shadow-custom flex items-center">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+    <hr class="border-gray-200">
+    <!-- Footer Buttons -->
+    <div class="px-6 py-4 flex items-center justify-between gap-3">
+      <button onclick="closeReceiptModal()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-small hover:bg-gray-50 font-medium transition-colors">
+        Tutup
+      </button>
+      <button onclick="printReceiptFromModal()" class="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 shadow-custom font-medium flex items-center justify-center gap-2 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
         Cetak
       </button>
     </div>
@@ -2198,7 +2251,7 @@ function completeTransaction(total, tax, taxRatePercent, subtotal, method) {
     // Auto print receipt after payment
     setTimeout(() => {
         printReceiptFromModal();
-    }, 1000); // Delay 3 second to allow modal to show
+    }, 1000); // Delay 1 second to allow modal to show
     
     // Reset keranjang
     cart = [];
@@ -2986,79 +3039,101 @@ function updateTotals() {
 }
 
 function generateReceiptHTML(txn) {
-    const width = printerSettings.type === '58mm' ? '58mm' : '80mm';
-    const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
+    const printerType = (typeof printerSettings !== 'undefined') ? printerSettings.type : '58mm';
+    const width = printerType === '58mm' ? '58mm' : '80mm';
+    const fontSize = printerType === '58mm' ? '10px' : '12px';
+    const lineWidth = printerType === '58mm' ? '================================' : '================================================';
     
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
-    const logoHTML = storeSettings.logo ? `<div style="text-align: center; margin-bottom: 8px;"><img src="${storeSettings.logo}" style="max-height: 60px; max-width: 60px;"></div>` : '<div style="font-size: 1.5em; margin-bottom: 5px;">🏪</div>';
+    const logoHTML = storeSettings.logo 
+        ? `<div style="text-align:center;margin-bottom:6px;line-height:1;">
+             <img src="${storeSettings.logo}" 
+               style="width:100%;max-width:100%;height:auto;
+                      display:block;margin:0 auto;
+                      -webkit-print-color-adjust:exact;print-color-adjust:exact;">
+           </div>` 
+        : '';
+    
+    // Helper: buat baris 2 kolom kiri-kanan rata
+    function rowLR(left, right) {
+        // Gunakan table agar tidak bergantung pada flexbox (lebih stabil di print)
+        return `<table style="width:100%;border-collapse:collapse;margin:1px 0;">
+            <tr>
+                <td style="text-align:left;padding:0;vertical-align:top;">${left}</td>
+                <td style="text-align:right;padding:0;white-space:nowrap;vertical-align:top;">${right}</td>
+            </tr>
+        </table>`;
+    }
+
+    function divider() {
+        return `<div style="border-top:1px dashed #000;margin:5px 0;"></div>`;
+    }
     
     return `
-    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
-      <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+    <div class="receipt-container" style="width:100%;font-size:${fontSize};padding:6px 5px;color:#000;background:white;">
+      
+      <div style="text-align:center;padding-bottom:5px;">
         ${logoHTML}
-        <h2 style="margin: 0; font-size: 1.8em; font-weight: 900; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-transform: uppercase;">${storeSettings.name}</h2>
-        ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
-        ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
-        <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 0.95em;">STRUK PEMBAYARAN</p>
+        <div style="font-weight:bold;font-size:1.3em;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">${storeSettings.name}</div>
+        ${storeSettings.address ? `<div style="font-size:0.9em;margin:1px 0;">${storeSettings.address}</div>` : ''}
+        ${storeSettings.phone ? `<div style="font-size:0.9em;margin:1px 0;">HP/WA: ${storeSettings.phone}</div>` : ''}
+        <div style="font-weight:bold;margin-top:3px;">STRUK PEMBAYARAN</div>
       </div>
       
-      <div style="margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between;">
-          <span>No:</span>
-          <span style="font-weight: bold;">${txn.id}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span>Tgl:</span>
-          <span>${txn.date}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span>Plg:</span>
-          <span>${txn.customer || 'Pelanggan Umum'}</span>
-        </div>
+      ${divider()}
+      
+      <div style="margin-bottom:5px;">
+        ${rowLR('<span>No</span>', `<b>${txn.id}</b>`)}
+        ${rowLR('<span>Tgl</span>', `<span>${txn.date}</span>`)}
+        ${rowLR('<span>Plg</span>', `<span>${txn.customer || 'Umum'}</span>`)}
       </div>
       
-      <div style="border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px;">
+      ${divider()}
+      
+      <div style="margin-bottom:5px;">
         ${txn.items.map(item => `
-          <div style="margin-bottom: 5px;">
-            <div>${item.name}</div>
-            ${item.imei ? `<div style="font-size: 0.85em; color: #555; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
-            ${item.duration ? `<div style="font-size: 0.85em; color: #555;">Waktu: ${item.duration}</div>` : ''}
-            ${item.warranty ? `<div style="font-size: 0.85em; color: #555;">Garansi: ${item.warranty}</div>` : ''}
-            ${item.notes ? `<div style="font-size: 0.85em; color: #555; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
-            <div style="display: flex; justify-content: space-between;">
-              <span>${item.quantity} x ${formatIDR(item.price)}</span>
-              <span>${formatIDR(item.quantity * item.price)}</span>
-            </div>
+          <div style="margin-bottom:4px;">
+            <div style="word-break:break-word;">${item.name}</div>
+            ${item.imei ? `<div style="font-size:0.85em;color:#333;">IMEI/SN: ${item.imei}</div>` : ''}
+            ${item.duration ? `<div style="font-size:0.85em;color:#333;">Waktu: ${item.duration}</div>` : ''}
+            ${item.warranty ? `<div style="font-size:0.85em;color:#333;">Garansi: ${item.warranty}</div>` : ''}
+            ${item.notes ? `<div style="font-size:0.85em;color:#333;">Ket: ${item.notes}</div>` : ''}
+            ${rowLR(`<span>${item.quantity} x ${formatIDR(item.price)}</span>`, `<span>${formatIDR(item.quantity * item.price)}</span>`)}
           </div>
         `).join('')}
       </div>
       
-      <div style="margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between; font-weight: bold;">
-          <span>Subtotal</span>
-          <span>${formatIDR(txn.subtotal)}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span>VAT: ${txnTaxRate}%</span>
-          <span>${formatIDR(txn.tax)}</span>
-        </div>
-        <div style="border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em;">
-          <span>Jumlah</span>
-          <span>${formatIDR(txn.total)}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-          <span style="font-weight: bold;">${txn.method}</span>
-          <span>${formatIDR(txn.total)}</span>
+      ${divider()}
+      
+      <div style="margin-bottom:5px;">
+        ${rowLR('<b>Subtotal</b>', `<span>${formatIDR(txn.subtotal)}</span>`)}
+        ${rowLR(`<span>VAT: ${txnTaxRate}%</span>`, `<span>${formatIDR(txnTaxRate > 0 ? txn.tax : 0)}</span>`)}
+      </div>
+      
+      ${divider()}
+      
+      <div style="margin-bottom:5px;">
+        <table style="width:100%;border-collapse:collapse;">
+            <tr>
+                <td style="text-align:left;padding:0;font-weight:bold;font-size:1.1em;vertical-align:top;">Jumlah</td>
+                <td style="text-align:right;padding:0;font-weight:bold;font-size:1.1em;white-space:nowrap;vertical-align:top;">${formatIDR(txn.total)}</td>
+            </tr>
+        </table>
+        <div style="margin-top:4px;">
+          ${rowLR(`<span>${txn.method}</span>`, `<span>${formatIDR(txn.cash && txn.cash > 0 ? txn.cash : txn.total)}</span>`)}
+          ${txn.change && txn.change > 0 ? rowLR('<span>Kembali</span>', `<span>${formatIDR(txn.change)}</span>`) : ''}
         </div>
       </div>
       
-      <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
-        <p style="margin: 5px 0; font-size: 0.95em;">${printerSettings.footer}</p>
-        <p style="margin: 5px 0; font-size: 0.85em; color: #666;">
-          ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}
-        </p>
-        <p style="margin: 5px 0; font-size: 0.85em;">No: ${txn.id}</p>
+      ${divider()}
+      
+      <div style="text-align:center;padding-top:3px;">
+        <div style="font-size:0.95em;font-weight:bold;margin:3px 0;">${printerSettings.footer || ''}</div>
+        <div style="font-size:0.82em;color:#555;margin:2px 0;">${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}</div>
+        <div style="font-size:0.82em;margin:2px 0;">No: ${txn.id}</div>
       </div>
+      
+      <div style="height:1mm;"></div>
     </div>
     `;
 }
@@ -3081,114 +3156,60 @@ function closeReceiptModal() {
     }
 }
 
-// --- UPDATE FUNGSI PRINT: MERENDER NOTA SEBAGAI GAMBAR DAHULU ---
-function printReceiptFromModal() function printReceipt(transactionId) {
-    const txn = transactions.find(t => t.id === transactionId);
-    if (!txn) return;
-
-    // Membuat window baru untuk proses printing
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
+// --- FUNGSI PRINT (Sudah ditambah fitur tutup otomatis) ---
+function printReceiptFromModal() {
+    if(!currentReceiptTransaction) return;
     
-    // Generate baris item
-    let itemsHtml = '';
-    txn.items.forEach(item => {
-        const subtotal = item.price * item.quantity;
-        itemsHtml += `
-            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                <div style="flex: 1;">${item.name}</div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;">
-                <div style="padding-left: 10px;">${item.quantity} x ${formatIDR(item.price)}</div>
-                <div>${formatIDR(subtotal)}</div>
-            </div>
+    if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+        // Print via Bluetooth
+        const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
+        sendDataToPrinter(escPosData);
+        closeReceiptModal();
+    } else {
+        // Print via browser
+        const content = generateReceiptHTML(currentReceiptTransaction);
+        const printContainer = document.getElementById('receiptPrint');
+        
+        const printerType = (typeof printerSettings !== 'undefined') ? printerSettings.type : '58mm';
+        const width = printerType === '80mm' ? '80mm' : '58mm';
+        
+        printContainer.style.width = width;
+        printContainer.style.maxWidth = width;
+        printContainer.className = printerType === '80mm' ? 'size-80mm' : 'size-58mm';
+        printContainer.innerHTML = content;
+        printContainer.style.display = 'block';
+
+        // Inject style khusus untuk @page tanpa sisa kertas
+        let styleOverride = document.getElementById('_receiptPageStyle');
+        if (!styleOverride) {
+            styleOverride = document.createElement('style');
+            styleOverride.id = '_receiptPageStyle';
+            document.head.appendChild(styleOverride);
+        }
+        styleOverride.textContent = `
+            @page {
+                size: ${width} auto !important;
+                margin: 0mm !important;
+            }
+            @media print {
+                html, body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+            }
         `;
-    });
-
-    const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Struk Pembayaran - ${txn.id}</title>
-            <style>
-                @page { margin: 0; }
-                body { 
-                    font-family: 'Courier New', Courier, monospace; 
-                    width: 58mm; 
-                    padding: 5px; 
-                    margin: 0; 
-                    font-size: 12px; 
-                    color: #000;
-                }
-                .text-center { text-align: center; }
-                .text-right { text-align: right; }
-                .bold { font-weight: bold; }
-                .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
-                .flex-between { display: flex; justify-content: space-between; }
-            </style>
-        </head>
-        <body>
-            <div class="text-center">
-                <div class="bold" style="font-size: 14px;">${storeSettings.name}</div>
-                <div style="font-size: 10px;">${storeSettings.address || 'Alamat Toko'}</div>
-                <div style="font-size: 10px;">Telp: ${storeSettings.phone || '-'}</div>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="flex-between"><span>No:</span> <span>${txn.id}</span></div>
-            <div class="flex-between"><span>Tgl:</span> <span>${txn.date} ${txn.time || ''}</span></div>
-            <div class="flex-between"><span>Kasir:</span> <span>${adminProfile.name}</span></div>
-            <div class="flex-between"><span>Pelanggan:</span> <span>${txn.customerName}</span></div>
-            
-            <div class="divider"></div>
-            
-            ${itemsHtml}
-            
-            <div class="divider"></div>
-            
-            <div class="flex-between bold">
-                <span>TOTAL</span>
-                <span>${formatIDR(txn.total)}</span>
-            </div>
-            <div class="flex-between">
-                <span>TUNAI</span>
-                <span>${formatIDR(txn.payment)}</span>
-            </div>
-            <div class="flex-between">
-                <span>KEMBALI</span>
-                <span>${formatIDR(txn.change)}</span>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="text-center" style="margin-top: 10px; font-size: 10px;">
-                TERIMA KASIH<br>
-                Barang yang sudah dibeli tidak dapat<br>
-                ditukar atau dikembalikan.
-            </div>
-
-            <script>
-                window.onload = function() {
-                    window.print();
-                    setTimeout(function() { window.close(); }, 500);
-                }
-            </script>
-        </body>
-        </html>
-    `;
-    
-    printWindow.document.write(html);
-    printWindow.document.close();
-}
-
-// Fungsi cadangan jika html2canvas gagal dimuat
-function fallbackPrint(container) {
-    container.style.position = 'relative';
-    container.style.top = '0';
-    container.style.width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
-    window.print();
-    container.style.display = 'none';
-    closeReceiptModal();
+        
+        setTimeout(() => {
+            window.print();
+            setTimeout(() => {
+                printContainer.style.display = 'none';
+                printContainer.className = '';
+                // Kembalikan @page ke default setelah print
+                if (styleOverride) styleOverride.textContent = '';
+                closeReceiptModal();
+            }, 300);
+        }, 500);
+    }
 }
 
 function renderProductsTable() {
@@ -4207,6 +4228,9 @@ function handleLogoUpload(event) {
         const logoBase64 = e.target.result;
         storeSettings.logo = logoBase64;
         
+        // Build ESC/POS bitmap cache untuk cetak Bluetooth
+        _buildLogoBitmapCache(logoBase64);
+        
         // Show preview
         const logoPreviewImg = document.getElementById('logoPreviewImg');
         logoPreviewImg.src = logoBase64;
@@ -4290,22 +4314,60 @@ async function connectBluetoothPrinter() {
     }
     
     try {
-        const deviceName = printerSettings.bluetoothDeviceName || 'MP58A1';
+        // UUID service & characteristic yang umum dipakai printer thermal BLE
+        const printerProfiles = [
+            { // Printer thermal umum (MP58, RPP02, dll)
+                service: '000018f0-0000-1000-8000-00805f9b34fb',
+                characteristic: '00002af1-0000-1000-8000-00805f9b34fb'
+            },
+            { // BLE Serial (SPP over BLE) – banyak printer murah China
+                service: '0000ff00-0000-1000-8000-00805f9b34fb',
+                characteristic: '0000ff02-0000-1000-8000-00805f9b34fb'
+            },
+            { // Nordic UART Service (NUS) – Adafruit, beberapa printer
+                service: '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+                characteristic: '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
+            },
+            { // Generic ESC/POS BLE alternative
+                service: '0000ffe0-0000-1000-8000-00805f9b34fb',
+                characteristic: '0000ffe1-0000-1000-8000-00805f9b34fb'
+            }
+        ];
+
         bluetoothDevice = await navigator.bluetooth.requestDevice({
             acceptAllDevices: true,
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // ESC/POS service UUID, adjust if needed
+            optionalServices: printerProfiles.map(p => p.service)
         });
         
         const server = await bluetoothDevice.gatt.connect();
-        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-        bluetoothCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+
+        // Coba setiap profile sampai berhasil
+        let connectedProfile = null;
+        for (const profile of printerProfiles) {
+            try {
+                const svc = await server.getPrimaryService(profile.service);
+                const chr = await svc.getCharacteristic(profile.characteristic);
+                bluetoothCharacteristic = chr;
+                connectedProfile = profile;
+                console.log('Printer terhubung dengan profile:', profile.service);
+                break;
+            } catch (e) {
+                // profile ini tidak cocok, coba berikutnya
+                continue;
+            }
+        }
+
+        if (!bluetoothCharacteristic) {
+            showNotification('UUID printer tidak dikenali. Coba hubungi pengembang.', 'error');
+            bluetoothDevice = null;
+            return;
+        }
         
         bluetoothDevice.addEventListener('gattserverdisconnected', () => {
             document.getElementById('bluetoothStatus').textContent = 'Status: Terputus - Mencoba reconnect...';
             bluetoothDevice = null;
             bluetoothCharacteristic = null;
             
-            // Auto reconnect after 2 seconds
             setTimeout(() => {
                 if (printerSettings.bluetoothDeviceName) {
                     connectBluetoothPrinter();
@@ -4316,7 +4378,6 @@ async function connectBluetoothPrinter() {
         document.getElementById('bluetoothStatus').textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
         showNotification('Printer Bluetooth terhubung', 'success');
         
-        // Save device name for auto reconnect
         printerSettings.bluetoothDeviceName = bluetoothDevice.name;
         saveData();
     } catch (error) {
@@ -4332,108 +4393,218 @@ async function sendDataToPrinter(data) {
     }
     
     try {
-        await bluetoothCharacteristic.writeValue(data);
+        // Kirim data dalam potongan kecil (max 100 bytes) agar tidak error BLE MTU
+        const CHUNK_SIZE = 100;
+        for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+            const chunk = data.slice(i, i + CHUNK_SIZE);
+            await bluetoothCharacteristic.writeValue(chunk);
+            // Jeda kecil antar chunk agar printer tidak overflow buffer
+            await new Promise(r => setTimeout(r, 30));
+        }
         showNotification('Nota berhasil dicetak', 'success');
     } catch (error) {
         console.error('Error sending data to printer:', error);
-        showNotification('Gagal mengirim data ke printer', 'error');
+        showNotification('Gagal mengirim data ke printer: ' + error.message, 'error');
     }
+}
+
+// ── Helper: konversi logo base64 ke ESC/POS bitmap (GS v 0) ──
+function _getLogoESCPOS(base64src) {
+    // Gunakan canvas untuk render gambar dan ambil pixel data
+    const MAX_W = 200; // max lebar pixel untuk printer 58mm (sekitar 384 dots, kita batasi 200)
+    
+    // Buat canvas sementara
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    // Sinkron tidak bisa, gunakan cache — jika logo sudah ada di storeSettings
+    // kita simpan versi bitmap-nya saat upload
+    // Fallback: skip jika tidak ada cache
+    if (!window._logoBitmapCache) return [];
+    return window._logoBitmapCache;
+}
+
+// ── Buat bitmap cache saat logo diupload/dimuat ──────────────
+function _buildLogoBitmapCache(base64src) {
+    if (!base64src) { window._logoBitmapCache = null; return; }
+    const MAX_W = 384; // lebar penuh kertas 58mm = 384 dots
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = function() {
+        // Hitung skala agar tidak melebihi MAX_W
+        const scale = Math.min(1, MAX_W / img.width);
+        const w = Math.floor(img.width * scale);
+        const h = Math.floor(img.height * scale);
+        
+        // Lebar harus kelipatan 8 untuk ESC/POS
+        const wBytes = Math.ceil(w / 8);
+        const wAligned = wBytes * 8;
+        
+        canvas.width = wAligned;
+        canvas.height = h;
+        
+        // Latar putih
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, wAligned, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        
+        const imageData = ctx.getImageData(0, 0, wAligned, h);
+        const pixels = imageData.data;
+        
+        // Konversi ke bitmap 1-bit (threshold 128)
+        const bitmap = [];
+        for (let row = 0; row < h; row++) {
+            for (let col = 0; col < wBytes; col++) {
+                let byte = 0;
+                for (let bit = 0; bit < 8; bit++) {
+                    const px = (row * wAligned + col * 8 + bit) * 4;
+                    const r = pixels[px], g = pixels[px+1], b = pixels[px+2];
+                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                    if (gray < 128) byte |= (0x80 >> bit); // hitam = 1
+                }
+                bitmap.push(byte);
+            }
+        }
+        
+        // Build GS v 0 command
+        // GS v 0 m xL xH yL yH d1...dk
+        // m=0 (normal), x=wBytes, y=h
+        const xL = wBytes & 0xFF;
+        const xH = (wBytes >> 8) & 0xFF;
+        const yL = h & 0xFF;
+        const yH = (h >> 8) & 0xFF;
+        
+        const cmd = [0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH, ...bitmap];
+        window._logoBitmapCache = cmd;
+    };
+    img.onerror = function() { window._logoBitmapCache = null; };
+    img.src = base64src;
 }
 
 function generateReceiptESC_POS(transaction) {
     let commands = [];
-    
-    // Initialize printer
-    commands.push(0x1B, 0x40); // ESC @
-    
-    // Center align
-    commands.push(0x1B, 0x61, 0x01); // ESC a 1
-    
-    // Header
-    // Make store name bold and enlarged
-    commands.push(0x1B, 0x45, 0x01); // ESC E 1 - Bold on
-    commands.push(0x1D, 0x21, 0x11); // GS ! - Double size (1x width, 1x height multiplier)
-    
-    const storeName = storeSettings.name.toUpperCase();
-    commands.push(...new TextEncoder().encode(`${storeName}\n`));
-    
-    commands.push(0x1B, 0x45, 0x00); // ESC E 0 - Bold off
-    commands.push(0x1D, 0x21, 0x00); // GS ! 0 - Normal size
-    
-    if (storeSettings.address) commands.push(...new TextEncoder().encode(`${storeSettings.address}\n`));
-    if (storeSettings.phone) commands.push(...new TextEncoder().encode(`HP/WA: ${storeSettings.phone}\n`));
-    commands.push(...new TextEncoder().encode('================\n'));
-    
-    // Left align
-    commands.push(0x1B, 0x61, 0x00); // ESC a 0
-    
-    // Transaction info
+    const enc = new TextEncoder();
+
+    // ── 1. Initialize printer ──────────────────────────────
+    commands.push(0x1B, 0x40); // ESC @ – reset printer
+
+    // ── 2. LOGO (jika ada) ────────────────────────────────
+    commands.push(0x1B, 0x61, 0x01); // center align
+    if (storeSettings.logo) {
+        try {
+            // Konversi base64 logo ke bitmap ESC/POS (GS v 0)
+            const logoData = _getLogoESCPOS(storeSettings.logo);
+            if (logoData && logoData.length > 0) {
+                commands.push(...logoData);
+                commands.push(...enc.encode('\n'));
+            }
+        } catch(e) {
+            console.log('Logo print skip:', e);
+        }
+    }
+
+    // ── 3. Nama toko – bold + double size ────────────────
+    commands.push(0x1B, 0x61, 0x01); // center
+    commands.push(0x1B, 0x45, 0x01); // Bold on
+    commands.push(0x1D, 0x21, 0x11); // Double width+height
+    commands.push(...enc.encode(`${storeSettings.name.toUpperCase()}\n`));
+    commands.push(0x1D, 0x21, 0x00); // Normal size
+    commands.push(0x1B, 0x45, 0x00); // Bold off
+
+    if (storeSettings.address) commands.push(...enc.encode(`${storeSettings.address}\n`));
+    if (storeSettings.phone)   commands.push(...enc.encode(`HP/WA: ${storeSettings.phone}\n`));
+
+    // ── 3. Judul struk (center, bold) ─────────────────────
+    commands.push(0x1B, 0x45, 0x01);
+    commands.push(...enc.encode('STRUK PEMBAYARAN\n'));
+    commands.push(0x1B, 0x45, 0x00);
+
+    // ── 4. Divider ────────────────────────────────────────
+    commands.push(...enc.encode('--------------------------------\n'));
+
+    // ── 5. Info transaksi (left align) ────────────────────
+    commands.push(0x1B, 0x61, 0x00); // ESC a 0 – left
+
     const txnDate = new Date(transaction.timestamp).toLocaleDateString('id-ID');
-    const txnTime = new Date(transaction.timestamp).toLocaleTimeString('id-ID');
-    commands.push(...new TextEncoder().encode(`Order: ${transaction.id}\n`));
-    commands.push(...new TextEncoder().encode(`Tanggal: ${txnDate}\n`));
-    commands.push(...new TextEncoder().encode(`Jam: ${txnTime}\n`));
-    commands.push(...new TextEncoder().encode(`Pelanggan: ${transaction.customer}\n`));
-    commands.push(...new TextEncoder().encode('================\n\n'));
-    
-    // Items with better formatting
+    const txnTime = new Date(transaction.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+
+    // helper: baris kiri-kanan dalam lebar 32 karakter
+    function rowLR(left, right) {
+        const total = 32;
+        const gap = Math.max(1, total - left.length - right.length);
+        return left + ' '.repeat(gap) + right + '\n';
+    }
+
+    commands.push(...enc.encode(rowLR('No:', transaction.id.length > 18 ? transaction.id.slice(-18) : transaction.id)));
+    commands.push(...enc.encode(rowLR('Tgl:', txnDate)));
+    commands.push(...enc.encode(rowLR('Plg:', (transaction.customer || 'Umum').substring(0, 18))));
+
+    // ── 6. Divider ────────────────────────────────────────
+    commands.push(...enc.encode('--------------------------------\n'));
+
+    // ── 7. Items ──────────────────────────────────────────
     transaction.items.forEach(item => {
         const itemTotal = item.quantity * item.price;
-        const itemName = item.name.length > 25 ? item.name.substring(0, 25) : item.name;
-        commands.push(...new TextEncoder().encode(`${itemName}\n`));
-        
+        // Nama item (max 32 karakter)
+        const itemName = item.name.length > 32 ? item.name.substring(0, 32) : item.name;
+        commands.push(...enc.encode(`${itemName}\n`));
+
+        // Detail IMEI/SN, Garansi, dll
+        if (item.imei)    commands.push(...enc.encode(`IMEI/SN: ${item.imei}\n`));
+        if (item.warranty) commands.push(...enc.encode(`Garansi: ${item.warranty}\n`));
+        if (item.notes)   commands.push(...enc.encode(`Ket: ${item.notes}\n`));
+
         const qtyPrice = `${item.quantity} x Rp${item.price.toLocaleString('id-ID')}`;
         const priceStr = `Rp${itemTotal.toLocaleString('id-ID')}`;
-        
-        // Format: qty x price (left) and total price (right)
-        const spacer = ' '.repeat(Math.max(0, 30 - qtyPrice.length - priceStr.length));
-        commands.push(...new TextEncoder().encode(`${qtyPrice}${spacer}${priceStr}\n`));
+        commands.push(...enc.encode(rowLR(qtyPrice, priceStr)));
     });
-    
-    commands.push(...new TextEncoder().encode('================\n'));
-    
-    // Subtotal and Tax
-    const taxRate = transaction.taxRate || 10;
-    const subtotalStr = `Subtotal`;
+
+    // ── 8. Divider ────────────────────────────────────────
+    commands.push(...enc.encode('--------------------------------\n'));
+
+    // ── 9. Subtotal & VAT ─────────────────────────────────
+    const taxRate = transaction.taxRate !== undefined ? transaction.taxRate : 0;
     const subtotalPrice = `Rp${transaction.subtotal.toLocaleString('id-ID')}`;
-    let spacer = ' '.repeat(Math.max(0, 30 - subtotalStr.length - subtotalPrice.length));
-    commands.push(...new TextEncoder().encode(`${subtotalStr}${spacer}${subtotalPrice}\n`));
-    
-    const taxStr = `VAT: ${taxRate}%`;
-    const taxPrice = `Rp${transaction.tax.toLocaleString('id-ID')}`;
-    spacer = ' '.repeat(Math.max(0, 30 - taxStr.length - taxPrice.length));
-    commands.push(...new TextEncoder().encode(`${taxStr}${spacer}${taxPrice}\n`));
-    
-    commands.push(...new TextEncoder().encode('================\n'));
-    
-    // Total (bold/emphasized)
-    const totalStr = `JUMLAH`;
+    commands.push(...enc.encode(rowLR('Subtotal', subtotalPrice)));
+
+    const taxPrice = `Rp${(transaction.tax || 0).toLocaleString('id-ID')}`;
+    commands.push(...enc.encode(rowLR(`VAT: ${taxRate}%`, taxPrice)));
+
+    // ── 10. Divider ───────────────────────────────────────
+    commands.push(...enc.encode('--------------------------------\n'));
+
+    // ── 11. Jumlah (bold) ─────────────────────────────────
+    commands.push(0x1B, 0x45, 0x01); // Bold on
     const totalPrice = `Rp${transaction.total.toLocaleString('id-ID')}`;
-    spacer = ' '.repeat(Math.max(0, 30 - totalStr.length - totalPrice.length));
-    commands.push(...new TextEncoder().encode(`${totalStr}${spacer}${totalPrice}\n`));
-    commands.push(...new TextEncoder().encode('\n'));
-    
-    // Payment method
-    const paymentStr = `${transaction.method}`;
-    commands.push(...new TextEncoder().encode(`${paymentStr}\n`));
-    const paymentPrice = `Rp${transaction.total.toLocaleString('id-ID')}`;
-    commands.push(...new TextEncoder().encode(`${paymentPrice}\n`));
-    
-    // Center align for footer
-    commands.push(0x1B, 0x61, 0x01); // ESC a 1
-    
-    // Footer message
-    commands.push(...new TextEncoder().encode('\n'));
-    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n`));
-    commands.push(...new TextEncoder().encode('\n'));
-    
-    // Timestamp footer
-    commands.push(...new TextEncoder().encode(`${txnDate} ${txnTime}\n`));
-    commands.push(...new TextEncoder().encode(`No: ${transaction.id}\n`));
-    
-    // Cut paper
-    commands.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0
-    
+    commands.push(...enc.encode(rowLR('Jumlah', totalPrice)));
+    commands.push(0x1B, 0x45, 0x00); // Bold off
+
+    // ── 12. Metode bayar ──────────────────────────────────
+    const cashAmount = (transaction.cash && transaction.cash > 0) ? transaction.cash : transaction.total;
+    commands.push(...enc.encode(rowLR(transaction.method || 'Tunai', `Rp${cashAmount.toLocaleString('id-ID')}`)));
+    if (transaction.change && transaction.change > 0) {
+        commands.push(...enc.encode(rowLR('Kembali', `Rp${transaction.change.toLocaleString('id-ID')}`)));
+    }
+
+    // ── 13. Divider ───────────────────────────────────────
+    commands.push(...enc.encode('--------------------------------\n'));
+
+    // ── 14. Footer (center) ───────────────────────────────
+    commands.push(0x1B, 0x61, 0x01); // center
+    if (printerSettings && printerSettings.footer) {
+        commands.push(...enc.encode(`${printerSettings.footer}\n`));
+    }
+    commands.push(...enc.encode('\n'));
+    commands.push(...enc.encode(`${txnDate} ${txnTime}\n`));
+    commands.push(...enc.encode(`No: ${transaction.id}\n`));
+
+    // ── 15. Feed ~1cm lalu Cut ────────────────────────────
+    // ESC J n = feed n dots (1 dot = 0.125mm, 1cm = 80 dots)
+    commands.push(0x1B, 0x4A, 0x50); // ESC J 80 – feed ~1cm
+    commands.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0 – cut
+
     return new Uint8Array(commands);
 }
 
@@ -4629,6 +4800,10 @@ document.getElementById('productManagementSearch')?.addEventListener('input', re
 
 initThemeSettings();
 
+// Build ESC/POS logo bitmap cache jika logo sudah tersimpan
+if (storeSettings && storeSettings.logo) {
+    _buildLogoBitmapCache(storeSettings.logo);
+}
 </script>
 <script>
   // Prevent refresh with F5 or Ctrl+R
