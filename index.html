@@ -286,38 +286,11 @@ html, body {
 
 /* --- UPDATE PRINT CSS UNTUK LAPORAN --- */
 @media print {
-  @page {
-    margin: 0;
-    size: auto;
-  }
-  
   body * { visibility: hidden; }
   
   /* Print Receipt (Struk Kecil) */
   #receiptPrint, #receiptPrint * { visibility: visible; }
-    #receiptPrint {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      min-height: 100%;
-      background: white;
-      text-align: center;
-      padding: 0;
-    }
-    #receiptPrint .receipt-container {
-      display: block;
-      margin: 0 auto;
-      width: 58mm !important;
-      background: white !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      padding: 0 !important;
-      font-family: 'Courier New', monospace !important;
-      font-size: 12px !important;
-      line-height: 1.4 !important;
-      border: none !important;
-    }
+  #receiptPrint { position: absolute; left: 0; top: 0; width: 100%; }
   
   /* Print Report (Laporan A4) */
   #reportPrintArea, #reportPrintArea * { visibility: visible; }
@@ -331,39 +304,12 @@ html, body {
   }
 }
 
-/* --- RECEIPT CONTAINER (Preview & Print harus sama) --- */
 .receipt-container {
-  font-family: 'Courier New', monospace !important;
-  font-size: 10px !important;
-  line-height: 1.4 !important;
-  margin: 0 auto !important;
-  background: white !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-  width: 58mm !important;
-  padding: 0 !important;
-  display: block !important;
-  text-align: center !important;
-  color: #000 !important;
-  border: 1px solid #ddd !important;
-  border-radius: 0 !important;
-}
-
-/* Pastikan semua child element receipt-container konsisten */
-.receipt-container * {
-  color: #000 !important;
-  font-family: 'Courier New', monospace !important;
-  font-size: inherit !important;
-}
-
-/* Pastikan receiptModalContent tidak dipengaruhi Tailwind */
-#receiptModalContent {
-  display: flex !important;
-  justify-content: center !important;
-  background: transparent !important;
-}
-
-#receiptModalContent .receipt-container {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 auto;
+  background: white;
 }
 
 /* Laporan Table Style */
@@ -1461,7 +1407,7 @@ button, a, [role="button"] {
         </div>
       </div>
 
-      <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+      <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
         <h3 class="font-bold text-gray-700 mb-4">Grafik Best Seller</h3>
         <div class="h-64">
           <canvas id="bestSellerChart"></canvas>
@@ -1544,7 +1490,7 @@ button, a, [role="button"] {
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Profil Admin</h3>
             <form onsubmit="updateAdminProfile(event)">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -1561,7 +1507,7 @@ button, a, [role="button"] {
             </form>
           </div>
 
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Toko & Modal</h3>
             <div class="space-y-6">
               
@@ -1597,7 +1543,7 @@ button, a, [role="button"] {
 
             </div>
           </div>
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pembayaran QRIS</h3>
             <div class="space-y-4">
               <div>
@@ -1613,7 +1559,7 @@ button, a, [role="button"] {
             </div>
           </div>
 			
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pajak (PPN)</h3>
             <div class="space-y-4">
               <div class="flex items-center justify-between border-b pb-4">
@@ -1632,7 +1578,7 @@ button, a, [role="button"] {
             </div>
           </div>
 
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Printer</h3>
             <div class="space-y-4">
               <div>
@@ -1657,7 +1603,7 @@ button, a, [role="button"] {
               <button onclick="savePrinterSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan Printer</button>
           </div>
           
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Tampilan & Tema</h3>
             <div class="space-y-6">
               <div>
@@ -1687,7 +1633,7 @@ button, a, [role="button"] {
             </div>
           </div>
 
-          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6 flex items-center">
               <svg class="w-6 h-6 mr-2 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7h2v2h-2zm0-8h2v6h-2z"/></svg>
               Sinkronisasi Google Sheet
@@ -1708,7 +1654,7 @@ button, a, [role="button"] {
         </div>
 
         <div class="lg:col-span-1 space-y-6">
-             <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
+             <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
                 <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Keamanan Akun</h3>
                 <form onsubmit="updateAccountSecurity(event)">
                   <div class="space-y-4 mb-6">
@@ -2041,16 +1987,13 @@ if (!hasInitialized) {
 }
 
 let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
-  name: 'Toko Saya',
-  address: 'Jl. Merdeka No. 1',
-  phone: '',
-  taxEnabled: true,
-  taxRate: 10,
-  qrisImage: '',
-  modal: 0 // Modal Default
+    name: 'Toko Saya',
+    address: 'Jl. Merdeka No. 1',
+    taxEnabled: true,
+    taxRate: 10,
+    qrisImage: '',
+    modal: 0 // Modal Default
 };
-// Patch: jika data lama tidak punya phone, tambahkan agar tidak undefined
-if (!('phone' in storeSettings)) storeSettings.phone = '';
 let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
     type: '58mm', 
     footer: 'Terima kasih atas kunjungan Anda!',
@@ -3002,66 +2945,72 @@ function updateTotals() {
 }
 
 function generateReceiptHTML(txn) {
-    const width = '58mm';
-    const fontSize = '10px';
+    const width = printerSettings.type === '58mm' ? '58mm' : '80mm';
+    const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
+    
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
+    
     return `
-    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; color: black; font-family: 'Courier New', monospace; background: white; margin: 0 auto; padding: 0; display: block; text-align: center;">
-      <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
-        <div style="font-size: 11px; font-weight: bold; margin: 0; color: #000;">${storeSettings.name}</div>
-        ${storeSettings.address ? `<div style="margin: 2px 0; font-size: 9px; color: #000;">${storeSettings.address}</div>` : ''}
-        ${storeSettings.phone ? `<div style="margin: 2px 0; font-size: 9px; color: #000;">HP/WA: ${storeSettings.phone}</div>` : ''}
-        <div style="margin: 5px 0 0 0; font-weight: bold; font-size: 10px; color: #000;">STRUK PEMBAYARAN</div>
+    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
+      <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
+        ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
+        ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
+        <p style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</p>
       </div>
-      <div style="margin-bottom: 8px;">
-        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
+      
+      <div style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between;">
           <span>No:</span>
           <span style="font-weight: bold;">${txn.id}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
+        <div style="display: flex; justify-content: space-between;">
           <span>Tgl:</span>
           <span>${txn.date}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
+        <div style="display: flex; justify-content: space-between;">
           <span>Plg:</span>
           <span>${txn.customer || 'Pelanggan Umum'}</span>
         </div>
       </div>
-      <div style="border-bottom: 1px dashed #000; padding-bottom: 4px; margin-bottom: 4px;">
+      
+      <div style="border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px;">
         ${txn.items.map(item => `
-          <div style="margin-bottom: 4px; font-size: 10px; color: #000;">
-            <div style="font-weight: bold; font-size: 10px;">${item.name}</div>
-            ${item.imei ? `<div style="font-size: 8px; color: #000; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
-            ${item.duration ? `<div style="font-size: 8px; color: #000;">Waktu: ${item.duration}</div>` : ''}
-            ${item.warranty ? `<div style="font-size: 8px; color: #000;">Garansi: ${item.warranty}</div>` : ''}
-            ${item.notes ? `<div style="font-size: 8px; color: #000; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
-            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
+          <div style="margin-bottom: 5px;">
+            <div>${item.name}</div>
+            ${item.imei ? `<div style="font-size: 0.85em; color: #555; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
+            ${item.duration ? `<div style="font-size: 0.85em; color: #555;">Waktu: ${item.duration}</div>` : ''}
+            ${item.warranty ? `<div style="font-size: 0.85em; color: #555;">Garansi: ${item.warranty}</div>` : ''}
+            ${item.notes ? `<div style="font-size: 0.85em; color: #555; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
+            <div style="display: flex; justify-content: space-between;">
               <span>${item.quantity} x ${formatIDR(item.price)}</span>
               <span>${formatIDR(item.quantity * item.price)}</span>
             </div>
           </div>
         `).join('')}
       </div>
-      <div style="margin-bottom: 8px;">
-        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
+      
+      <div style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between;">
           <span>Subtotal:</span>
           <span>${formatIDR(txn.subtotal)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
+        <div style="display: flex; justify-content: space-between;">
           <span>Pajak (${txnTaxRate}%):</span>
           <span>${formatIDR(txn.tax)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; margin-top: 4px; color: #000;">
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; margin-top: 5px;">
           <span>TOTAL:</span>
           <span>${formatIDR(txn.total)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px; font-size: 10px; color: #000;">
+        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px;">
           <span>Metode:</span>
           <span>${txn.method}</span>
         </div>
       </div>
-      <div style="text-align: center; border-top: 1px dashed #000; padding-top: 8px; margin-top: 8px;">
-        <div style="font-size: 9px; color: #000;">${printerSettings.footer}</div>
+      
+      <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
+        <p>${printerSettings.footer}</p>
       </div>
     </div>
     `;
@@ -3090,22 +3039,29 @@ function printReceiptFromModal() {
     if(!currentReceiptTransaction) return;
     
     if (bluetoothDevice && bluetoothDevice.gatt.connected) {
-      // Print via Bluetooth
-      const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
-      sendDataToPrinter(escPosData);
-      closeReceiptModal();
+        // Print via Bluetooth
+        const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
+        sendDataToPrinter(escPosData);
+        closeReceiptModal();
     } else {
-      // Print preview modal persis seperti tampilannya
-      const printContents = document.getElementById('receiptModalContent').innerHTML;
-      const printArea = document.getElementById('receiptPrint');
-      // Wrap dengan container yang mensimulasikan modal untuk konsistensi
-      printArea.innerHTML = `<div style="padding: 1rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">${printContents}</div>`;
-      window.print();
-      setTimeout(() => {
-        printArea.innerHTML = '';
-      }, 1000);
-      // Tutup modal setelah print
-      closeReceiptModal();
+        // Print via browser
+        const content = generateReceiptHTML(currentReceiptTransaction);
+        const printContainer = document.getElementById('receiptPrint');
+        
+        // Penyesuaian lebar printer
+        const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
+        printContainer.style.width = width;
+        
+        printContainer.innerHTML = content;
+        printContainer.style.display = 'block';
+        
+        setTimeout(() => {
+            window.print();
+            printContainer.style.display = 'none';
+            
+            // Memanggil fungsi tutup setelah print selesai
+            closeReceiptModal(); 
+        }, 500);
     }
 }
 
@@ -4104,8 +4060,7 @@ function saveStoreSettings() {
     storeSettings.name = document.getElementById('storeNameInput').value;
     if(document.getElementById('storeAddressInput')) storeSettings.address = document.getElementById('storeAddressInput').value;
     if(document.getElementById('storePhoneInput')) storeSettings.phone = document.getElementById('storePhoneInput').value;
-    saveData();
-    loadSettings(); // Tambahkan ini agar data terbaru langsung diambil
+    saveData(); 
     showNotification('Profil Toko berhasil disimpan', 'success');
 }
 
@@ -4223,8 +4178,8 @@ function generateReceiptESC_POS(transaction) {
     commands.push(0x1B, 0x61, 0x01); // ESC a 1
     
     // Header
-    commands.push(...new TextEncoder().encode('HANDSCELL\n'));
-    commands.push(...new TextEncoder().encode('NgrakungWetan/Tawangharjo\n\n'));
+    commands.push(...new TextEncoder().encode('TOKO POS\n'));
+    commands.push(...new TextEncoder().encode('Jl. Contoh No. 123\n\n'));
     
     // Left align
     commands.push(0x1B, 0x61, 0x00); // ESC a 0
