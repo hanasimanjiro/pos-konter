@@ -304,7 +304,6 @@ html, body {
       background: white;
       text-align: center;
       padding: 0;
-      font-family: 'Courier New', monospace !important;
     }
     #receiptPrint .receipt-container {
       display: block;
@@ -314,6 +313,10 @@ html, body {
       box-shadow: none !important;
       border-radius: 0 !important;
       padding: 0 !important;
+      font-family: 'Courier New', monospace !important;
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+      border: none !important;
     }
   
   /* Print Report (Laporan A4) */
@@ -328,12 +331,39 @@ html, body {
   }
 }
 
+/* --- RECEIPT CONTAINER (Preview & Print harus sama) --- */
 .receipt-container {
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  line-height: 1.4;
-  margin: 0 auto;
-  background: white;
+  font-family: 'Courier New', monospace !important;
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+  margin: 0 auto !important;
+  background: white !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  width: 58mm !important;
+  padding: 0 !important;
+  display: block !important;
+  text-align: center !important;
+  color: #000 !important;
+  border: 1px solid #ddd !important;
+  border-radius: 0 !important;
+}
+
+/* Pastikan semua child element receipt-container konsisten */
+.receipt-container * {
+  color: #000 !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: inherit !important;
+}
+
+/* Pastikan receiptModalContent tidak dipengaruhi Tailwind */
+#receiptModalContent {
+  display: flex !important;
+  justify-content: center !important;
+  background: transparent !important;
+}
+
+#receiptModalContent .receipt-container {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
 }
 
 /* Laporan Table Style */
@@ -2976,36 +3006,36 @@ function generateReceiptHTML(txn) {
     const fontSize = '10px';
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
     return `
-    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; color: black; font-family: 'Courier New', monospace; background: white; margin: 0 auto;">
+    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; color: black; font-family: 'Courier New', monospace; background: white; margin: 0 auto; padding: 0; display: block; text-align: center;">
       <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
-        <div style="font-size: 1.1em; font-weight: bold; margin:0;">${storeSettings.name}</div>
-        ${storeSettings.address ? `<div style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</div>` : ''}
-        ${storeSettings.phone ? `<div style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</div>` : ''}
-        <div style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</div>
+        <div style="font-size: 11px; font-weight: bold; margin: 0; color: #000;">${storeSettings.name}</div>
+        ${storeSettings.address ? `<div style="margin: 2px 0; font-size: 9px; color: #000;">${storeSettings.address}</div>` : ''}
+        ${storeSettings.phone ? `<div style="margin: 2px 0; font-size: 9px; color: #000;">HP/WA: ${storeSettings.phone}</div>` : ''}
+        <div style="margin: 5px 0 0 0; font-weight: bold; font-size: 10px; color: #000;">STRUK PEMBAYARAN</div>
       </div>
       <div style="margin-bottom: 8px;">
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
           <span>No:</span>
           <span style="font-weight: bold;">${txn.id}</span>
         </div>
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
           <span>Tgl:</span>
           <span>${txn.date}</span>
         </div>
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
           <span>Plg:</span>
           <span>${txn.customer || 'Pelanggan Umum'}</span>
         </div>
       </div>
       <div style="border-bottom: 1px dashed #000; padding-bottom: 4px; margin-bottom: 4px;">
         ${txn.items.map(item => `
-          <div style="margin-bottom: 4px;">
-            <div>${item.name}</div>
-            ${item.imei ? `<div style="font-size: 0.85em; color: #222; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
-            ${item.duration ? `<div style="font-size: 0.85em; color: #222;">Waktu: ${item.duration}</div>` : ''}
-            ${item.warranty ? `<div style="font-size: 0.85em; color: #222;">Garansi: ${item.warranty}</div>` : ''}
-            ${item.notes ? `<div style="font-size: 0.85em; color: #222; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
-            <div style="display: flex; justify-content: space-between;">
+          <div style="margin-bottom: 4px; font-size: 10px; color: #000;">
+            <div style="font-weight: bold; font-size: 10px;">${item.name}</div>
+            ${item.imei ? `<div style="font-size: 8px; color: #000; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
+            ${item.duration ? `<div style="font-size: 8px; color: #000;">Waktu: ${item.duration}</div>` : ''}
+            ${item.warranty ? `<div style="font-size: 8px; color: #000;">Garansi: ${item.warranty}</div>` : ''}
+            ${item.notes ? `<div style="font-size: 8px; color: #000; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
               <span>${item.quantity} x ${formatIDR(item.price)}</span>
               <span>${formatIDR(item.quantity * item.price)}</span>
             </div>
@@ -3013,25 +3043,25 @@ function generateReceiptHTML(txn) {
         `).join('')}
       </div>
       <div style="margin-bottom: 8px;">
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
           <span>Subtotal:</span>
           <span>${formatIDR(txn.subtotal)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #000;">
           <span>Pajak (${txnTaxRate}%):</span>
           <span>${formatIDR(txn.tax)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.05em; margin-top: 4px;">
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; margin-top: 4px; color: #000;">
           <span>TOTAL:</span>
           <span>${formatIDR(txn.total)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px;">
+        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px; font-size: 10px; color: #000;">
           <span>Metode:</span>
           <span>${txn.method}</span>
         </div>
       </div>
       <div style="text-align: center; border-top: 1px dashed #000; padding-top: 8px; margin-top: 8px;">
-        <div style="font-size: 0.9em;">${printerSettings.footer}</div>
+        <div style="font-size: 9px; color: #000;">${printerSettings.footer}</div>
       </div>
     </div>
     `;
