@@ -290,7 +290,17 @@ html, body {
   
   /* Print Receipt (Struk Kecil) */
   #receiptPrint, #receiptPrint * { visibility: visible; }
-  #receiptPrint { position: absolute; left: 0; top: 0; width: 100%; }
+  #receiptPrint { 
+      position: absolute; 
+      left: 0; 
+      top: 0; 
+      width: 100%; 
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+  }
   
   /* Print Report (Laporan A4) */
   #reportPrintArea, #reportPrintArea * { visibility: visible; }
@@ -3039,29 +3049,21 @@ function printReceiptFromModal() {
     if(!currentReceiptTransaction) return;
     
     if (bluetoothDevice && bluetoothDevice.gatt.connected) {
-        // Print via Bluetooth
-        const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
-        sendDataToPrinter(escPosData);
-        closeReceiptModal();
+      // Print via Bluetooth
+      const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
+      sendDataToPrinter(escPosData);
+      closeReceiptModal();
     } else {
-        // Print via browser
-        const content = generateReceiptHTML(currentReceiptTransaction);
-        const printContainer = document.getElementById('receiptPrint');
-        
-        // Penyesuaian lebar printer
-        const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
-        printContainer.style.width = width;
-        
-        printContainer.innerHTML = content;
-        printContainer.style.display = 'block';
-        
-        setTimeout(() => {
-            window.print();
-            printContainer.style.display = 'none';
-            
-            // Memanggil fungsi tutup setelah print selesai
-            closeReceiptModal(); 
-        }, 500);
+      // Print preview modal persis seperti tampilannya
+      const printContents = document.getElementById('receiptModalContent').innerHTML;
+      const printArea = document.getElementById('receiptPrint');
+      printArea.innerHTML = printContents;
+      window.print();
+      setTimeout(() => {
+        printArea.innerHTML = '';
+      }, 1000);
+      // Tutup modal setelah print
+      closeReceiptModal();
     }
 }
 
