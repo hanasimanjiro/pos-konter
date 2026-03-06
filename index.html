@@ -11,6 +11,7 @@
 <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
 <script src="assets/js/tailwind.js"></script>
 <script>
@@ -290,18 +291,28 @@ html, body {
   
   /* Print Receipt (Struk Kecil) */
   #receiptPrint, #receiptPrint * { visibility: visible; }
-  #receiptPrint { position: absolute; left: 0; top: 0; width: 100%; }
+  #receiptPrint { 
+    position: static;
+    width: 100%;
+    height: auto;
+  }
   
   /* Print Report (Laporan A4) */
   #reportPrintArea, #reportPrintArea * { visibility: visible; }
   #reportPrintArea { 
-      position: absolute; 
-      left: 0; 
-      top: 0; 
-      width: 100%; 
+      position: static;
+      width: 100%;
+      height: auto;
+      overflow: visible;
       background: white;
       padding: 20px;
+      margin: 0;
+      page-break-after: auto;
   }
+  
+  #reportPrintArea table { page-break-inside: avoid; }
+  #reportPrintArea tr { page-break-inside: avoid; }
+  #reportPrintArea tbody { page-break-after: auto; }
 }
 
 .receipt-container {
@@ -310,6 +321,11 @@ html, body {
   line-height: 1.4;
   margin: 0 auto;
   background: white;
+}
+
+.receipt-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
 }
 
 /* Laporan Table Style */
@@ -1407,7 +1423,7 @@ button, a, [role="button"] {
         </div>
       </div>
 
-      <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+      <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
         <h3 class="font-bold text-gray-700 mb-4">Grafik Best Seller</h3>
         <div class="h-64">
           <canvas id="bestSellerChart"></canvas>
@@ -1490,7 +1506,7 @@ button, a, [role="button"] {
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Profil Admin</h3>
             <form onsubmit="updateAdminProfile(event)">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -1507,7 +1523,7 @@ button, a, [role="button"] {
             </form>
           </div>
 
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Toko & Modal</h3>
             <div class="space-y-6">
               
@@ -1524,7 +1540,15 @@ button, a, [role="button"] {
                   <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP / WA</label>
                   <input type="text" id="storePhoneInput" placeholder="Contoh: 081234567890" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Profil Toko</button>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Upload Logo Toko</label>
+                  <input type="file" id="storeLogo" accept="image/*" class="w-full border border-gray-300 rounded-small px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="handleLogoUpload(event)">
+                  <p class="text-xs text-gray-500 mt-1">Logo akan ditampilkan di atas nama toko pada nota cetak.</p>
+                  <div id="logoPreview" class="mt-3 flex justify-center">
+                    <img id="logoPreviewImg" src="" alt="Logo Preview" style="max-height: 80px; display: none;">
+                  </div>
+                </div>
+                <button onclick="saveStoreSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom w-full">Simpan Profil Toko</button>
               </div>
 
               <div class="bg-blue-50 p-5 rounded-large border border-blue-100">
@@ -1543,7 +1567,7 @@ button, a, [role="button"] {
 
             </div>
           </div>
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pembayaran QRIS</h3>
             <div class="space-y-4">
               <div>
@@ -1559,7 +1583,7 @@ button, a, [role="button"] {
             </div>
           </div>
 			
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Pajak (PPN)</h3>
             <div class="space-y-4">
               <div class="flex items-center justify-between border-b pb-4">
@@ -1578,7 +1602,7 @@ button, a, [role="button"] {
             </div>
           </div>
 
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Pengaturan Printer</h3>
             <div class="space-y-4">
               <div>
@@ -1603,7 +1627,7 @@ button, a, [role="button"] {
               <button onclick="savePrinterSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-small hover:bg-indigo-700 font-medium shadow-custom">Simpan Pengaturan Printer</button>
           </div>
           
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Tampilan & Tema</h3>
             <div class="space-y-6">
               <div>
@@ -1633,7 +1657,7 @@ button, a, [role="button"] {
             </div>
           </div>
 
-          <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+          <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
             <h3 class="font-heading text-lg font-bold text-gray-900 mb-6 flex items-center">
               <svg class="w-6 h-6 mr-2 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7h2v2h-2zm0-8h2v6h-2z"/></svg>
               Sinkronisasi Google Sheet
@@ -1654,7 +1678,7 @@ button, a, [role="button"] {
         </div>
 
         <div class="lg:col-span-1 space-y-6">
-             <div class="bg-white rounded-large shadow-custom border border-gray-200 p-6">
+             <div class="bg-blue-50 rounded-large shadow-custom border border-blue-100 p-6">
                 <h3 class="font-heading text-lg font-bold text-gray-900 mb-6">Keamanan Akun</h3>
                 <form onsubmit="updateAccountSecurity(event)">
                   <div class="space-y-4 mb-6">
@@ -2949,14 +2973,16 @@ function generateReceiptHTML(txn) {
     const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
     
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
+    const logoHTML = storeSettings.logo ? `<div style="text-align: center; margin-bottom: 8px;"><img src="${storeSettings.logo}" style="max-height: 60px; max-width: 60px;"></div>` : '<div style="font-size: 1.5em; margin-bottom: 5px;">🏪</div>';
     
     return `
     <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
       <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
-        <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
+        ${logoHTML}
+        <h2 style="margin: 0; font-size: 1.8em; font-weight: 900; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-transform: uppercase;">${storeSettings.name}</h2>
         ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
         ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
-        <p style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</p>
+        <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 0.95em;">STRUK PEMBAYARAN</p>
       </div>
       
       <div style="margin-bottom: 10px;">
@@ -2991,26 +3017,30 @@ function generateReceiptHTML(txn) {
       </div>
       
       <div style="margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between;">
-          <span>Subtotal:</span>
+        <div style="display: flex; justify-content: space-between; font-weight: bold;">
+          <span>Subtotal</span>
           <span>${formatIDR(txn.subtotal)}</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-          <span>Pajak (${txnTaxRate}%):</span>
+          <span>VAT: ${txnTaxRate}%</span>
           <span>${formatIDR(txn.tax)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; margin-top: 5px;">
-          <span>TOTAL:</span>
+        <div style="border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em;">
+          <span>Jumlah</span>
           <span>${formatIDR(txn.total)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-style: italic; margin-top: 2px;">
-          <span>Metode:</span>
-          <span>${txn.method}</span>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+          <span style="font-weight: bold;">${txn.method}</span>
+          <span>${formatIDR(txn.total)}</span>
         </div>
       </div>
       
       <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
-        <p>${printerSettings.footer}</p>
+        <p style="margin: 5px 0; font-size: 0.95em;">${printerSettings.footer}</p>
+        <p style="margin: 5px 0; font-size: 0.85em; color: #666;">
+          ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}
+        </p>
+        <p style="margin: 5px 0; font-size: 0.85em;">No: ${txn.id}</p>
       </div>
     </div>
     `;
@@ -3034,35 +3064,14 @@ function closeReceiptModal() {
     }
 }
 
-// --- FUNGSI PRINT (Sudah ditambah fitur tutup otomatis) ---
+// --- FUNGSI PRINT (Mode Cetak Gambar dari Preview) ---
 function printReceiptFromModal() {
     if(!currentReceiptTransaction) return;
-    
-    if (bluetoothDevice && bluetoothDevice.gatt.connected) {
-        // Print via Bluetooth
-        const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
-        sendDataToPrinter(escPosData);
-        closeReceiptModal();
-    } else {
-        // Print via browser
-        const content = generateReceiptHTML(currentReceiptTransaction);
-        const printContainer = document.getElementById('receiptPrint');
-        
-        // Penyesuaian lebar printer
-        const width = (typeof printerSettings !== 'undefined' && printerSettings.type === '80mm') ? '80mm' : '58mm';
-        printContainer.style.width = width;
-        
-        printContainer.innerHTML = content;
-        printContainer.style.display = 'block';
-        
-        setTimeout(() => {
-            window.print();
-            printContainer.style.display = 'none';
-            
-            // Memanggil fungsi tutup setelah print selesai
-            closeReceiptModal(); 
-        }, 500);
-    }
+    const pc = document.getElementById('receiptPrint');
+    if (!pc) return;
+    pc.innerHTML = generateReceiptHTML(currentReceiptTransaction);
+    pc.style.display = 'block';
+    setTimeout(() => { window.print(); }, 200);
 }
 
 function renderProductsTable() {
@@ -3842,78 +3851,19 @@ function updateReportChart(filteredTxns) {
 }
 
 function printReportA4() {
-    const startStr = document.getElementById('reportStartDate').value;
-    const endStr = document.getElementById('reportEndDate').value;
-    const revenue = document.getElementById('reportTotalRevenue').innerText;
-    const expensesValue = document.getElementById('reportTotalExpense').innerText;
-    const txnParams = document.getElementById('reportTotalTransactions').innerText;
-    const modalValue = document.getElementById('reportModalValue').innerText;
-    const totalCashValue = document.getElementById('reportTotalCash').innerText;
-    
-    const tableBody = document.getElementById('reportTableBody').innerHTML;
-
-    const printContent = `
-        <div style="font-family: Arial, sans-serif; color: black;">
-            <div class="report-header">
-                <h1 style="margin: 0; font-size: 24px;">${storeSettings.name}</h1>
-                <p style="margin: 5px 0 0 0;">Laporan Penjualan & Keuangan</p>
-                <p style="font-size: 14px; color: #555;">Periode: ${startStr} s/d ${endStr}</p>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
-                    <strong>Modal Awal:</strong><br>
-                    <span style="font-size: 14px;">${modalValue}</span>
-                </div>
-                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
-                    <strong>Total Omzet:</strong><br>
-                    <span style="font-size: 14px;">${revenue}</span>
-                </div>
-                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
-                    <strong>Pengeluaran:</strong><br>
-                    <span style="font-size: 14px;">${expensesValue}</span>
-                </div>
-                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
-                    <strong>Estimasi Kas:</strong><br>
-                    <span style="font-size: 14px;">${totalCashValue}</span>
-                </div>
-                <div style="border: 1px solid #ccc; padding: 10px; width: 19%;">
-                    <strong>Transaksi:</strong><br>
-                    <span style="font-size: 14px;">${txnParams}</span>
-                </div>
-            </div>
-
-            <table class="report-table">
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">Tanggal</th>
-                        <th style="width: 20%;">ID</th>
-                        <th style="width: 25%;">Pelanggan</th>
-                        <th style="width: 15%;">Metode</th>
-                        <th style="width: 25%; text-align: right;">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableBody}
-                </tbody>
-            </table>
-            
-            <div style="margin-top: 40px; text-align: right;">
-                <p>Dicetak pada: ${new Date().toLocaleString('id-ID')}</p>
-                <br><br>
-                <p>( ${adminProfile.name} )</p>
-            </div>
-        </div>
-    `;
-
-    const printArea = document.getElementById('reportPrintArea');
-    printArea.innerHTML = printContent;
-    
-    window.print();
-    
-    setTimeout(() => {
-        printArea.innerHTML = '';
-    }, 1000);
+    const a = document.getElementById('reportStartDate').value;
+    const b = document.getElementById('reportEndDate').value;
+    const c = document.getElementById('reportTotalRevenue').innerText;
+    const d = document.getElementById('reportTotalExpense').innerText;
+    const e = document.getElementById('reportTotalTransactions').innerText;
+    const f = document.getElementById('reportModalValue').innerText;
+    const g = document.getElementById('reportTotalCash').innerText;
+    const h = document.getElementById('reportTableBody').innerHTML;
+    const i = document.getElementById('reportPrintArea');
+    if (!i) return;
+    i.innerHTML = `<div style="font-family:Arial;"><h1>${storeSettings.name}</h1><p>Laporan: ${a} s/d ${b}</p></div>`;
+    i.style.display = 'block';
+    setTimeout(() => { window.print(); setTimeout(() => { i.style.display = 'none'; i.innerHTML = ''; }, 500); }, 200);
 }
 
 function initCharts() {
@@ -4037,11 +3987,27 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
     document.getElementById('printerType').value = printerSettings.type;
     document.getElementById('receiptFooter').value = printerSettings.footer;
     document.getElementById('bluetoothDeviceName').value = printerSettings.bluetoothDeviceName || '';
-    document.getElementById('bluetoothStatus').textContent = bluetoothDevice ? 'Status: Terhubung ke ' + bluetoothDevice.name : 'Status: Tidak terhubung';
+    const statusEl = document.getElementById('bluetoothStatus');
+    if (bluetoothDevice) {
+        statusEl.textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
+    } else if (printerSettings.bluetoothDeviceName) {
+        statusEl.textContent = 'Status: Printer tersimpan - ' + printerSettings.bluetoothDeviceName;
+    } else {
+        statusEl.textContent = 'Status: Tidak terhubung';
+    }
     document.getElementById('taxEnabledInput').checked = storeSettings.taxEnabled;
     document.getElementById('taxRateInput').value = storeSettings.taxRate;
     if(document.getElementById('googleScriptUrlInput')) document.getElementById('googleScriptUrlInput').value = googleScriptUrl;
     document.getElementById('editUsername').value = loginCredentials.username;
+
+    // Load logo preview
+    const logoPreviewImg = document.getElementById('logoPreviewImg');
+    if (storeSettings.logo) {
+        logoPreviewImg.src = storeSettings.logo;
+        logoPreviewImg.style.display = 'block';
+    } else {
+        logoPreviewImg.style.display = 'none';
+    }
 
     const previewImg = document.getElementById('qrisPreviewImg');
     const previewText = document.getElementById('qrisPreviewText');
@@ -4054,6 +4020,25 @@ if(document.getElementById('storePhoneInput')) document.getElementById('storePho
         previewImg.classList.add('hidden');
         previewText.classList.remove('hidden');
     } 
+}
+
+function handleLogoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const logoBase64 = e.target.result;
+        storeSettings.logo = logoBase64;
+        
+        // Show preview
+        const logoPreviewImg = document.getElementById('logoPreviewImg');
+        logoPreviewImg.src = logoBase64;
+        logoPreviewImg.style.display = 'block';
+        
+        showNotification('Logo berhasil diupload', 'success');
+    };
+    reader.readAsDataURL(file);
 }
 
 function saveStoreSettings() {
@@ -4124,88 +4109,256 @@ function savePrinterSettings() {
 
 async function connectBluetoothPrinter() {
     if (!navigator.bluetooth) {
-        showNotification('Web Bluetooth tidak didukung di browser ini', 'error');
+        showNotification('Web Bluetooth tidak didukung di browser ini. Gunakan Chrome, Edge, atau Firefox terbaru.', 'error');
         return;
     }
     
     try {
         const deviceName = printerSettings.bluetoothDeviceName || 'MP58A1';
+        console.log('Attempting to connect to:', deviceName);
+        
         bluetoothDevice = await navigator.bluetooth.requestDevice({
             acceptAllDevices: true,
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // ESC/POS service UUID, adjust if needed
+            optionalServices: [
+                '000018f0-0000-1000-8000-00805f9b34fb',  // ESC/POS Service
+                '0000180a-0000-1000-8000-00805f9b34fb',  // Device Information Service
+                '0000fff0-0000-1000-8000-00805f9b34fb'   // RFComm-like service
+            ]
         });
+        
+        console.log('Device selected:', bluetoothDevice.name);
         
         const server = await bluetoothDevice.gatt.connect();
-        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-        bluetoothCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+        console.log('GATT server connected');
+        
+        // Try primary service
+        let service;
+        try {
+            service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+            console.log('ESC/POS Service found');
+        } catch (e) {
+            console.warn('ESC/POS Service not found, trying alternative service');
+            // Fallback untuk beberapa printer variant
+            const services = await server.getPrimaryServices();
+            if (services.length > 0) {
+                service = services[0];
+                console.log('Using first available service:', service.uuid);
+            } else {
+                throw new Error('Tidak ada service yang tersedia');
+            }
+        }
+        
+        // Try get characteristic
+        let characteristics;
+        try {
+            bluetoothCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+            console.log('Write characteristic found');
+        } catch (e) {
+            console.warn('Standard characteristic not found, getting first writable characteristic');
+            characteristics = await service.getCharacteristics();
+            const writeableChar = characteristics.find(c => 
+                c.properties.write || c.properties.writeWithoutResponse
+            );
+            if (writeableChar) {
+                bluetoothCharacteristic = writeableChar;
+                console.log('Using writable characteristic:', writeableChar.uuid);
+            } else {
+                throw new Error('Tidak ada writable characteristic ditemukan');
+            }
+        }
         
         bluetoothDevice.addEventListener('gattserverdisconnected', () => {
-            document.getElementById('bluetoothStatus').textContent = 'Status: Terputus';
+            console.warn('Bluetooth device disconnected');
+            document.getElementById('bluetoothStatus').textContent = 'Status: Terputus - Mencoba reconnect...';
             bluetoothDevice = null;
             bluetoothCharacteristic = null;
+            
+            // Auto reconnect after 3 seconds
+            setTimeout(() => {
+                if (printerSettings.bluetoothDeviceName) {
+                    console.log('Auto-reconnecting to printer...');
+                    connectBluetoothPrinter();
+                }
+            }, 3000);
         });
         
-        document.getElementById('bluetoothStatus').textContent = 'Status: Terhubung ke ' + bluetoothDevice.name;
-        showNotification('Printer Bluetooth terhubung', 'success');
+        document.getElementById('bluetoothStatus').textContent = '✅ Status: Terhubung ke ' + bluetoothDevice.name;
+        showNotification('✅ Printer MP58A1 terhubung berhasil!', 'success');
+        
+        // Save device name for auto reconnect
+        printerSettings.bluetoothDeviceName = bluetoothDevice.name;
+        localStorage.setItem('pos_printerSettings', JSON.stringify(printerSettings));
+        
     } catch (error) {
         console.error('Error connecting to Bluetooth printer:', error);
-        showNotification('Gagal menghubungkan ke printer Bluetooth', 'error');
+        document.getElementById('bluetoothStatus').textContent = '❌ Status: Error - ' + error.message;
+        showNotification('❌ Gagal menghubungkan ke printer: ' + error.message, 'error');
     }
 }
 
 async function sendDataToPrinter(data) {
-    if (!bluetoothCharacteristic) {
-        showNotification('Printer Bluetooth tidak terhubung', 'error');
+    if (!bluetoothDevice || !bluetoothCharacteristic) {
+        showNotification('❌ Printer Bluetooth tidak terhubung. Klik "Connect Bluetooth Printer" dulu.', 'error');
+        console.warn('Bluetooth device or characteristic not available');
         return;
     }
     
     try {
-        await bluetoothCharacteristic.writeValue(data);
-        showNotification('Nota berhasil dicetak', 'success');
+        console.log('Sending', data.length, 'bytes to printer...');
+        
+        // MP58A1 optimal: send data in chunks to avoid buffer overflow
+        const chunkSize = 20; // Kirim per 20 bytes dengan delay
+        
+        for (let i = 0; i < data.length; i += chunkSize) {
+            const chunk = data.slice(i, Math.min(i + chunkSize, data.length));
+            
+            // Check if characteristic supports writeWithoutResponse
+            if (bluetoothCharacteristic.properties.writeWithoutResponse) {
+                await bluetoothCharacteristic.writeValueWithoutResponse(chunk);
+            } else {
+                await bluetoothCharacteristic.writeValue(chunk);
+            }
+            
+            // Small delay between chunks to prevent overflow
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        
+        // Wait for printer to process
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        console.log('Data sent successfully');
+        showNotification('✅ Nota berhasil dicetak!', 'success');
+        
     } catch (error) {
         console.error('Error sending data to printer:', error);
-        showNotification('Gagal mengirim data ke printer', 'error');
+        showNotification('❌ Gagal mengirim data ke printer: ' + error.message, 'error');
+        
+        // Try to reconnect if connection lost
+        if (error.name === 'NetworkError' || error.message.includes('Device disconnected')) {
+            bluetoothDevice = null;
+            bluetoothCharacteristic = null;
+            document.getElementById('bluetoothStatus').textContent = '❌ Status: Koneksi terputus';
+        }
     }
 }
 
 function generateReceiptESC_POS(transaction) {
     let commands = [];
     
-    // Initialize printer
-    commands.push(0x1B, 0x40); // ESC @
+    // Initialize printer - RESET
+    commands.push(0x1B, 0x40); // ESC @ - Initialize printer
+    
+    // Set character code table to UTF-8 (if supported)
+    commands.push(0x1B, 0x2E); // ESC . - Select character set
     
     // Center align
-    commands.push(0x1B, 0x61, 0x01); // ESC a 1
+    commands.push(0x1B, 0x61, 0x01); // ESC a 1 - Center
     
-    // Header
-    commands.push(...new TextEncoder().encode('TOKO POS\n'));
-    commands.push(...new TextEncoder().encode('Jl. Contoh No. 123\n\n'));
+    // HEADER dengan format 58mm optimal
+    // Store name - Bold dan Normal size first
+    commands.push(0x1B, 0x45, 0x01); // ESC E 1 - Bold ON
     
-    // Left align
-    commands.push(0x1B, 0x61, 0x00); // ESC a 0
+    const storeName = (storeSettings.name || 'TOKO').toUpperCase().substring(0, 25);
+    commands.push(...new TextEncoder().encode(`${storeName}\n`));
     
-    // Transaction details
-    commands.push(...new TextEncoder().encode(`Tanggal: ${new Date(transaction.date).toLocaleString()}\n`));
-    commands.push(...new TextEncoder().encode(`No. Transaksi: ${transaction.id}\n\n`));
+    commands.push(0x1B, 0x45, 0x00); // ESC E 0 - Bold OFF
     
-    // Items
-    transaction.items.forEach(item => {
-        const line = `${item.name} x${item.quantity} ${item.price.toLocaleString()}\n`;
-        commands.push(...new TextEncoder().encode(line));
-    });
+    // Store address dan phone (smaller)
+    if (storeSettings.address) {
+        const addr = storeSettings.address.substring(0, 28);
+        commands.push(...new TextEncoder().encode(`${addr}\n`));
+    }
+    if (storeSettings.phone) {
+        const phone = `HP: ${storeSettings.phone}`.substring(0, 28);
+        commands.push(...new TextEncoder().encode(`${phone}\n`));
+    }
     
-    commands.push(...new TextEncoder().encode('\n'));
+    // Separator line
+    commands.push(...new TextEncoder().encode('============================\n'));
     
-    // Total
-    commands.push(0x1B, 0x61, 0x02); // Right align
-    commands.push(...new TextEncoder().encode(`Total: Rp ${transaction.total.toLocaleString()}\n`));
+    // Set left align untuk items
+    commands.push(0x1B, 0x61, 0x00); // ESC a 0 - Left align
     
-    // Footer
+    // Transaction info
+    const txnDate = transaction.date || new Date().toLocaleDateString('id-ID');
+    const txnTime = new Date(transaction.timestamp || Date.now()).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+    commands.push(...new TextEncoder().encode(`No: ${transaction.id}\n`));
+    commands.push(...new TextEncoder().encode(`Tgl: ${txnDate} ${txnTime}\n`));
+    commands.push(...new TextEncoder().encode(`Plg: ${(transaction.customer || 'Umum').substring(0, 20)}\n`));
+    commands.push(...new TextEncoder().encode('============================\n'));
+    
+    // Items section - OPTIMIZED FOR 58MM
+    if (transaction.items && transaction.items.length > 0) {
+        transaction.items.forEach(item => {
+            const itemTotal = item.quantity * item.price;
+            const itemName = item.name.substring(0, 22);
+            const qtyStr = `${item.quantity}x`;
+            const priceStr = (item.price / 1000).toFixed(0) + 'k';
+            const totalStr = `Rp${(itemTotal / 1000).toFixed(0)}k`;
+            
+            // Item name
+            commands.push(...new TextEncoder().encode(`${itemName}\n`));
+            
+            // Qty x Price = Total
+            const gap1 = Math.max(1, 27 - qtyStr.length - priceStr.length);
+            const gap2 = Math.max(1, 27 - (qtyStr + ' '.repeat(gap1) + priceStr).length - totalStr.length);
+            
+            const itemLine = `${qtyStr}${' '.repeat(gap1)}${priceStr}${' '.repeat(gap2)}${totalStr}\n`;
+            commands.push(...new TextEncoder().encode(itemLine));
+            
+            // Additional info jika ada
+            if (item.imei || item.warranty || item.notes) {
+                if (item.imei) commands.push(...new TextEncoder().encode(`  SN: ${item.imei.substring(0, 20)}\n`));
+                if (item.warranty) commands.push(...new TextEncoder().encode(`  Garansi: ${item.warranty}\n`));
+                if (item.notes) commands.push(...new TextEncoder().encode(`  Ket: ${item.notes.substring(0, 22)}\n`));
+            }
+        });
+    }
+    
+    // Summary section
+    commands.push(...new TextEncoder().encode('============================\n'));
+    
+    const subtotalLabel = 'Subtotal';
+    const subtotalValue = `Rp${(transaction.subtotal / 1000).toFixed(0)}k`;
+    const sub_gap = Math.max(1, 27 - subtotalLabel.length - subtotalValue.length);
+    commands.push(...new TextEncoder().encode(`${subtotalLabel}${' '.repeat(sub_gap)}${subtotalValue}\n`));
+    
+    const taxRate = transaction.taxRate || 10;
+    const taxLabel = `VAT ${taxRate}%`;
+    const taxValue = `Rp${(transaction.tax / 1000).toFixed(0)}k`;
+    const tax_gap = Math.max(1, 27 - taxLabel.length - taxValue.length);
+    commands.push(...new TextEncoder().encode(`${taxLabel}${' '.repeat(tax_gap)}${taxValue}\n`));
+    
+    commands.push(...new TextEncoder().encode('============================\n'));
+    
+    // Total (BOLD)
+    commands.push(0x1B, 0x45, 0x01); // Bold ON
+    const totalLabel = 'TOTAL';
+    const totalValue = `Rp${(transaction.total / 1000).toFixed(0)}k`;
+    const tot_gap = Math.max(1, 27 - totalLabel.length - totalValue.length);
+    commands.push(...new TextEncoder().encode(`${totalLabel}${' '.repeat(tot_gap)}${totalValue}\n`));
+    commands.push(0x1B, 0x45, 0x00); // Bold OFF
+    
+    // Payment method
+    commands.push(...new TextEncoder().encode(`\nMetode: ${transaction.method}\n`));
+    
+    // Center align untuk footer
     commands.push(0x1B, 0x61, 0x01); // Center
-    commands.push(...new TextEncoder().encode(`${printerSettings.footer}\n\n`));
+    
+    // Footer message
+    const footer = printerSettings.footer || 'Terima kasih!';
+    commands.push(...new TextEncoder().encode(`\n${footer}\n`));
+    
+    // Timestamp
+    commands.push(...new TextEncoder().encode(`${txnDate}\n`));
     
     // Cut paper
-    commands.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0
+    commands.push(0x1D, 0x56, 0x42, 0x00); // GS V B 0 - Full cut
+    
+    // Extra newlines sebelum cut
+    commands.push(0x0A, 0x0A); // LF LF
+    
+    console.log('ESC/POS commands generated, total:', commands.length, 'bytes');
     
     return new Uint8Array(commands);
 }
