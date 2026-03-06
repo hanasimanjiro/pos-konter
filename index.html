@@ -2011,13 +2011,16 @@ if (!hasInitialized) {
 }
 
 let storeSettings = JSON.parse(localStorage.getItem('pos_storeSettings')) || {
-    name: 'Toko Saya',
-    address: 'Jl. Merdeka No. 1',
-    taxEnabled: true,
-    taxRate: 10,
-    qrisImage: '',
-    modal: 0 // Modal Default
+  name: 'Toko Saya',
+  address: 'Jl. Merdeka No. 1',
+  phone: '',
+  taxEnabled: true,
+  taxRate: 10,
+  qrisImage: '',
+  modal: 0 // Modal Default
 };
+// Patch: jika data lama tidak punya phone, tambahkan agar tidak undefined
+if (!('phone' in storeSettings)) storeSettings.phone = '';
 let printerSettings = JSON.parse(localStorage.getItem('pos_printerSettings')) || {
     type: '58mm', 
     footer: 'Terima kasih atas kunjungan Anda!',
@@ -4071,7 +4074,8 @@ function saveStoreSettings() {
     storeSettings.name = document.getElementById('storeNameInput').value;
     if(document.getElementById('storeAddressInput')) storeSettings.address = document.getElementById('storeAddressInput').value;
     if(document.getElementById('storePhoneInput')) storeSettings.phone = document.getElementById('storePhoneInput').value;
-    saveData(); 
+    saveData();
+    loadSettings(); // Tambahkan ini agar data terbaru langsung diambil
     showNotification('Profil Toko berhasil disimpan', 'success');
 }
 
