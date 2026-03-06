@@ -3082,60 +3082,103 @@ function closeReceiptModal() {
 }
 
 // --- UPDATE FUNGSI PRINT: MERENDER NOTA SEBAGAI GAMBAR DAHULU ---
-function printReceiptFromModal() {
-    if(!currentReceiptTransaction) return;
+function printReceiptFromModal() function printReceipt(transactionId) {
+    const txn = transactions.find(t => t.id === transactionId);
+    if (!txn) return;
+
+    // Membuat window baru untuk proses printing
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
     
-    if (bluetoothDevice && bluetoothDevice.gatt.connected) {
-        // Print via Bluetooth
-        const escPosData = generateReceiptESC_POS(currentReceiptTransaction);
-        sendDataToPrinter(escPosData);
-        closeReceiptModal();
-    } else {
-        // Print via browser
-        const printContainer = document.getElementById('receiptPrint');
-        const content = generateReceiptHTML(currentReceiptTransaction);
-        
-        // Atur styling wrapper untuk proses render
-        const is80mm = typeof printerSettings !== 'undefined' && printerSettings.type === '80mm';
-        const widthStyle = is80mm ? '302px' : '219px'; // Ukuran rata2 pixel struk kasir
-        
-        printContainer.style.width = widthStyle;
-        printContainer.style.position = 'absolute';
-        printContainer.style.top = '-9999px'; 
-        printContainer.style.display = 'block';
-        printContainer.style.backgroundColor = '#ffffff';
-        printContainer.innerHTML = content;
-        
-        // Render HTML menjadi gambar menggunakan html2canvas
-        setTimeout(() => {
-            if (typeof html2canvas !== 'undefined') {
-                html2canvas(printContainer, {
-                    scale: 2, // Kualitas resolusi tinggi
-                    useCORS: true,
-                    backgroundColor: '#ffffff'
-                }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    
-                    // Ganti isi elemen dengan output Image yang dirender
-                    printContainer.style.position = 'relative';
-                    printContainer.style.top = '0';
-                    printContainer.style.width = '100%';
-                    printContainer.innerHTML = `<img src="${imgData}" style="width: 100%; max-width: ${widthStyle}; display: block; margin: 0 auto; height: auto;">`;
-                    
-                    setTimeout(() => {
-                        window.print();
-                        printContainer.style.display = 'none';
-                        closeReceiptModal();
-                    }, 500);
-                }).catch(err => {
-                    console.error('html2canvas error:', err);
-                    fallbackPrint(printContainer); // Fallback jika gagal render gambar
-                });
-            } else {
-                fallbackPrint(printContainer);
-            }
-        }, 500); // Jeda memuat file/gambar sebelum dirender
-    }
+    // Generate baris item
+    let itemsHtml = '';
+    txn.items.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        itemsHtml += `
+            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                <div style="flex: 1;">${item.name}</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;">
+                <div style="padding-left: 10px;">${item.quantity} x ${formatIDR(item.price)}</div>
+                <div>${formatIDR(subtotal)}</div>
+            </div>
+        `;
+    });
+
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Struk Pembayaran - ${txn.id}</title>
+            <style>
+                @page { margin: 0; }
+                body { 
+                    font-family: 'Courier New', Courier, monospace; 
+                    width: 58mm; 
+                    padding: 5px; 
+                    margin: 0; 
+                    font-size: 12px; 
+                    color: #000;
+                }
+                .text-center { text-align: center; }
+                .text-right { text-align: right; }
+                .bold { font-weight: bold; }
+                .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+                .flex-between { display: flex; justify-content: space-between; }
+            </style>
+        </head>
+        <body>
+            <div class="text-center">
+                <div class="bold" style="font-size: 14px;">${storeSettings.name}</div>
+                <div style="font-size: 10px;">${storeSettings.address || 'Alamat Toko'}</div>
+                <div style="font-size: 10px;">Telp: ${storeSettings.phone || '-'}</div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="flex-between"><span>No:</span> <span>${txn.id}</span></div>
+            <div class="flex-between"><span>Tgl:</span> <span>${txn.date} ${txn.time || ''}</span></div>
+            <div class="flex-between"><span>Kasir:</span> <span>${adminProfile.name}</span></div>
+            <div class="flex-between"><span>Pelanggan:</span> <span>${txn.customerName}</span></div>
+            
+            <div class="divider"></div>
+            
+            ${itemsHtml}
+            
+            <div class="divider"></div>
+            
+            <div class="flex-between bold">
+                <span>TOTAL</span>
+                <span>${formatIDR(txn.total)}</span>
+            </div>
+            <div class="flex-between">
+                <span>TUNAI</span>
+                <span>${formatIDR(txn.payment)}</span>
+            </div>
+            <div class="flex-between">
+                <span>KEMBALI</span>
+                <span>${formatIDR(txn.change)}</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="text-center" style="margin-top: 10px; font-size: 10px;">
+                TERIMA KASIH<br>
+                Barang yang sudah dibeli tidak dapat<br>
+                ditukar atau dikembalikan.
+            </div>
+
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(function() { window.close(); }, 500);
+                }
+            </script>
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(html);
+    printWindow.document.close();
 }
 
 // Fungsi cadangan jika html2canvas gagal dimuat
