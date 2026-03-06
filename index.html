@@ -4223,8 +4223,8 @@ function generateReceiptESC_POS(transaction) {
     commands.push(0x1B, 0x61, 0x01); // ESC a 1
     
     // Header
-    commands.push(...new TextEncoder().encode('TOKO POS\n'));
-    commands.push(...new TextEncoder().encode('Jl. Contoh No. 123\n\n'));
+    commands.push(...new TextEncoder().encode('HANDSCELL\n'));
+    commands.push(...new TextEncoder().encode('NgrakungWetan/Tawangharjo\n\n'));
     
     // Left align
     commands.push(0x1B, 0x61, 0x00); // ESC a 0
