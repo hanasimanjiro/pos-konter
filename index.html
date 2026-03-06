@@ -90,10 +90,7 @@ html, body {
     height: 100vh;
     height: 100vh; height: 100dvh;
   }
-  :root {
-    --space-base: 0.75rem;
-    font-size: 14px;
-  }
+  :root { --space-base: 0.75rem; font-size: 14px; }
 }
 
 /* Modal & Utility Styles */
@@ -244,35 +241,36 @@ html, body {
 .shape-1 { top: -5%; left: -5%; width: 250px; height: 250px; background: #818cf8; }
 .shape-2 { bottom: -5%; right: -5%; width: 200px; height: 200px; background: #c026d3; }
 
-/* === LOGIN CARD FALLBACK === */
-#login-screen { display: flex; justify-content: center; align-items: center; }
+/* === LOGIN CARD FALLBACK (tidak perlu Tailwind) === */
+#login-screen { display: -webkit-flex; display: flex; -webkit-justify-content: center; justify-content: center; -webkit-align-items: center; align-items: center; }
 #login-card {
     background: rgba(255,255,255,0.97) !important;
     border-radius: 1rem !important;
     box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3) !important;
     width: calc(100% - 2rem) !important; max-width: 370px !important;
     padding: 2rem !important; margin: 0 1rem !important;
-    position: relative !important; box-sizing: border-box !important;
-    overflow: hidden !important;
+    position: relative !important; box-sizing: border-box !important; overflow: hidden !important;
 }
 #login-card .text-center > div:first-child {
     width: 64px !important; height: 64px !important;
     min-width: 64px !important; max-width: 64px !important;
     min-height: 64px !important; max-height: 64px !important;
     background: #4f46e5 !important; border-radius: 1rem !important;
-    display: flex !important; align-items: center !important; justify-content: center !important;
+    display: -webkit-flex !important; display: flex !important;
+    -webkit-align-items: center !important; align-items: center !important;
+    -webkit-justify-content: center !important; justify-content: center !important;
     margin: 0 auto 1rem auto !important; overflow: hidden !important;
 }
 #login-card .text-center > div:first-child svg {
     width: 32px !important; height: 32px !important;
-    max-width: 32px !important; max-height: 32px !important;
-    flex-shrink: 0 !important;
+    max-width: 32px !important; max-height: 32px !important; flex-shrink: 0 !important;
 }
 #loginForm { margin-top: 1.5rem !important; }
 #loginForm > div { margin-bottom: 1rem !important; position: relative !important; }
 .input-group-icon {
     position: absolute !important; left: 0.9rem !important; top: 50% !important;
-    transform: translateY(-50%) !important; width: 20px !important; height: 20px !important;
+    -webkit-transform: translateY(-50%) !important; transform: translateY(-50%) !important;
+    width: 20px !important; height: 20px !important;
     color: #9ca3af !important; pointer-events: none !important; z-index: 1 !important;
 }
 .input-group-icon svg { width: 20px !important; height: 20px !important; display: block !important; }
@@ -283,14 +281,30 @@ html, body {
     font-size: 16px !important; -webkit-appearance: none !important; outline: none !important; color: #111827 !important;
 }
 #loginBtn {
-    display: flex !important; align-items: center !important; justify-content: center !important;
+    display: -webkit-flex !important; display: flex !important;
+    -webkit-align-items: center !important; align-items: center !important;
+    -webkit-justify-content: center !important; justify-content: center !important;
     width: 100% !important; box-sizing: border-box !important; padding: 0.875rem 1rem !important;
     background: #4f46e5 !important; color: white !important; font-weight: 700 !important;
     font-size: 1rem !important; border: none !important; border-radius: 0.75rem !important;
     cursor: pointer !important; -webkit-appearance: none !important;
 }
 #loginBtn svg { width: 20px !important; height: 20px !important; margin-left: 0.5rem !important; }
-/* === END LOGIN CARD FALLBACK === */
+
+/* === MAIN APP FALLBACK (pastikan muncul setelah login) === */
+#main-app {
+    display: none; /* default tersembunyi via CSS, bukan Tailwind hidden */
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+#main-app.app-visible {
+    display: -webkit-flex !important;
+    display: flex !important;
+}
+/* === END FALLBACK === */
 
 .input-group-icon {
     position: absolute;
@@ -650,7 +664,7 @@ button, a, [role="button"] {
             <div class="relative group">
                 <svg class="w-5 h-5 input-group-icon group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 <input type="password" id="password" class="input-with-icon w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" placeholder="Password" required autocomplete="current-password">
-                <button type="button" onclick="togglePasswordVisibility()" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;padding:4px;cursor:pointer;display:flex;align-items:center;color:#9ca3af;z-index:2;-webkit-appearance:none;">
+                <button type="button" onclick="togglePasswordVisibility()" style="position:absolute;right:0.75rem;top:50%;-webkit-transform:translateY(-50%);transform:translateY(-50%);background:none;border:none;padding:4px;cursor:pointer;display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;color:#9ca3af;z-index:2;-webkit-appearance:none;">
                     <svg id="eye-icon" style="width:20px;height:20px;display:block;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     <svg id="eye-slash-icon" style="width:20px;height:20px;display:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
                 </button>
@@ -670,7 +684,7 @@ button, a, [role="button"] {
     </div>
 </div>
 
-<div id="main-app" class="hidden flex h-screen overflow-hidden">
+<div id="main-app">
 <div id="resetDataModal" class="modal">
   <div class="bg-white rounded-large shadow-custom max-w-sm w-full mx-4 p-6 modal-content">
     <div class="text-center mb-6">
@@ -2030,14 +2044,12 @@ function setLoginStatus(isLoggedIn) {
 window.addEventListener('DOMContentLoaded', function() {
   const isLoggedIn = localStorage.getItem('pos_is_logged_in') === 'true';
   if (isLoggedIn) {
-    document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').classList.remove('hidden');
-    try {
-      showView('pos');
-    } catch(err) {
-      console.error("pos render error:", err);
-    }
+    var mainApp = document.getElementById('main-app');
+    mainApp.classList.add('app-visible');
+    mainApp.style.display = '-webkit-flex';
+    mainApp.style.display = 'flex';
+    try { showView('pos'); } catch(err) { console.error("pos render error:", err); }
   }
 });
 const defaultProducts = [
@@ -2409,17 +2421,16 @@ function handleLogin(e) {
       if((u === loginCredentials.username && p === loginCredentials.password) || (u === 'handscell' && p === 'handscell123')) {
         showNotification('Login Berhasil!', 'success');
         setLoginStatus(true);
-        const loginScreen = document.getElementById('login-screen');
+        var loginScreen = document.getElementById('login-screen');
         loginScreen.style.opacity = '0';
-        setTimeout(() => {
-          loginScreen.classList.add('hidden');
+        loginScreen.style.transition = 'opacity 0.5s ease';
+        setTimeout(function() {
           loginScreen.style.display = 'none';
-          document.getElementById('main-app').classList.remove('hidden');
-          try {
-            showView('pos');
-          } catch(err) {
-            console.error("pos render error:", err);
-          }
+          var mainApp = document.getElementById('main-app');
+          mainApp.classList.add('app-visible');
+          mainApp.style.display = '-webkit-flex';
+          mainApp.style.display = 'flex';
+          try { showView('pos'); } catch(err) { console.error("pos render error:", err); }
         }, 500);
       } else {
         shakeElement(loginCard);
