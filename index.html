@@ -295,20 +295,26 @@ html, body {
   
   /* Print Receipt (Struk Kecil) */
   #receiptPrint, #receiptPrint * { visibility: visible; }
-  #receiptPrint { 
-      position: absolute; 
-      left: 0; 
-      top: 0; 
-      width: 100%; 
-      height: 100%;
+    #receiptPrint {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      min-height: 100%;
       background: white;
       text-align: center;
-      padding: 20px 0;
-  }
-  #receiptPrint .receipt-container {
-      display: inline-block;
+      padding: 0;
+      font-family: 'Courier New', monospace !important;
+    }
+    #receiptPrint .receipt-container {
+      display: block;
       margin: 0 auto;
-  }
+      width: 58mm !important;
+      background: white !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+    }
   
   /* Print Report (Laporan A4) */
   #reportPrintArea, #reportPrintArea * { visibility: visible; }
@@ -2963,21 +2969,18 @@ function updateTotals() {
 }
 
 function generateReceiptHTML(txn) {
-    const width = printerSettings.type === '58mm' ? '58mm' : '80mm';
-    const fontSize = printerSettings.type === '58mm' ? '10px' : '12px';
-    
+    const width = '58mm';
+    const fontSize = '10px';
     const txnTaxRate = txn.taxRate !== undefined ? txn.taxRate : 10;
-    
     return `
-    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; padding: 10px; color: black;">
-      <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
-        <h2 style="margin: 0; font-size: 1.2em; font-weight: bold;">${storeSettings.name}</h2>
-        ${storeSettings.address ? `<p style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</p>` : ''}
-        ${storeSettings.phone ? `<p style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</p>` : ''}
-        <p style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</p>
+    <div class="receipt-container" style="width: ${width}; font-size: ${fontSize}; color: black; font-family: 'Courier New', monospace; background: white; margin: 0 auto;">
+      <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+        <div style="font-size: 1.1em; font-weight: bold; margin:0;">${storeSettings.name}</div>
+        ${storeSettings.address ? `<div style="margin: 2px 0; font-size: 0.9em;">${storeSettings.address}</div>` : ''}
+        ${storeSettings.phone ? `<div style="margin: 2px 0; font-size: 0.9em;">HP/WA: ${storeSettings.phone}</div>` : ''}
+        <div style="margin: 5px 0 0 0; font-weight: bold;">STRUK PEMBAYARAN</div>
       </div>
-      
-      <div style="margin-bottom: 10px;">
+      <div style="margin-bottom: 8px;">
         <div style="display: flex; justify-content: space-between;">
           <span>No:</span>
           <span style="font-weight: bold;">${txn.id}</span>
@@ -2991,15 +2994,14 @@ function generateReceiptHTML(txn) {
           <span>${txn.customer || 'Pelanggan Umum'}</span>
         </div>
       </div>
-      
-      <div style="border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px;">
+      <div style="border-bottom: 1px dashed #000; padding-bottom: 4px; margin-bottom: 4px;">
         ${txn.items.map(item => `
-          <div style="margin-bottom: 5px;">
+          <div style="margin-bottom: 4px;">
             <div>${item.name}</div>
-            ${item.imei ? `<div style="font-size: 0.85em; color: #555; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
-            ${item.duration ? `<div style="font-size: 0.85em; color: #555;">Waktu: ${item.duration}</div>` : ''}
-            ${item.warranty ? `<div style="font-size: 0.85em; color: #555;">Garansi: ${item.warranty}</div>` : ''}
-            ${item.notes ? `<div style="font-size: 0.85em; color: #555; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
+            ${item.imei ? `<div style="font-size: 0.85em; color: #222; margin-top: 2px;">IMEI/SN: ${item.imei}</div>` : ''}
+            ${item.duration ? `<div style="font-size: 0.85em; color: #222;">Waktu: ${item.duration}</div>` : ''}
+            ${item.warranty ? `<div style="font-size: 0.85em; color: #222;">Garansi: ${item.warranty}</div>` : ''}
+            ${item.notes ? `<div style="font-size: 0.85em; color: #222; margin-bottom: 2px;">Ket: ${item.notes}</div>` : ''}
             <div style="display: flex; justify-content: space-between;">
               <span>${item.quantity} x ${formatIDR(item.price)}</span>
               <span>${formatIDR(item.quantity * item.price)}</span>
@@ -3007,8 +3009,7 @@ function generateReceiptHTML(txn) {
           </div>
         `).join('')}
       </div>
-      
-      <div style="margin-bottom: 10px;">
+      <div style="margin-bottom: 8px;">
         <div style="display: flex; justify-content: space-between;">
           <span>Subtotal:</span>
           <span>${formatIDR(txn.subtotal)}</span>
@@ -3017,7 +3018,7 @@ function generateReceiptHTML(txn) {
           <span>Pajak (${txnTaxRate}%):</span>
           <span>${formatIDR(txn.tax)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; margin-top: 5px;">
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.05em; margin-top: 4px;">
           <span>TOTAL:</span>
           <span>${formatIDR(txn.total)}</span>
         </div>
@@ -3026,9 +3027,8 @@ function generateReceiptHTML(txn) {
           <span>${txn.method}</span>
         </div>
       </div>
-      
-      <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px;">
-        <p>${printerSettings.footer}</p>
+      <div style="text-align: center; border-top: 1px dashed #000; padding-top: 8px; margin-top: 8px;">
+        <div style="font-size: 0.9em;">${printerSettings.footer}</div>
       </div>
     </div>
     `;
