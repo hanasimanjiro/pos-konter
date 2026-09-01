@@ -2561,13 +2561,15 @@ function renderAnalytics() {
     // Update summary cards
     let totalMargin = 0;
     let soldCount = 0;
+    let totalRevenueAll = 0;
     
     bestSellers.forEach(item => {
         totalMargin += item.totalMargin;
         soldCount += item.quantitySold;
+        totalRevenueAll += item.totalRevenue;
     });
     
-    const avgMargin = soldCount > 0 ? Math.round((totalMargin / (bestSellers[0]?.totalRevenue || 1)) * 100 * 100) / 100 : 0;
+    const avgMargin = totalRevenueAll > 0 ? Math.round((totalMargin / totalRevenueAll) * 100 * 100) / 100 : 0;
     const topProduct = bestSellers[0]?.productName || 'N/A';
     const totalStockValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
     
@@ -2597,16 +2599,39 @@ function renderAnalytics() {
 
 function calculateBestSellers() {
     const productStats = {};
+    // Statistik khusus untuk item Jasa Servis HP (tidak ada di data products)
+    let serviceStats = null;
     
     // Aggregate transaction data
     transactions.forEach(txn => {
         if (txn.items) {
             txn.items.forEach(item => {
-                const prod = products.find(p => p.id === item.productId);
+                // Item Servis HP dikenali dari field 'imei' yang hanya ada pada transaksi servis
+                if (item.imei !== undefined) {
+                    if (!serviceStats) {
+                        serviceStats = {
+                            productId: 'SERVICE',
+                            productName: 'Jasa Servis HP',
+                            productSKU: 'SRV',
+                            quantitySold: 0,
+                            price: 0,
+                            hpp: 0, // Servis dianggap tanpa HPP (biaya jasa/tenaga kerja)
+                            totalRevenue: 0,
+                            totalCost: 0
+                        };
+                    }
+                    serviceStats.quantitySold += item.quantity;
+                    serviceStats.totalRevenue += item.price * item.quantity;
+                    return;
+                }
+
+                // Item dari keranjang POS menyimpan id produk sebagai 'id', bukan 'productId'
+                const pid = item.productId !== undefined ? item.productId : item.id;
+                const prod = products.find(p => p.id === pid);
                 if (prod) {
-                    if (!productStats[item.productId]) {
-                        productStats[item.productId] = {
-                            productId: item.productId,
+                    if (!productStats[pid]) {
+                        productStats[pid] = {
+                            productId: pid,
                             productName: item.productName || prod.name,
                             productSKU: prod.sku,
                             quantitySold: 0,
@@ -2616,9 +2641,9 @@ function calculateBestSellers() {
                             totalCost: 0
                         };
                     }
-                    productStats[item.productId].quantitySold += item.quantity;
-                    productStats[item.productId].totalRevenue += item.price * item.quantity;
-                    productStats[item.productId].totalCost += (prod.hpp || Math.round(prod.price * 0.6)) * item.quantity;
+                    productStats[pid].quantitySold += item.quantity;
+                    productStats[pid].totalRevenue += item.price * item.quantity;
+                    productStats[pid].totalCost += (prod.hpp || Math.round(prod.price * 0.6)) * item.quantity;
                 }
             });
         }
@@ -2631,6 +2656,18 @@ function calculateBestSellers() {
         marginPercent: Math.round(((stat.price - stat.hpp) / stat.price) * 100),
         totalMargin: stat.totalRevenue - stat.totalCost
     }));
+
+    // Masukkan Jasa Servis HP ke hasil (margin 100% karena tanpa HPP)
+    if (serviceStats && serviceStats.quantitySold > 0) {
+        const avgPrice = Math.round(serviceStats.totalRevenue / serviceStats.quantitySold);
+        results.push({
+            ...serviceStats,
+            price: avgPrice,
+            marginPerUnit: avgPrice,
+            marginPercent: 100,
+            totalMargin: serviceStats.totalRevenue
+        });
+    }
     
     // Sort by total margin descending
     return results.sort((a, b) => b.totalMargin - a.totalMargin);
